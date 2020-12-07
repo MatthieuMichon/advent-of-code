@@ -10,7 +10,6 @@ import sys
 from pathlib import Path
 from typing import List
 
-
 NULL_SEARCH = (None, None)
 HALF_VALUE = 2020 / 2
 
@@ -50,7 +49,7 @@ def repair(file: Path) -> any:
         even_amount_expenses = []
         odd_amount_expenses = []
         even = lambda a: True == (a % 2)
-        product = lambda tuple_: tuple_[0] * tuple_[1]
+        def product(tuple_): return tuple_[0] * tuple_[1]
 
         for line in fp.readlines():
             if not len(line.strip()):

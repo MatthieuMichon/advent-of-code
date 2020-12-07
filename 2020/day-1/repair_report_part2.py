@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """
-Advent of Code 2020 - Day 1: Report Repair
+Advent of Code 2020 - Day 1: Report Repair - Part 2
 """
+
 import argparse
 import functools
 import itertools
@@ -13,7 +14,6 @@ from typing import List
 
 
 NULL_SEARCH = (None, None, None)
-HALF_VALUE = 2020 / 2
 
 
 def search_expenses(expense_list: List[int]) -> tuple:
@@ -21,7 +21,7 @@ def search_expenses(expense_list: List[int]) -> tuple:
     Search expense list for pair matching the sum requirement
 
     :param expense_list: list of expenses
-    :return: null or pair of integers matching required total
+    :return: triplet of nulls or integers matching required total
     """
 
     for triplet in itertools.permutations(expense_list, 3):
@@ -33,10 +33,10 @@ def search_expenses(expense_list: List[int]) -> tuple:
 
 def repair(file: Path) -> any:
     """
-    Repair the given file by finding the incorrect expense entry pair
+    Repair the given file by finding the incorrect expense entry triplet
 
     :param file: report file to repair
-    :return: tuple representing the incorrect expenses
+    :return: product of the incorrect expenses
     """
 
     with open(file) as fp:

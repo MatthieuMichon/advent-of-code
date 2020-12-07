@@ -1,11 +1,8 @@
-# Day 1
+# Day 1: Report Repair
 
 ## Challenge Statement
 
-### Part 1
 ```
---- Day 1: Report Repair ---
-
 After saving Christmas five years in a row, you've decided to take a vacation 
 at a nice resort on a tropical island. Surely, Christmas will go on without 
 you.
@@ -46,7 +43,7 @@ to 2020; what do you get if you multiply them together?
 To begin, get your puzzle input.
 ```
 
-## Part 2
+### Part 2
 
 ```
 The Elves in accounting are thankful for your help; one of them even offers 
