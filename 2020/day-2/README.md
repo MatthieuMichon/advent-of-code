@@ -70,3 +70,5 @@ policies?
 
 Filename | Description
 --- | ---
+[check_password_list.py](check_password_list.py) | Script
+password-db.txt | Password file
