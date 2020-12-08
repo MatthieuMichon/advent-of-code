@@ -73,23 +73,6 @@ def count_trees_part2(file: Path) -> int:
     return trees
 
 
-def filter_valid_passwords_part2(file: Path) -> List[str]:
-    """
-    Filter function for part 2 of the challenge
-
-    :param file: password list file
-    :return: password meeting requirements
-    """
-
-    for line in open(file):
-        min_max, char, password = line.strip().split(' ')
-        first_index, second_index = [int(part) - 1
-                                     for part in min_max.split('-')]
-        char = char[0]
-        if (password[first_index] == char) ^ (password[second_index] == char):
-            yield password
-
-
 def main() -> int:
     """
     Main function
