@@ -1,10 +1,12 @@
-Day 12: Rain Risk ---
+# Day 12: Rain Risk
 
-Your ferry made decent progress toward the island, but the storm came in faster than anyone expected. The ferry needs to take evasive actions!
+# Part One
 
-Unfortunately, the ship's navigation computer seems to be malfunctioning; rather than giving a route directly to safety, it produced extremely circuitous instructions. When the captain uses the PA system to ask if anyone can help, you quickly volunteer.
+Your ferry made decent progress toward the island, but the storm came in faster than anyone expected. The ferry needs to take **evasive actions!**
 
-The navigation instructions (your puzzle input) consists of a sequence of single-character actions paired with integer input values. After staring at them for a few minutes, you work out what they probably mean:
+Unfortunately, the ship's navigation computer seems to be malfunctioning; rather than giving a route directly to safety, it produced extremely circuitous instructions. When the captain uses the [PA system](https://en.wikipedia.org/wiki/Public_address_system) to ask if anyone can help, you quickly volunteer.
+
+The navigation instructions (your puzzle input) consists of a sequence of single-character **actions** paired with integer input **values**. After staring at them for a few minutes, you work out what they probably mean:
 
     Action N means to move north by the given value.
     Action S means to move south by the given value.
