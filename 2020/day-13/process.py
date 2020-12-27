@@ -4,12 +4,8 @@ Advent of Code 2020: Day 13
 """
 
 import sys
-from collections import Counter
-from copy import deepcopy
 from pathlib import Path
 import os
-from typing import List
-import math
 
 
 TXT_FILES = [Path(f) for f in os.listdir('./') if '.txt' in f]
@@ -37,7 +33,6 @@ def process(file: Path) -> int:
     return submission
 
 
-
 def process_part2(file: Path) -> int:
     """
     Process input file yielding the submission value
@@ -46,7 +41,25 @@ def process_part2(file: Path) -> int:
     :return: value to submit
     """
 
-    submission = 0
+    lines = (l for l in open(file))
+    next(lines)  # skip timestamp
+    bus_id_offsets = {int(bus_id): -i
+                      for i, bus_id in enumerate(next(lines).strip().split(','))
+                      if bus_id.isnumeric()}
+    time = 0
+    global_offset = 1
+    for bus_id, offset in bus_id_offsets.items():
+        while (time - offset) % bus_id != 0:
+            time += global_offset
+        global_offset *= bus_id
+
+    debug = False
+    if debug:
+        bus_id_list = list(bus_id_offsets.keys())
+        for t in range(time-5, time+max(bus_id_list)):
+            print(f'{t}\t{" ".join("D" if (t % b == 0) else "." for b in bus_id_list)}')
+
+    submission = time
 
     return submission
 
@@ -62,11 +75,11 @@ def main() -> int:
         submission = process(file=Path(file))
         print(f'In file {file}, submission: {submission}')
 
-    # print('Part 2')
-    #
-    # for file in TXT_FILES:
-    #     submission = process_part2(file=Path(file))
-    #     print(f'In file {file}, submission: {submission}')
+    print('Part 2')
+
+    for file in TXT_FILES:
+        submission = process_part2(file=Path(file))
+        print(f'In file {file}, submission: {submission}')
 
     return 0
 

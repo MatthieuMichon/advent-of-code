@@ -18,4 +18,4 @@ Day | Challenge | Part One | Part Two
 [Day 10](./2020/day-10) | [Adapter Array](./2020/day-10/README.md) | Ok | Stuck: had to do a forward walking w/ back-track
 [Day 11](./2020/day-11) | [Seating System](./2020/day-11/README.md) | Ok | Ok
 [Day 12](./2020/day-12) | [Rain Risk](./2020/day-12/README.md) | Ok | Had bad rounding issues (``int`` vs ``round``)
-[Day 13](./2020/day-13) | [Shuttle Search](./2020/day-13/README.md) | Ok | TBD
+[Day 13](./2020/day-13) | [Shuttle Search](./2020/day-13/README.md) | Ok | First try was way too slow, trick was to multiply bus IDs
