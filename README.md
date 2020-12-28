@@ -19,3 +19,5 @@ Day | Challenge | Part One | Part Two
 [Day 11](./2020/day-11) | [Seating System](./2020/day-11/README.md) | Ok | Ok
 [Day 12](./2020/day-12) | [Rain Risk](./2020/day-12/README.md) | Ok | Had bad rounding issues (``int`` vs ``round``)
 [Day 13](./2020/day-13) | [Shuttle Search](./2020/day-13/README.md) | Ok | First try was way too slow, trick was to multiply bus IDs
+[Day 14](./2020/day-14) | [Docking Data](./2020/day-14/README.md) | Ok | Ok
+
