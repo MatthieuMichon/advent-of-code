@@ -20,4 +20,5 @@ Day | Challenge | Part One | Part Two
 [Day 12](./2020/day-12) | [Rain Risk](./2020/day-12/README.md) | Ok | Had bad rounding issues (``int`` vs ``round``)
 [Day 13](./2020/day-13) | [Shuttle Search](./2020/day-13/README.md) | Ok | First try was way too slow, trick was to multiply bus IDs
 [Day 14](./2020/day-14) | [Docking Data](./2020/day-14/README.md) | Ok | Ok
-
+[Day 15](./2020/day-15) | [Rambunctious Recitation](./2020/day-15/README.md) | Ok | Ok
+[Day 16](./2020/day-16) | [Ticket Translation](./2020/day-16/README.md) | Ok | First try was naive, hopefully field constraints where not sneaky. 
