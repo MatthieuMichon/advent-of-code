@@ -22,4 +22,6 @@ Day | Challenge | Part One | Part Two
 [Day 14](./2020/day-14) | [Docking Data](./2020/day-14/README.md) | Ok | Ok
 [Day 15](./2020/day-15) | [Rambunctious Recitation](./2020/day-15/README.md) | Ok | Ok
 [Day 16](./2020/day-16) | [Ticket Translation](./2020/day-16/README.md) | Ok | First try was naive, hopefully field constraints where not sneaky. 
-[Day 17](./2020/day-17) | [Conway Cubes](./2020/day-17/README.md) | *TBD* | *TBD* 
+[Day 17](./2020/day-17) | [Conway Cubes](./2020/day-17/README.md) | Ok | Ok
+[Day 18](./2020/day-18) | [Operation Order](./2020/day-18/README.md) | *TBD* | *TBD*
+ 
