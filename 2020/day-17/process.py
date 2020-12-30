@@ -20,73 +20,66 @@ DEBUG = False
 # Common -----------------------------------------------------------------------
 
 
-def list_indexes(state: dict[tuple, any], axis: int) -> list:
-    """
-    Get the indexes of an axis on a state mapping
-
-    :param state:
-    :param axis:
-    :return: set of indexes across the given axis
-    """
-
-    indexes = set(position[axis] for position in state.keys())
-    index_list = sorted(indexes)
-    return index_list
-
-
-# Part One ---------------------------------------------------------------------
-
-
-def visualize(state: dict[tuple[int, int, int], bool]) -> None:
-    """
-
-    :param state:
-    :return:
-    """
-
-    for z in list_indexes(state, 2):
-        print(f'z={z}')
-        print(f'      {" ".join(str(c) for c in list_indexes(state, 0)):6}')
-        print(f'      {" ".join("-" for c in list_indexes(state, 0)):6}')
-        for y in list_indexes(state, 1):
-            print(f'{y:3} - {" ".join("X" if state[(x, y, z)] else "." for x in list_indexes(state, 0))}')
-
-
-def visualize_neighbors(neighbors: dict[tuple[int, int, int], int]) -> None:
-    """
-    Visualize a neighbors quantity map
-
-    :param neighbors:
-    :return: nothing
-    """
-
-    for z in list_indexes(neighbors, 2):
-        print(f'z={z}')
-        print(f'      {" ".join(str(c) for c in list_indexes(neighbors, 0)):6}')
-        print(f'      {" ".join("-" for c in list_indexes(neighbors, 0)):6}')
-        for y in list_indexes(neighbors, 1):
-            print(f'{y:3} - {" ".join(str(neighbors[(x, y, z)]) for x in list_indexes(neighbors, 1))}')
-
-
-def decode(file: Path) -> dict[tuple[int, int, int], bool]:
+def decode(file: Path) -> dict[tuple[int, int], bool]:
     """
     Decode file contents
 
-    :param file:
-    :return: 3d map of the initial slice
+    :param file: file containing the input values
+    :return: 2d map of the initial slice
     """
 
     fh = open(file)
     decoded_map = dict()
-    for i, l in enumerate(fh):
-        for j, c in enumerate(l.strip()):
-            active = True if c == '#' else False
-            x = j
-            y = i
-            z = 0
-            decoded_map[(x, y, z)] = active
+    for y, l in enumerate(fh):
+        for x, c in enumerate(l.strip()):
+            active = c == '#'
+            decoded_map[(x, y)] = active
 
     return decoded_map
+
+
+def list_indexes(map_: dict[tuple, any], axis: int) -> list:
+    """
+    List the indexes of a given axis in a mapping
+
+    :param map_: mapping of a property (activation) per grid position
+    :param axis: selected grid axis
+    :return: set of indexes across the given axis
+    """
+
+    axis_count: int = len(next(iter(map_.keys())))
+    if axis >= axis_count:
+        return [0]
+    indexes = set(position[axis] for position in map_.keys())
+    index_list = sorted(indexes)
+    return index_list
+
+
+def visualize(map_: dict[tuple, any]) -> None:
+    """
+    Visualize slices of a mapping
+
+    :param map_: mapping of a property (activation) per grid position
+    :return: nothing
+    """
+
+    conv = lambda pos, axis_count: \
+        ('X' if map_[pos[:axis_count]] else ".") \
+            if isinstance(map_[pos[:axis_count]], bool) else \
+            str(map_[pos[:axis_count]])
+
+    axis_count: int = len(next(iter(map_.keys())))
+    for w in list_indexes(map_, 3):
+        for z in list_indexes(map_, 2):
+            if axis_count == 4:
+                print(f'z={z}, w={w}')
+            elif axis_count == 3:
+                print(f'z={z}')
+            for y in list_indexes(map_, 1):
+                print(f'{" ".join(conv((x, y, z, w), axis_count) for x in list_indexes(map_, 0))}')
+
+
+# Part One ---------------------------------------------------------------------
 
 
 def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, int, int], bool]:
@@ -99,7 +92,7 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
     expanded_state = state
     for axis in range(3):
         state = copy.deepcopy(expanded_state)
-        axis_values = list_indexes(state=state, axis=axis)
+        axis_values = list_indexes(map_=state, axis=axis)
         for upper in [True, False]:
             index = max(axis_values) if upper else min(axis_values)
             state_slice = {pos: v for pos, v in state.items()
@@ -111,7 +104,8 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
                     new_pos = tuple(new_index if i == axis else a
                                for i, a in enumerate(pos))
                     expanded_state[new_pos] = False
-    #visualize(expanded_state)
+    if DEBUG:
+        visualize(expanded_state)
 
     state_dd = defaultdict(bool, expanded_state)
     active_neighbors_map = dict()
@@ -125,7 +119,8 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
             if state_dd[neighbor]:
                 active_neighbors += 1
         active_neighbors_map[pos] = active_neighbors
-    #visualize_neighbors(active_neighbors_map)
+    if DEBUG:
+        visualize(active_neighbors_map)
 
     updated_state = copy.copy(expanded_state)
     ACTIVE = True
@@ -137,8 +132,8 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
             updated_state[pos] = INACTIVE
         elif not cube_active and neighbors_active == 3:
             updated_state[pos] = ACTIVE
-
-    #visualize(updated_state)
+    if DEBUG:
+        visualize(updated_state)
 
     return updated_state
 
@@ -152,9 +147,10 @@ def process(file: Path) -> int:
     """
 
     initial_slice = decode(file=file)
-    visualize(state=initial_slice)
+    initial_state = {pos + tuple([0]): state for pos, state in initial_slice.items()}
+    visualize(map_=initial_state)
 
-    state = initial_slice
+    state = initial_state
     for cycle in range(6):
         visualize(state)
         new_state = execute_cycle(state=state)
