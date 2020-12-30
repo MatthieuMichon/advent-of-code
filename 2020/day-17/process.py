@@ -16,6 +16,9 @@ from pathlib import Path
 
 DEBUG = False
 
+ACTIVE = True
+INACTIVE = False
+
 
 # Common -----------------------------------------------------------------------
 
@@ -63,10 +66,9 @@ def visualize(map_: dict[tuple, any]) -> None:
     :return: nothing
     """
 
-    conv = lambda pos, axis_count: \
-        ('X' if map_[pos[:axis_count]] else ".") \
-            if isinstance(map_[pos[:axis_count]], bool) else \
-            str(map_[pos[:axis_count]])
+    conv = lambda pos, axis_cnt: \
+        ('X' if map_[pos[:axis_cnt]] else ".") if isinstance(
+            map_[pos[:axis_cnt]], bool) else str(map_[pos[:axis_cnt]])
 
     axis_count: int = len(next(iter(map_.keys())))
     for w in list_indexes(map_, 3):
@@ -79,19 +81,18 @@ def visualize(map_: dict[tuple, any]) -> None:
                 print(f'{" ".join(conv((x, y, z, w), axis_count) for x in list_indexes(map_, 0))}')
 
 
-# Part One ---------------------------------------------------------------------
-
-
-def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, int, int], bool]:
+def execute_cycle(state: dict[tuple, bool]) -> dict[tuple[int, int, int], bool]:
     """
+    Execute one single state update cycle
 
     :param state: 3d mapping of the state
     :return: 3d mapping of the state
     """
 
     expanded_state = state
-    for axis in range(3):
-        state = copy.deepcopy(expanded_state)
+    axis_count: int = len(next(iter(state.keys())))
+    for axis in range(axis_count):
+        state = copy.copy(expanded_state)
         axis_values = list_indexes(map_=state, axis=axis)
         for upper in [True, False]:
             index = max(axis_values) if upper else min(axis_values)
@@ -102,29 +103,27 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
                 new_index = index + (1 if upper else -1)
                 for pos, s in state_slice.items():
                     new_pos = tuple(new_index if i == axis else a
-                               for i, a in enumerate(pos))
+                                    for i, a in enumerate(pos))
                     expanded_state[new_pos] = False
     if DEBUG:
         visualize(expanded_state)
 
     state_dd = defaultdict(bool, expanded_state)
     active_neighbors_map = dict()
-    moves = [[-1, 0, +1]] * 3
-    self = (0, 0, 0)
+    moves = [[-1, 0, +1]] * axis_count
+    self = tuple([0] * axis_count)
     directions = [m for m in list(itertools.product(*moves)) if m != self]
     for pos in expanded_state.keys():
         active_neighbors = 0
-        for dir in directions:
-            neighbor = tuple(pos[axis] + dir[axis] for axis in range(3))
+        for dir_ in directions:
+            neighbor = tuple(pos[axis] + dir_[axis] for axis in range(axis_count))
             if state_dd[neighbor]:
                 active_neighbors += 1
         active_neighbors_map[pos] = active_neighbors
     if DEBUG:
         visualize(active_neighbors_map)
 
-    updated_state = copy.copy(expanded_state)
-    ACTIVE = True
-    INACTIVE = False
+    updated_state = expanded_state #copy.copy(expanded_state)
     for pos, count in active_neighbors_map.items():
         cube_active = expanded_state[pos] == ACTIVE
         neighbors_active = active_neighbors_map[pos]
@@ -138,6 +137,9 @@ def execute_cycle(state: dict[tuple[int, int, int], bool]) -> dict[tuple[int, in
     return updated_state
 
 
+# Part One ---------------------------------------------------------------------
+
+
 def process(file: Path) -> int:
     """
     Process input file yielding the submission value
@@ -148,11 +150,13 @@ def process(file: Path) -> int:
 
     initial_slice = decode(file=file)
     initial_state = {pos + tuple([0]): state for pos, state in initial_slice.items()}
-    visualize(map_=initial_state)
+    if DEBUG:
+        visualize(map_=initial_state)
 
     state = initial_state
     for cycle in range(6):
-        visualize(state)
+        if DEBUG:
+            visualize(state)
         new_state = execute_cycle(state=state)
         state = new_state
 
@@ -161,10 +165,36 @@ def process(file: Path) -> int:
     return submission
 
 
-# Part Two
+# Part Two ---------------------------------------------------------------------
 
 
-# Main
+def process_part2(file: Path) -> int:
+    """
+    Process input file yielding the submission value
+
+    :param file: file containing the input values
+    :return: value to submit
+    """
+
+    initial_slice = decode(file=file)
+    initial_state = {pos + tuple([0, 0]): state
+                     for pos, state in initial_slice.items()}
+    if DEBUG:
+        visualize(map_=initial_state)
+
+    state = initial_state
+    for cycle in range(6):
+        if DEBUG:
+            visualize(state)
+        new_state = execute_cycle(state=state)
+        state = new_state
+
+    active_cubes = sum(state.values())
+    submission = active_cubes
+    return submission
+
+
+# Main -------------------------------------------------------------------------
 
 
 def main() -> int:
@@ -175,9 +205,18 @@ def main() -> int:
     """
 
     files = ['./example.txt', './input.txt']
+    #files = ['./example.txt']
+    #files = []
     for f in files:
         print(f'In file {f}:')
         print(f'\tPart One: {process(file=Path(f))}')
+
+    files = ['./example.txt', './input.txt']
+    #files = ['./example.txt']
+    #files = []
+    for f in files:
+        print(f'In file {f}:')
+        print(f'\tPart Two: {process_part2(file=Path(f))}')
 
     return 0
 
