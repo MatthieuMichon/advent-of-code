@@ -23,5 +23,5 @@ Day | Challenge | Part One | Part Two
 [Day 15](./2020/day-15) | [Rambunctious Recitation](./2020/day-15/README.md) | Ok | Ok
 [Day 16](./2020/day-16) | [Ticket Translation](./2020/day-16/README.md) | Ok | First try was naive, hopefully field constraints where not sneaky. 
 [Day 17](./2020/day-17) | [Conway Cubes](./2020/day-17/README.md) | Ok | Ok
-[Day 18](./2020/day-18) | [Operation Order](./2020/day-18/README.md) | *TBD* | *TBD*
- 
+[Day 18](./2020/day-18) | [Operation Order](./2020/day-18/README.md) | Interesting! used the shunting-yard algorithm and RPN evaluation | Ok
+[Day 19](./2020/day-19) | [Monster Messages](./2020/day-19/README.md) | - | -
