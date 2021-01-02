@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
-Advent of Code 2020: Day 16
+Advent of Code 2020: Day 18
 """
 
 import signal
 import sys
 from types import FrameType
-from typing import List, Mapping, Union, Iterator
+from typing import Union, Iterator
 from pathlib import Path
 
 
@@ -69,6 +69,8 @@ def evaluate(tokens: list[Union[int, str]]) -> int:
 
     retval: int = stack.pop()
     assert not len(stack)
+    if DEBUG:
+        print(f'Expression result: {retval}')
 
     return retval
 
@@ -92,20 +94,17 @@ def convert_rpn(tokens: list[str]) -> list[Union[int, str]]:
             output_queue.append(int(t))
         elif t in ['+', '*']:
             while len(operator_stack) and operator_stack[-1] != '(':
-                op = operator_stack.pop()
-                output_queue.append(op)
+                output_queue.append(operator_stack.pop())
             operator_stack.append(t)
         elif t == '(':
             operator_stack.append(t)
         elif t == ')':
             while operator_stack[-1] != '(':
-                op = operator_stack.pop()
-                output_queue.append(op)
+                output_queue.append(operator_stack.pop())
             if operator_stack[-1] == '(':
                 operator_stack.pop()
     while len(operator_stack):
-        op = operator_stack.pop()
-        output_queue.append(op)
+        output_queue.append(operator_stack.pop())
 
     return output_queue
 
@@ -145,20 +144,17 @@ def convert_rpn_part2(tokens: list[str]) -> list[Union[int, str]]:
             output_queue.append(int(t))
         elif t in ['+', '*']:
             while len(operator_stack) and (operator_stack[-1] == '+') and (t == '*') and operator_stack[-1] != '(':
-                op = operator_stack.pop()
-                output_queue.append(op)
+                output_queue.append(operator_stack.pop())
             operator_stack.append(t)
         elif t == '(':
             operator_stack.append(t)
         elif t == ')':
             while operator_stack[-1] != '(':
-                op = operator_stack.pop()
-                output_queue.append(op)
+                output_queue.append(operator_stack.pop())
             if operator_stack[-1] == '(':
                 operator_stack.pop()
     while len(operator_stack):
-        op = operator_stack.pop()
-        output_queue.append(op)
+        output_queue.append(operator_stack.pop())
 
     return output_queue
 
