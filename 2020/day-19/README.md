@@ -50,3 +50,50 @@ retval.extend(''.join(c) for c in itertools.product(*temp))
 return retval
 ```
 
+## Part 2
+
+Initial implementation was unrolling the recurrent rules on a depth matching the longest message. This turned up being too slow and memory intensive.
+
+```python
+retval: dict[int, list] = dict()
+for k, v in rules.items():
+    rule_is_recursive = k in v
+    if rule_is_recursive:
+        unrolled_rule = v[:v.index('|')]
+        repeating_group = v[v.index('|')+1:]
+        rule_suffix = repeating_group.copy()
+        for depth in range(max_depth):
+            i = rule_suffix.index(k)
+            rule_suffix[i:i+1] = repeating_group
+            unrolled_rule.extend(['|'] + rule_suffix)
+        retval[k] = [item for item in unrolled_rule if item != k]
+    else:
+        retval[k] = v
+return retval
+```
+
+Looking into third-party implementations it appeared that there was no other way than crafting a solution with some hard coded assumptions: that both modified rules relied only on two other rules yielding matches with the exact same lengths.
+
+```python
+rule_31_solutions = set(graph_rules(rules, 31))
+rule_31_sol_lengths = {len(s) for s in rule_31_solutions}
+rule_42_solutions = set(graph_rules(rules, 42))
+rule_42_sol_lengths = {len(s) for s in rule_42_solutions}
+assert rule_31_sol_lengths == rule_42_sol_lengths
+block_len = next(iter(rule_31_sol_lengths))
+
+valid_messages = 0
+for msg in messages:
+    words = [msg[0 + i:block_len + i] for i in range(0, len(msg), block_len)]
+    word_cnt = len(words)
+    rule_31_match_cnt = 0
+    for word in reversed(words):  # reverse since rule 31 matches at the end of message
+        if word in rule_31_solutions:
+            rule_31_match_cnt += 1
+        else:
+            break
+    if 0 < rule_31_match_cnt < word_cnt/2 and all(word in rule_42_solutions for word in words[:-rule_31_match_cnt]):
+        valid_messages += 1
+
+return valid_messages
+```
