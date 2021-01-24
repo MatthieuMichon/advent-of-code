@@ -5,7 +5,7 @@ Advent of Code 2020: Day 20
 
 import signal
 import sys
-import math
+import itertools
 from pathlib import Path
 from types import FrameType
 import operator
@@ -15,6 +15,12 @@ import functools
 DEBUG = False
 SIDES = ('N', 'E', 'S', 'W')
 MATCHING_CORNERS: tuple = (('E', 'S'), ('S', 'W'), ('W', 'N'), ('N', 'E'),)
+
+AXIS_QTY = 2
+OFFSETS = [(-1, 0, +1)] * AXIS_QTY
+POSITIONS = list(itertools.product(*OFFSETS))
+SELF_POS = tuple([0 for _ in range(AXIS_QTY)])
+NEIGHBOR_OFFSETS = {p for p in POSITIONS if p != SELF_POS and abs(sum(p)) == 1}
 
 
 # Common -----------------------------------------------------------------------
@@ -61,6 +67,7 @@ def flip_corner(corner: tuple) -> tuple:
 # ....
 # ....
 
+
 def flip(str_array: list[str]) -> list[str]:
     """
     Flip a list of strings on a top-left to bottom-right diagonal
@@ -68,9 +75,7 @@ def flip(str_array: list[str]) -> list[str]:
     :param str_array: array as a list of strings
     :return: array flipped
     """
-
-    flip_array = list(''.join(c) for c in zip(*str_array))
-    return flip_array
+    return list(reversed(str_array.copy()))
 
 
 def rotate_cw(str_array: list[str]) -> list[str]:
@@ -217,27 +222,6 @@ def read_tiles(file: Path) -> dict[int, Tile]:
     return tiles
 
 
-# def load_tiles(file: Path) -> Iterator[dict]:
-#     """
-#     Load tiles data from a given file
-#
-#     :param file: file containing the input values
-#     :return: tile iterator
-#     """
-#
-#     tile = dict()
-#     for line in open(file):
-#         if 'Tile ' in line:
-#             tile['id'] = int(line[5:-2])
-#             tile['rows'] = list()
-#         elif len(line) > 2:
-#             tile['rows'].append(line.strip())
-#             last_row = len(tile['rows']) == len(line.strip())
-#             if last_row:
-#                 yield tile
-#                 tile = dict()
-
-
 # Part One ---------------------------------------------------------------------
 
 
@@ -343,168 +327,431 @@ def process(file: Path) -> int:
 # Part Two ---------------------------------------------------------------------
 
 
-def compute_matches(tiles_by_id: dict[int, Tile]) -> dict[int, dict]:
+def compute_transformations(str_array: list[str]) -> list[list[str]]:
     """
-    Match borders with identical hash values between any pair of tiles
+    Compute all possible transformations
 
-    :param tiles_by_id: Tiles instances per ID
-    :return: matches per tile ID
-    """
-
-    matches_per_tile = dict()
-    for tile in tiles_by_id.values():
-        matching_borders = dict()
-        opposite_tiles = tiles_by_id.copy()
-        opposite_tiles.pop(tile.id)
-        for side in SIDES:
-            matches = list()
-            border = tile.borders[side]
-
-            for op_tile in opposite_tiles.values():
-                for op_side, op_border in op_tile.borders.items():
-                    if border == op_border:
-                        matches.append([op_tile.id, op_side, op_border])
-            if matches:
-                matching_borders[side] = matches
-        if matching_borders:
-            matches_per_tile[tile.id] = matching_borders
-
-    return matches_per_tile
-
-
-#def transform_tile(matches: dict, constraints: dict[str, any]) -> dict
-
-
-def arrange_tiles(tiles_by_id: dict[int, Tile],
-                  matches_by_id: dict[int, dict]) -> list[list[int]]:
-    """
-    Arrange adjacent tiles
-
-    :param tiles_by_id: matches per tile ID
-    :param matches_by_id: matches per tile ID
-    :return: 2d list of tile IDs
+    :param str_array: array as a list of strings
+    :return: possible transformations
     """
 
-    image_width = math.sqrt((len(tiles_by_id)))
-    assert image_width.is_integer()
-    image_width = int(image_width)
-    board = dict()
+    str_array_cw90 = rotate_cw(str_array=str_array)
+    str_array_cw180 = rotate_cw(str_array=str_array_cw90)
+    str_array_cw270 = rotate_cw(str_array=str_array_cw180)
+    transformations = [
+        str_array, str_array_cw90, str_array_cw180, str_array_cw270,
+        flip(str_array), flip(str_array_cw90), flip(str_array_cw180),
+        flip(str_array_cw270),
+    ]
 
-    corner_tiles = tuple(
-        tiles_by_id[id_] for id_, sides in matches_by_id.items()
-        if len(sides) == 2)
+    return transformations
 
-    seed_tile = corner_tiles[0]
-    req_neighbors = MATCHING_CORNERS[0]
-    actual_corners = tuple(matches_by_id[seed_tile.id].keys())
-    while req_neighbors != actual_corners:
-        seed_tile.rotate_cw()
-        seed_tile.search_neighbors(tiles_by_id=tiles_by_id)
-        actual_corners = rotate_corner_cw(actual_corners)
-    board[(0, 0)] = seed_tile
 
-    for i in range(1, image_width):
-        last_tile: Tile = board[(0, i - 1)]
-        tile: Tile = tiles_by_id[last_tile.neighbors['E'][0][0]]
-        flip_required = 'inv' in last_tile.neighbors['E'][0][1]
-        if flip_required:
-            tile.flip()
-            tile.search_neighbors(tiles_by_id=tiles_by_id)
-            actual_corners = flip_corner(corner=actual_corners)
-        req_neighbors = ('E', 'S', 'W')
-        actual_corners = tuple(matches_by_id[tile.id].keys())
-        while req_neighbors != actual_corners:
-            tile.rotate_cw()
-            tile.search_neighbors(tiles_by_id=tiles_by_id)
-            actual_corners = rotate_corner_cw(actual_corners)
-        board[(0, i)] = tile
+def arrange_tiles(tile_map: dict[int, any]):
+    """
+    Flip and rotate tiles until inner borders match
 
-    #
-    # for i, tile in enumerate(corners):
-    #     orientation: int = i
-    #     req_corners = MATCHING_CORNERS[orientation]
-    #     actual_corners = tuple(matches_by_id[tile.id].keys())
-    #     while req_corners != actual_corners:
-    #         tile.str_rows = Tile.rotate_cw(tile.str_rows)
-    #         tile.borders = Tile.compute_borders(tile.str_rows)
-    #         orientation = (1 + orientation) % 4
-    #         actual_corners = rotate_corner_cw(actual_corners)
-    #     if i == 0:
-    #         board[(0, 0)] = tile
-    #     if i == 1:
-    #         board[(0, image_width - 1)] = tile
-    #     if i == 2:
-    #         board[(image_width - 1, image_width - 1)] = tile
-    #     if i == 3:
-    #         board[(image_width - 1, 0)] = tile
+    :param tile_map: map of tiles per ID
+    :return: array of tuple of tile ID and required transformation
+    """
 
-    return [[0]]
+    n = int(len(tile_map) ** 0.5)
+    assembled = [[(0, 0)] * n for _ in range(n)]
+    remaining = set(tile_map.keys())
 
-# def chop_borders(tile: list[str]) -> list[str]:
+    def arrange_tile(tile_rank: int) -> bool:
+        if tile_rank == n * n:
+            return True
+        row = tile_rank // n
+        col = tile_rank % n
+        for id_ in list(remaining):
+            for i, transformation in enumerate(tile_map[id_]):
+                up_ok = left_ok = True
+                if row > 0:
+                    up_tileid, up_transformation = assembled[row - 1][col]
+                    up_tile = tile_map[up_tileid][up_transformation]
+                    up_ok = all(transformation[0][i] == up_tile[9][i] for i in range(10))
+                if col > 0:
+                    left_tileid, left_transformation = assembled[row][col - 1]
+                    left_tile = tile_map[left_tileid][left_transformation]
+                    left_ok = all(transformation[i][0] == left_tile[i][9] for i in range(10))
+                if up_ok and left_ok:
+                    assembled[row][col] = (id_, i)
+                    remaining.remove(id_)
+                    if arrange_tile(tile_rank=tile_rank + 1):
+                        return True
+                    remaining.add(id_)
+        return False
+
+    arrange_tile(tile_rank=0)
+
+    return assembled
+
+
+# def compute_matches(tiles_by_id: dict[int, Tile]) -> dict[int, dict]:
 #     """
-#     Chop borders from a tile
+#     Match borders with identical hash values between any pair of tiles
 #
-#     :param tile: binary string bitmap
-#     :return: binary string bitmap
-#     """
-#
-#     tile_chopped_n_s = tile[1:-1]
-#     rot_cw = list(''.join(c) for c in zip(*tile_chopped_n_s[::-1]))
-#     tile_rot_chopped_n_s_e_w = rot_cw[1:-1]
-#     tile_chopped_n_s_e_w = list(
-#         ''.join(c) for c in zip(*tile_rot_chopped_n_s_e_w))[::-1]
-#
-#     return tile_chopped_n_s_e_w
-#
-#
-# def form_image(tiles: list[list[str]]) -> list[str]:
-#     """
-#     Form an image from a list of tiles after removing all borders
-#
-#     :param tiles: list of tiles
-#     :return: binary string bitmap
-#     """
-#
-#     chopped_tiles = [chop_borders(t) for t in tiles]
-#
-#     return ['a']
-#
-#
-# def list_operations(
-#         tile: dict, outer_borders: set, neighbors: dict[int, dict]) -> list:
-#     """
-#     List operations required on a tile for matching a set of constraints
-#
-#     :param tile:
-#     :param outer_borders:
-#     :param neighbors:
-#     :return:
+#     :param tiles_by_id: Tiles instances per ID
+#     :return: matches per tile ID
 #     """
 #
-#     borders = next(iter(tile.values()))
+#     matches_per_tile = dict()
+#     for tile in tiles_by_id.values():
+#         matching_borders = dict()
+#         opposite_tiles = tiles_by_id.copy()
+#         opposite_tiles.pop(tile.id)
+#         for side in SIDES:
+#             matches = list()
+#             border = tile.borders[side]
 #
-#     #current_inner_borders = {v for v in tile.values()}
+#             for op_tile in opposite_tiles.values():
+#                 for op_side, op_border in op_tile.borders.items():
+#                     if border == op_border:
+#                         matches.append([op_tile.id, op_side, op_border])
+#             if matches:
+#                 matching_borders[side] = matches
+#         if matching_borders:
+#             matches_per_tile[tile.id] = matching_borders
 #
-#     return None
+#     return matches_per_tile
 #
 #
-# def assemble(tile_borders: dict[int, dict], tile_matches: dict[int, dict]) -> list[str]:
+# def arrange_tiles_try1(tiles_by_id: dict[int, Tile],
+#                   matches_by_id: dict[int, dict]) -> list[list[int]]:
 #     """
-#     Assemble an image by transforming tiles
+#     Arrange adjacent tiles
 #
-#     :param tile_borders: mapping of all tile borders
-#     :param tile_matches: mapping of all possible tile matches
-#     :return: binary string image
+#     :param tiles_by_id: matches per tile ID
+#     :param matches_by_id: matches per tile ID
+#     :return: 2d list of tile IDs
 #     """
 #
-#     corner_tiles = [{k: v} for k, v in tile_matches.items() if len(v) == 2]
-#     assert len(corner_tiles) == 4
+#     image_width = math.sqrt((len(tiles_by_id)))
+#     assert image_width.is_integer()
+#     image_width = int(image_width)
+#     board = dict()
 #
-#     list_operations(tile=corner_tiles[0], outer_borders={'E', 'N'}, neighbors=dict())
+#     corner_tiles = tuple(
+#         tiles_by_id[id_] for id_, sides in matches_by_id.items()
+#         if len(sides) == 2)
 #
-#     print(corner_tiles)
+#     tile = None
+#     for row_index in range(image_width):
+#         for col_index in range(image_width):
+#             start_tile = (row_index == 0) and (col_index == 0)
+#             if start_tile:
+#                 tile = corner_tiles[0]
+#                 req_neighbors = MATCHING_CORNERS[0]
+#                 actual_corners = tuple(matches_by_id[tile.id].keys())
+#                 while req_neighbors != actual_corners:
+#                     tile.rotate_cw()
+#                     tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                     actual_corners = rotate_corner_cw(actual_corners)
+#                 board[(row_index, col_index)] = tile
+#             else:
+#                 if col_index > 0:
+#                     assert tile
+#                     last_tile: Tile = tile
+#                     tile = tiles_by_id[last_tile.neighbors['E'][0][0]]
+#                     tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                     actual_corners = tuple(matches_by_id[tile.id].keys())
+#                     flip_required = 'inv' in last_tile.neighbors['E'][0][1]
+#                     if flip_required:
+#                         tile.flip()
+#                         tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                         actual_corners = flip_corner(corner=actual_corners)
+#                     while not tile.neighbors['W'] or tile.neighbors['W'][0][0] != last_tile.id:
+#                         tile.rotate_cw()
+#                         tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                         actual_corners = rotate_corner_cw(actual_corners)
+#                     board[(row_index, col_index)] = tile
+#                 else:
+#                     assert col_index == 0
+#                     assert row_index > 0
+#                     last_tile: Tile = board[(row_index - 1), col_index]
+#                     tile = tiles_by_id[last_tile.neighbors['S'][0][0]]
+#                     tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                     actual_corners = tuple(matches_by_id[tile.id].keys())
+#                     flip_required = 'inv' in last_tile.neighbors['S'][0][1]
+#                     if flip_required:
+#                         tile.flip()
+#                         tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                         actual_corners = flip_corner(corner=actual_corners)
+#                     while not tile.neighbors['N'] or tile.neighbors['N'][0][0] != last_tile.id:
+#                         tile.rotate_cw()
+#                         tile.search_neighbors(tiles_by_id=tiles_by_id)
+#                         actual_corners = rotate_corner_cw(actual_corners)
+#                     board[(row_index, col_index)] = tile
+#         print(0)
 #
-#     return ['hello']
+#     return [[0]]
+#
+#
+# def list_neighbors(
+#         tile_map: dict[tuple[int, int], int],
+#         position: tuple[int, int]) -> set[int]:
+#     """
+#     List neighbors
+#
+#     :param tile_map: tile IDs per position
+#     :param position: coordinates
+#     :return: set of IDs
+#     """
+#
+#     neighbors = list()
+#     npos = [(position[0] + o[0], position[1] + o[1]) for o in NEIGHBOR_OFFSETS]
+#     for pos in npos:
+#         if pos not in tile_map:
+#             continue
+#         neighbors.append(tile_map[pos])
+#
+#     return set(neighbors)
+#
+#
+# def place_tiles(tile_matches: dict[int, dict[str, dict]]) -> dict[tuple, int]:
+#     """
+#     Place tiles according to a map
+#
+#     :param tile_matches: tile matches by tile id
+#     :return: TBD
+#     """
+#
+#     neighbor_map = {
+#         k: [vv[0][0] for vv in v.values()]
+#         for k, v in tile_matches.items()}
+#     neighbor_map_copy = neighbor_map.copy()
+#
+#     tiles_qty = len(neighbor_map)
+#     assert math.sqrt(tiles_qty).is_integer()
+#     image_width = int(math.sqrt(tiles_qty))
+#
+#     corner_tiles = tuple(
+#         id_ for id_, sides in tile_matches.items() if len(sides) == 2)
+#     border_tiles = tuple(
+#         id_ for id_, sides in tile_matches.items() if len(sides) <= 3)
+#
+#     tile_map = dict()
+#     tile_map[(0, 0)] = corner_tiles[0]
+#     last_tile = corner_tiles[0]
+#
+#     for col in range(1, image_width):
+#         last_tile_neighbors = neighbor_map[last_tile]
+#         tiles = set(border_tiles) & set(last_tile_neighbors) - set(tile_map.values())
+#         tile = list(tiles)[0]
+#         neighbor_map.pop(last_tile)
+#         assert tile not in tile_map.values()
+#         tile_map[(col, 0)] = tile
+#         last_tile = tile
+#
+#     for row in range(1, image_width):
+#         last_tile_neighbors = neighbor_map[last_tile]
+#         tiles = set(border_tiles) & set(last_tile_neighbors) - set(tile_map.values())
+#         tile = list(tiles)[0]
+#         neighbor_map.pop(last_tile)
+#         assert tile not in tile_map.values()
+#         tile_map[(image_width - 1), row] = tile
+#         last_tile = tile
+#
+#     for col in reversed(range(0, image_width - 1)):
+#         last_tile_neighbors = neighbor_map[last_tile]
+#         tiles = set(border_tiles) & set(last_tile_neighbors) - set(tile_map.values())
+#         tile = list(tiles)[0]
+#         neighbor_map.pop(last_tile)
+#         assert tile not in tile_map.values()
+#         tile_map[col, (image_width - 1)] = tile
+#         last_tile = tile
+#
+#     for row in reversed(range(1, image_width - 1)):
+#         last_tile_neighbors = neighbor_map[last_tile]
+#         tiles = set(border_tiles) & set(last_tile_neighbors) - set(tile_map.values())
+#         tile = list(tiles)[0]
+#         neighbor_map.pop(last_tile)
+#         assert tile not in tile_map.values()
+#         tile_map[(0, row)] = tile
+#         last_tile = tile
+#
+#     neighbor_map.pop(last_tile)
+#
+#     # scan over all map tiles
+#
+#     for row in range(1, image_width - 1):
+#         for col in range(1, image_width - 1):
+#             candidates = list()
+#             neighbor_id_list = list_neighbors(tile_map=tile_map, position=(col, row))
+#             for nid in neighbor_id_list:
+#                 candidates.append(neighbor_map_copy[nid])
+#             tile = set.intersection(*map(set, candidates)) - set(tile_map.values())
+#             assert len(tile) == 1
+#             tile = list(tile)[0]
+#             tile_map[(col, row)] = tile
+#             neighbor_map.pop(tile)
+#
+#     return tile_map
+#
+#
+# def arrange_tiles(tile_map: dict[tuple[int, int], int], tiles_by_id: dict[int, Tile]):
+#
+#     tiles_qty = len(tile_map)
+#     assert math.sqrt(tiles_qty).is_integer()
+#     image_width = int(math.sqrt(tiles_qty))
+#
+#     for row in range(image_width):
+#         for col in range(image_width):
+#             if (col, row) == (0, 0):
+#                 continue
+#             match_left_tile = col > 0
+#             match_upper_tile = (col == 0) and (row > 0)
+#
+#             if match_left_tile:
+#                 left_tile_pos = (col - 1, row)
+#                 left_tile = tile_map[left_tile_pos]
+#                 opposite_border = tiles_by_id[left_tile].borders['E']
+#                 tile = tiles_by_id[tile_map[(col, row)]]
+#                 print(0)
+
+
+def assemble_tiles(tiles_by_id: dict[int, Tile], tile_map: list[list[tuple]]
+                   ) -> list[list[str]]:
+    """
+    Assemble tiles
+
+    :param tiles_by_id: tile instances by ID
+    :param tile_map: array of tuple of tile ID and required transformation
+    :return: list of strings
+    """
+
+    tile_size = len(list(tiles_by_id.values())[0].str_rows[0])
+    horiz_tiles = int(len(tiles_by_id) ** 0.5)
+    image_size = horiz_tiles * tile_size
+    image = [[' '] * image_size for _ in range(image_size)]
+
+    for i, row in enumerate(tile_map):
+        for j, tile_data in enumerate(row):
+            row_slice = [j * tile_size, (j + 1) * tile_size]
+            id = tile_data[0]
+            transform = tile_data[1]
+            flip = transform // 4
+            rotations = transform % 4
+            for _ in range(rotations):
+                tiles_by_id[id].rotate_cw()
+            if flip:
+                tiles_by_id[id].flip()
+            for line in range(tile_size):
+                image_row = i * tile_size + line
+                image[image_row][slice(*row_slice)] = tiles_by_id[id].str_rows[line]
+
+    return image
+
+
+def remove_borders(image: list[list[str]], size: int) -> list[list[str]]:
+    """
+    Remove borders of the given image
+
+    :param image: 2d list of strings
+    :param size: individual tile width
+    :return: 2d list of strings
+    """
+
+    cropped_list = list()
+    is_border = lambda i: (i % size) in [0, 9]
+    for i, row in enumerate(image):
+        if is_border(i):
+            continue
+        cropped_row = list()
+        for j, cell in enumerate(row):
+            if is_border(j):
+                continue
+            cropped_row.append(cell)
+        cropped_list.append(cropped_row)
+
+    return cropped_list
+
+
+def correlate(a: list[list[str]], b: list[list[str]]) -> bool:
+    """
+    Correlate two patterns
+
+    :param a: 2d list of strings
+    :param b: 2d list of strings
+    :return: True if argument match
+    """
+
+    int_ = lambda l: int(''.join(l.replace('#', '1').replace(' ', '0').replace('.', '0')), 2)
+
+    a_int_array = [int_(''.join(l)) for l in a]
+    b_int_array = [int_(''.join(l)) for l in b]
+    assert len(a_int_array) == len(b_int_array)
+
+    for i, a_int in enumerate(a_int_array):
+        b_int = b_int_array[i]
+        c = a_int & b_int
+        if c != c | b_int:
+            return False
+
+    return True
+
+
+img = """.#.#..#.##...#.##..#####
+###....#.#....#..#......
+##.##.###.#.#..######...
+###.#####...#.#####.#..#
+##.#....#.##.####...#.##
+...########.#....#####.#
+....#..#...##..#.#.###..
+.####...#..#.....#......
+#..#.##..#..###.#.##....
+#.####..#.####.#.#.###..
+###.#.#...#.######.#..##
+#.####....##..########.#
+##..##.#...#...#.#.#.#..
+...#..#..#.#.##..###.###
+.#.#....#.##.#...###.##.
+###.#...#..#.##.######..
+.#.#.###.##.##.#..#.##..
+.####.###.#...###.#..#.#
+..#.#..#..#.#.#.####.###
+#..####...#.#.#.###.###.
+#####..#####...###....##
+#.##..#..#...#..####...#
+.#.###..##..##..####.##.
+...###...##...#...#..###""".split('\n')
+
+
+def search_pattern(image: list[list[str]], pattern: list[list[str]]
+                   ) -> list[list[str]]:
+    """
+    Search for a pattern in the given image
+
+    :param image: 2d list of strings
+    :param pattern: 2d list of strings
+    :return: 2d list of strings
+    """
+
+    image = [''.join(r) for r in image]
+    image_size = len(image)
+    pattern_hsize = len(pattern[0])
+    pattern_vsize = len(pattern)
+    tries = 0
+
+    for transform in range(8):
+        #assert img != image
+        for i in range(image_size - pattern_vsize):
+            v_crop = image[i:i + pattern_vsize]
+            for j in range(image_size - pattern_hsize):
+                crop = [r[j:j + pattern_hsize] for r in v_crop]
+                c = correlate(a=crop, b=pattern)
+                tries += 1
+                if c:
+                    print(crop)
+        do_flip = transform == 4
+        if not do_flip:
+            image = rotate_cw(image)
+        else:
+            image = flip(image)
+
+        print(tries)
+    print(tries)
 
 
 def process_part2(file: Path) -> int:
@@ -516,23 +763,18 @@ def process_part2(file: Path) -> int:
     """
 
     tiles_by_id = read_tiles(file=file)
-    matches_by_id = compute_matches(tiles_by_id=tiles_by_id)
-    tiles_by_id = arrange_tiles(tiles_by_id=tiles_by_id, matches_by_id=matches_by_id)
+    tile_transforms = {tile.id: compute_transformations(tile.str_rows) for tile in tiles_by_id.values()}
+    tile_map = arrange_tiles(tile_map=tile_transforms)
+    image = assemble_tiles(tiles_by_id=tiles_by_id, tile_map=tile_map)
+    image = remove_borders(image=image, size=10)
 
-    corner_tiles = {tiles_by_id[i] for i, m in matches_by_id.items() if len(m.values()) == 2}
-    outer_tiles = {tiles_by_id[i] for i, m in matches_by_id.items() if len(m.values()) == 3}
-    for id_, tile in tiles_by_id.items():
-        b = compute_borders(tile=tile)
-    tiles_by_id = read_tiles(file=file)
+    pattern = [
+        '                  # ',
+        '#    ##    ##    ###',
+        ' #  #  #  #  #  #   ']
+    image = search_pattern(image=image, pattern=pattern)
 
-    print(len(list(tiles_by_id)))
-
-    #
-    # border_map = decode(file=file)
-    # tile_matches = match_borders(border_map=border_map)
-    # image = assemble(tile_borders=border_map, tile_matches=tile_matches)
-
-    print(0)
+    return 0
 
 
 # Main -------------------------------------------------------------------------
@@ -553,7 +795,8 @@ def main() -> int:
         print(f'\tPart One: {process(file=Path(f))}')
 
     files = ['./example.txt', './input.txt']
-    #files = ['./input.txt']
+    files = ['./example.txt']
+    files = ['./input.txt']
     #files = []
     for f in files:
         print(f'In file {f}:')

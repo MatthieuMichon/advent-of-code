@@ -25,4 +25,5 @@ Day | Challenge | Part One | Part Two
 [Day 17](./2020/day-17) | [Conway Cubes](./2020/day-17/README.md) | Ok | Ok
 [Day 18](./2020/day-18) | [Operation Order](./2020/day-18/README.md) | Interesting! used the shunting-yard algorithm and RPN evaluation | Ok
 [Day 19](./2020/day-19) | [Monster Messages](./2020/day-19/README.md) | Interesting! used a top-down graph traversal | Stuck: had to hard-code top of rule dependency graph 
-[Day 20](./2020/day-20) | [Jurassic Jigsaw](./2020/day-20/README.md) | - | -
+[Day 20](./2020/day-20) | [Jurassic Jigsaw](./2020/day-20/README.md) | Ok | Stuck: had to use recursion for reconstructing the image
+
