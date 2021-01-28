@@ -78,7 +78,7 @@ The challenge states:
 
 > Allergens aren't always marked.
 
-However this is true on a per-food basis. The set of allergens can be compiled by iterating through all the food items.
+However this is true when considering the complete list of foods. The set of allergens can be compiled by iterating through all the food items.
 
 ```python
     ingredients = set()
@@ -104,8 +104,19 @@ This statement implies that for all foods containing the allergen, ingredients w
 
 The idea consists in:
 
-* Compile a set of ingredients
 * Compile a map of food ingredients by allergen
+
+```python
+def map_foods_by_allergen(foods: list[dict[str, any]]) -> dict[str, set[str]]:
+    foods_by_allergen = defaultdict(list)
+    for food in foods:
+        ingredients = set(food['ingredients'])
+        for allergen in food['some_allergens']:
+            foods_by_allergen[allergen].append(ingredients)
+    return dict(foods_by_allergen)
+```
+
+* Compile a set of ingredients
 * For each allergen:
     1. Get a list of ingredients present in all the food ingredients containing the allergen
     1. Remove these ingredients from the copy of the ingredient list
@@ -115,15 +126,7 @@ def list_safe_ingredients(foods: list[dict[str, any]]) -> set[str]:
     safe_ingredients = {ingredient
                         for f in foods
                         for ingredient in f['ingredients']}
-    ingredients_by_allergen = dict()
-    for food in foods:
-        ingredients = set(food['ingredients'])
-        for allergen in food['some_allergens']:
-            if allergen not in ingredients_by_allergen:
-                ingredients_by_allergen[allergen] = [ingredients]
-            else:
-                ingredients_by_allergen[allergen].append(ingredients)
-    for allergen, food_ingredients in ingredients_by_allergen.items():
+    for allergen, food_ingredients in map_foods_by_allergen(foods).items():
         unsafe_ingredients = set.intersection(*food_ingredients)
         safe_ingredients -= unsafe_ingredients
     return safe_ingredients
@@ -140,4 +143,40 @@ This count is obtained by iterating over each safe ingredients and over all food
 ```python
 count = lambda i: sum(1 for f in foods if i in f['ingredients'])
 submission = sum(count(i) for i in safe_ingredients)
+```
+
+## Part Two
+
+The challenge states:
+
+> Now that you've isolated the inert ingredients, you should have enough information to figure out which ingredient contains which allergen.
+
+Mapping allergens to each ingredient requires several actions:
+* Compile a list of suspected ingredients by allergen.
+* While this list is not empty:
+    * For each allergen matching suspected ingredients:
+        * Remove from the suspected ingredients the ones which are already mapped to an allergen.
+        * If there is no ambiguity than the ingredient / allergen pair is stored in the map.
+    * For each allergen in the map:
+        * If this allergen is present in the suspected ingredients map:
+            * Remove this allergen from this map
+
+```python
+def map_allergens(foods: list[dict[str, any]]) -> dict[str, str]:
+    dangerous_ingredients = {
+        k: set.intersection(*v)
+        for k, v in map_foods_by_allergen(foods).items()}
+    allergen_map = dict()
+    while len(dangerous_ingredients):
+        for allergen, suspected_ingredients in dangerous_ingredients.items():
+            suspected_ingredients = suspected_ingredients - set(allergen_map.keys())
+            assert 0 < len(suspected_ingredients)
+            unambiguous_ingredient = 1 == len(suspected_ingredients)
+            if unambiguous_ingredient:
+                dangerous_ingredient = list(suspected_ingredients)[0]
+                allergen_map[dangerous_ingredient] = allergen
+        for allergen in allergen_map.values():
+            if allergen in dangerous_ingredients:
+                dangerous_ingredients.pop(allergen)
+    return allergen_map
 ```
