@@ -14,92 +14,130 @@ After decoding:
 
 ```python
 line = {
+    'line': 1,
     'ingredients': ['mxmxvkd', 'kfcds', 'sqjhc', 'nhms'],
     'some_allergens': ['dairy', 'fish'],
 }
 ```
 
-### Multiple Stage Split Decoding
+### Multiple Stage String Split Decoding
 
 This decoding methods involves a number of split stages:
 
-1. Remove trailing closing parenthesis
-1. Split lines using `` (contains `` as separator.
-    1. Left hand side is then split using space character as separator.
-    1. Right hand side is then split using space character as separator.
-1. Group lists in a dictionary structure.
+* For each line until EOF:
+    1. Test if it contains the line ending used when contents is present.
+        * If not present, ignore this line and iterate again.
+    1. Split line contents using `` (contains `` as separator into groups.
+    1. Split each group using the space character `` `` as separator into a list of strings.
+    1. Group lists in a dictionary structure.
+    1. Yield the dictionary.
 
 ```python
-for line in lines:
-    line: str = line.strip()[:-1]
-    lhs, rhs = line.split(' (contains ')
-    ingredients: list = lhs.split(' ')
-    allergens: list = rhs.split(' ')
-    yield {
-        'ingredients': ingredients,
-        'some_allergens': allergens,
-    }
+def load_food_list(file: Path) -> Iterator[dict[str, any]]:
+    line_ending = ')\n'
+    for i, line in enumerate(open(file)):
+        if not line.endswith(line_ending):
+            continue
+        groups = line.strip(line_ending).split(' (contains ')
+        ingredients = groups[0].split()
+        allergens = groups[1].split(', ')
+        assert all(map(len, (ingredients, allergens)))
+        food: dict = {
+            'line': 1 + i,
+            'ingredients': ingredients,
+            'some_allergens': allergens,
+            }
+        yield food
 ```
 
-### Tile Data Extraction
+## Data Recon
 
-Bitmaps are serialized following a common pattern.
+### Test for Lines with All Allergens Listed
 
-```
-Tile 1234:
-..##.#..#.
-##..#.....
-#...##..#.
-####.#...#
-##.##.###.
-##...#.###
-.#.#.#..##
-..#....#..
-###...#.#.
-..###..###
-```
-* String ``Tile`` followed by an integer
-* A 10x10 binary array, with the states ``#`` and ``.`` 
+The challenge states:
 
+> Each allergen is found in exactly one ingredient. Each ingredient contains zero or one allergen. Allergens aren't always marked; when they're listed, the ingredient that contains each listed allergen will be somewhere in the corresponding ingredients list. However, even if an allergen isn't listed, the ingredient that contains that allergen could still be present: maybe they forgot to label it, or maybe it was labeled in a language you don't know.
 
-First order of business is to load contents, no need to go fancy just yet.
+A key point is the statement ``Allergens aren't always marked``. Being the case would allow assigning a set of known allergens to a set of ingredients. This can be tested by filtering lines with the same number of ingredients and allergens.
 
 ```python
-tile = dict()
-for line in open(file):
-    if 'Tile ' in line:
-        tile['id'] = int(line[5:-2])
-        tile['rows'] = list()
-    elif len(line) > 2:
-        tile['rows'].append(line.strip())
-        last_row = len(tile['rows']) == len(line.strip())
-        if last_row:
-            yield tile
-            tile = dict()
+if len(ingredients) == len(allergens):
+    print(f'Found closed set at line {line}')
 ```
 
-### Tile Border Computation
+Contents File | Total Lines | Lines with All Allergens
+--- | --- | ---
+Example.txt | 4 | 0
+Input.txt | 34 | 0
 
-The day 20 challenge only uses border data, leaving out all data not part of the tile borders.
+Although worth a try, *there are no lines with all allergens* being indicated. 
 
-Extracting top and bottom borders is straightforward, however the tile needs to be rotated to facilitate extraction of the two remaining borders.
-```python
-rows = tile['rows']
-rot_cw = list(''.join(c) for c in zip(*rows[::-1]))
-```
+### Determining Known Allergens Set
 
-Since tiles may be flipped, borders may also be reversed. After converting borders into a list of integer.
+The challenge states:
 
-### Submission Calculation
+> Allergens aren't always marked.
 
-Corner tiles can be extracted by matching tiles with only two border matches.
+However this is true on a per-food basis. The set of allergens can be compiled by iterating through all the food items.
 
 ```python
-corner_tiles = [k for k, v in matched_tiles.items() if len(v) == 2]
-corners_id_product = functools.reduce(operator.mul, corner_tiles)
+    ingredients = set()
+    allergens = set()
+    for food in foods:
+        ingredients.update(food['ingredients'])
+        allergens.update(food['some_allergens'])
+
 ```
 
-# Part Two
+Contents File | Ingredients | Allergens
+--- | --- | ---
+Example.txt | 7 | 3
+Input.txt | 200 | 8
 
-Had to go through several iterations to get this one right.
+### Ingredients by Allergens Map
 
+The challenge states:
+
+> Each allergen is found in exactly one ingredient.
+
+This statement implies that for all foods containing the allergen, ingredients which are not present in all the foods does not contain the corresponding allergen.
+
+The idea consists in:
+
+* Compile a set of ingredients
+* Compile a map of food ingredients by allergen
+* For each allergen:
+    1. Get a list of ingredients present in all the food ingredients containing the allergen
+    1. Remove these ingredients from the copy of the ingredient list
+
+```python
+def list_safe_ingredients(foods: list[dict[str, any]]) -> set[str]:
+    safe_ingredients = {ingredient
+                        for f in foods
+                        for ingredient in f['ingredients']}
+    ingredients_by_allergen = dict()
+    for food in foods:
+        ingredients = set(food['ingredients'])
+        for allergen in food['some_allergens']:
+            if allergen not in ingredients_by_allergen:
+                ingredients_by_allergen[allergen] = [ingredients]
+            else:
+                ingredients_by_allergen[allergen].append(ingredients)
+    for allergen, food_ingredients in ingredients_by_allergen.items():
+        unsafe_ingredients = set.intersection(*food_ingredients)
+        safe_ingredients -= unsafe_ingredients
+    return safe_ingredients
+```
+
+### Counting Occurrences of Safe Ingredients
+
+The submission question is as follows:
+
+> How many times do any of those ingredients appear?
+
+This count is obtained by iterating over each safe ingredients and over all foods.
+
+```python
+count = lambda i: sum(1 for f in foods if i in f['ingredients'])
+submission = sum(count(i) for i in safe_ingredients)
+```

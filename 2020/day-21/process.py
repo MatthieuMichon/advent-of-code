@@ -1,4 +1,9 @@
-import os
+#!/usr/bin/env python
+
+"""
+Advent of Code day 21 challenge
+"""
+
 import sys
 from pathlib import Path
 from typing import Iterator
@@ -7,25 +12,70 @@ from typing import Iterator
 # Common -----------------------------------------------------------------------
 
 
-def load_food_list(file: Path) -> Iterator[dict[str, list]]:
+def load_foods(file: Path) -> Iterator[dict[str, any]]:
     """
-    Read food lists from the given file
+    Read foods from the given file
 
-    :param file: file containing list of ingredients and allergens
+    :param file: file containing list of food with ingredients and allergens
     :return: iterator of dict objects
     """
 
-    for line in open(file):
-        line_has_contents = len(line) > len(os.linesep)
-        if line_has_contents:
-            line: str = line.strip()[:-1]
-            lhs, rhs = line.split(' (contains ')
-            ingredients: list = lhs.split(' ')
-            allergens: list = rhs.split(' ')
-            yield {
-                'ingredients': ingredients,
-                'some_allergens': allergens,
+    line_ending = ')\n'
+    for i, line in enumerate(open(file)):
+        if not line.endswith(line_ending):
+            continue
+        groups = line.strip(line_ending).split(' (contains ')
+        ingredients = groups[0].split()
+        allergens = groups[1].split(', ')
+        assert all(map(len, (ingredients, allergens)))
+        food: dict = {
+            'line': 1 + i,
+            'ingredients': ingredients,
+            'some_allergens': allergens,
             }
+        yield food
+
+
+def list_safe_ingredients(foods: list[dict[str, any]]) -> set[str]:
+    """
+    List safe ingredients without allergen
+
+    :param foods: list of ingredients and corresponding known allergens
+    :return: list of ingredients which do not contain any allergen
+    """
+
+    safe_ingredients = {ingredient
+                        for f in foods
+                        for ingredient in f['ingredients']}
+
+    ingredients_by_allergen = dict()
+    for food in foods:
+        ingredients = set(food['ingredients'])
+        for allergen in food['some_allergens']:
+            if allergen not in ingredients_by_allergen:
+                ingredients_by_allergen[allergen] = [ingredients]
+            else:
+                ingredients_by_allergen[allergen].append(ingredients)
+
+    for allergen, food_ingredients in ingredients_by_allergen.items():
+        unsafe_ingredients = set.intersection(*food_ingredients)
+        safe_ingredients -= unsafe_ingredients
+
+    return safe_ingredients
+
+
+def count_ingredients(foods: list[dict[str, any]], ingredient: str) -> int:
+    """
+    Count number of occurrences of an ingredient in a list of foods
+
+    :param foods: list of ingredients and corresponding known allergens
+    :param ingredient: ingredient to count
+    :return: number of occurrences
+    """
+
+    count = sum(1 for f in foods if ingredient in f['ingredients'])
+
+    return count
 
 
 def compute_part_one(file: Path) -> int:
@@ -36,9 +86,12 @@ def compute_part_one(file: Path) -> int:
     :return:
     """
 
-    food_list: list[dict[str, list]] = list(load_food_list(file=file))
-    dummy = -1
-    return dummy
+    foods: list = list(load_foods(file=file))
+    safe_ingredients = list_safe_ingredients(foods=foods)
+    count = lambda i: sum(1 for f in foods if i in f['ingredients'])
+    submission = sum(count(i) for i in safe_ingredients)
+
+    return submission
 
 
 def main() -> int:
