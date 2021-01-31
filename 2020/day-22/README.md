@@ -109,6 +109,79 @@ The challenge is altered by adding a number of rules governing how rounds are co
 
 If the current deck configuration was already encountered in past then the game ends and player 1 wins.
 
+```python
+def play_recursive_combat(decks: tuple[list[int]], game: int) -> int:
+    previous_decks = list()
+    while min(map(len, decks)):
+        if decks in previous_decks:
+            return PLAYER_1
+        previous_decks.append(decks)
+```
+
 > If both players have at least as many cards remaining in their deck as the value of the card they just drew, the winner of the round is determined by playing a new game of Recursive Combat.
 
 Due to recursion, it makes sense to factorize the method which takes in input both decks and runs iterations until an exit condition is found.
+
+```python
+def play_recursive_combat(decks: tuple[list[int]], game: int) -> int:
+    game += 1
+    round = 0
+    winner = -1
+    previous_decks = list()
+    while min(map(len, decks)):
+        if decks in previous_decks:
+            return PLAYER_1
+        previous_decks.append(decks)
+        round += 1
+        top_cards = list(zip(*decks))[0]
+        decks = tuple(d[1:] for d in decks)
+        do_recursive_combat = all(len(d) >= top_cards[i]
+                                  for i, d in enumerate(decks))
+        if do_recursive_combat:
+            copied_decks = list()
+            for i, deck in enumerate(decks):
+                copied_decks.append(deck.copy()[:top_cards[i]])
+            winner = play_recursive_combat(decks=tuple(copied_decks), game=game)
+        else:
+            winner = top_cards.index(max(card for card in top_cards))
+        top_cards = sorted(top_cards, reverse=True)
+        decks[winner].extend(top_cards)
+    return winner
+```
+
+This recursive function is bootstrapped by an other function. Both functions could have been merged in a single one.
+
+```python
+def play_regular_combat(decks: tuple[list[int]]) -> tuple[list[int]]:
+    game = 1
+    round = 0
+    previous_decks = list()
+    while min(map(len, decks)):
+        if decks in previous_decks:
+            assert False
+        round += 1
+        top_cards = list(zip(*decks))[0]
+        decks = tuple(d[1:] for d in decks)
+        do_recursive_combat = all(len(d) >= top_cards[i]
+                                  for i, d in enumerate(decks))
+        if do_recursive_combat:
+            copied_decks = list()
+            for i, deck in enumerate(decks):
+                copied_decks.append(deck.copy()[:top_cards[i]])
+            winner = play_recursive_combat(decks=tuple(copied_decks), game=game)
+        else:
+            winner = top_cards.index(max(card for card in top_cards))
+        top_cards = [top_cards[winner], top_cards[(1 + winner) % 2]]
+        decks[winner].extend(top_cards)
+    return decks
+```
+
+This leaves the calling function: 
+
+```python
+decks = read_decks(file=Path(f))
+decks = play_regular_combat(decks=decks)
+winning_deck = max(decks, key=len)
+score = score_combat(deck=winning_deck)
+print(f'= {score}')
+```

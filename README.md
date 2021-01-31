@@ -27,5 +27,4 @@ Day | Challenge | Part One | Part Two
 [Day 19](./2020/day-19) | [Monster Messages](./2020/day-19/README.md) | Interesting! used a top-down graph traversal | Stuck: had to hard-code top of rule dependency graph 
 [Day 20](./2020/day-20) | [Jurassic Jigsaw](./2020/day-20/README.md) | Ok | Stuck: had to use recursion for reconstructing the image
 [Day 21](./2020/day-21) | [Allergen Assessment](./2020/day-21/README.md) | Ok | Ok
-
-
+[Day 22](./2020/day-22) | [Crab Combat](./2020/day-22/README.md) | Ok | Ok, lost some time reading too fast (applied max sort which isn't always the case in the second part)
