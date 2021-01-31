@@ -28,3 +28,4 @@ Day | Challenge | Part One | Part Two
 [Day 20](./2020/day-20) | [Jurassic Jigsaw](./2020/day-20/README.md) | Ok | Stuck: had to use recursion for reconstructing the image
 [Day 21](./2020/day-21) | [Allergen Assessment](./2020/day-21/README.md) | Ok | Ok
 [Day 22](./2020/day-22) | [Crab Combat](./2020/day-22/README.md) | Ok | Ok, lost some time reading too fast (applied max sort which isn't always the case in the second part)
+[Day 23](./2020/day-23) | [Crab Cups](./2020/day-23/README.md) | Ok | -
