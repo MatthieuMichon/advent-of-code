@@ -226,6 +226,75 @@ def compute_answer(cups: deque[int]) -> int:
     return answer
 ```
 
+# Part Two
+
+## Puzzle Input Decoding
+
+Second part of the challenge starts by increasing the number of cups to one million.
+
+> the crab starts arranging many cups in a circle on your raft - one million (1000000) in total.
+
+The `decode_input()` method will definitively have to updated for providing these extra cups.
+
+> Your labeling is still correct for the first few cups; after that, the remaining cups are just numbered in an increasing fashion starting from the number after the highest number in your list and proceeding one by one until one million is reached.
+
+The extra cups can be added using a list comprehension.
+
+```python
+cups.extend(i for i in range(len(cups), 10**6))
+```
+
+The function thus becomes:
+
+```python
+
+```
+
+## Iterative Processing Implementation
+
+> the crab is going to do ten million (10000000) moves!
+
+The number of iteration must be bumped from one hundred to ten million, which requires an efficient implementation.
+
+The critical path in the implementation for part one goes through two loops, which must be replaced with something more efficient.
+
+```python
+# portion of the slow code
+while cups[0] != destination_cup:
+    cups.rotate(-1)
+cups = list(cups)
+cups[1:1] = cw_cups
+cups = deque(cups)
+while cups[0] != current_cup:
+    cups.rotate(-1)
+```
+
+Speed was improved about ten fold.
+
+```python
+# portion with the updated code
+    cups.rotate(-cups.index(destination_cup))
+    cups = list(cups)
+    cups[1:1] = cw_cups
+    cups = deque(cups)
+    cups.rotate(-cups.index(current_cup))
+```
+
+However this is far from being enough optimized for the answer to be computed in seconds.
+
+## Submission Value Computation
+
+> Determine which two cups will end up immediately clockwise of cup 1. What do you get if you multiply their labels together?
+
+```python
+def compute_answer_part_two(cups: deque[int]) -> int:
+    while cups[0] != 1:
+        cups.rotate(-1)
+    following_cups = list(cups)[1:3]
+    answer = int(following_cups[0]) * int(following_cups[1])
+    return answer
+
+```
 # Summary
 
 * Input handling: simple and happy with the implementation.

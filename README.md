@@ -29,3 +29,8 @@ Day | Challenge | Part One | Part Two
 [Day 21](./2020/day-21) | [Allergen Assessment](./2020/day-21/README.md) | Ok | Ok
 [Day 22](./2020/day-22) | [Crab Combat](./2020/day-22/README.md) | Ok | Ok, lost some time reading too fast (applied max sort which isn't always the case in the second part)
 [Day 23](./2020/day-23) | [Crab Cups](./2020/day-23/README.md) | Ok | -
+
+## Resources
+
+* [AoC subreddit](https://www.reddit.com/r/adventofcode/)
+* [Comprehensive walk-through](https://github.com/mebeim/aoc/blob/master/2020/README.md) by [Marco Bonelli](https://github.com/mebeim)
