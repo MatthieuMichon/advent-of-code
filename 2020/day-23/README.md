@@ -280,7 +280,54 @@ Speed was improved about ten fold.
     cups.rotate(-cups.index(current_cup))
 ```
 
-However this is far from being enough optimized for the answer to be computed in seconds.
+However this is far from being enough optimized for the answer to be computed in seconds. The code was further optimized by getting rid of costly conversions between [`list`][py-list] and [`collections.deque`][py-collections-deque] types, leaving the following method.
+
+```python
+def move_cups_deque(cups: deque[int], silent: bool = False) -> deque[int]:
+    def compute_destination_cup() -> int:
+        destination_cup = current_cup - 1
+        while destination_cup not in cups:
+            destination_cup -= 1
+            if destination_cup < min(cups):
+                return max(cups)
+        return destination_cup
+    current_cup = cups[0]
+    cups.rotate(-1)
+    cw_cups = list()
+    for i in range(3):
+        cw_cups.append(cups.popleft())
+    dest_cup = compute_destination_cup()
+    cups_len = len(cups)
+    cups.rotate(cups_len-cups.index(dest_cup))
+    for i, c in enumerate(cw_cups):
+        cups.insert(1 + i, c)
+    cups.rotate(-cups.index(current_cup)-1)
+    return cups
+```
+
+However the speed-up while significant is far from enough for computing 10**7 moves. This suggests that the [`collections.deque`][py-collections-deque] may not be suited for working with such large data set.
+
+Using an implementation relying on a [`list`][py-list] type yielded a further improvement, but falls still short of an acceptable target. 
+
+```python
+def move_cups_list(cups: list[int], cups_len: int) -> list[int]:
+    picked_cups = cups[0:4]
+    destination_cup_label = picked_cups[0] - 1
+    while (destination_cup_label in picked_cups[1:4]) \
+            or (destination_cup_label == 0):
+        destination_cup_label = (destination_cup_label - 1) % (1 + cups_len)
+    destination_cup_index = 1 + cups.index(destination_cup_label)
+    cups[destination_cup_index:destination_cup_index] = picked_cups[1:4]
+    cups.append(cups[0])
+    cups = cups[4:]
+    return cups
+```
+
+Looking at the big picture, it appears that assuming the `destination_cup_label` is not in part of the `picked_cups` list of integers, which is nearly always the case with 10^6 cups. If so there could be a way to optimize with, instead of having the `current_cup` always as a first item, having the list fixed and moving the index of the `current_cup` along the list.
+
+```
+odds = (10^6 - 3 - 1) / (10^6 - 1)
+```
 
 ## Submission Value Computation
 
