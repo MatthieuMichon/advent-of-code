@@ -329,6 +329,42 @@ Looking at the big picture, it appears that assuming the `destination_cup_label`
 odds = (10^6 - 3 - 1) / (10^6 - 1)
 ```
 
+Tried using a static approach, with moving the current cup while keeping the list in place (pretty much reflects the lists in the example). However doing so resulted in a regression, the code being as following:
+
+```python
+def mix_up_static(cups: list[int], moves: int) -> list[int]:
+    cups_len = len(cups)
+    index = 0
+    for move in range(moves):
+        rollover = 4 + index > cups_len
+        if not rollover:
+            picked_cups = cups[1 + index:4 + index]
+        else:
+            for i in range(3):
+                picked_cups[i] = cups[(i + 1 + index) % cups_len]
+        destination_cup_label = cups[index % cups_len] - 1
+        while (destination_cup_label in picked_cups) \
+                or (destination_cup_label == 0)\
+                or ((destination_cup_label < 10) and destination_cup_label not in cups):
+            destination_cup_label = (destination_cup_label - 1) % (1 + cups_len)
+        destination_cup_index = 1 + cups.index(destination_cup_label)
+        rollover = destination_cup_index < 4 + index
+        if not rollover:
+            cups[index + 1:destination_cup_index - 3] = cups[index + 4:destination_cup_index]
+            cups[destination_cup_index - 3:destination_cup_index] = picked_cups
+        else:
+            for i in range(index + 1, cups_len + destination_cup_index - 3):
+                cups[i % cups_len] = cups[(i + 3) % cups_len]
+            for i in range(cups_len + destination_cup_index - 3, cups_len + destination_cup_index):
+                cups[i % cups_len] = picked_cups[i - (cups_len + destination_cup_index - 3)]
+        index = (index + 1) % cups_len
+    return cups
+```
+
+Rollover conditions are extremely unlikely, thus nothing clever was attempted.
+
+Going forward data must be mapped in a way to limit operations to the bare minimum. This requires replacing a simple list by something more clever.
+
 ## Submission Value Computation
 
 > Determine which two cups will end up immediately clockwise of cup 1. What do you get if you multiply their labels together?
