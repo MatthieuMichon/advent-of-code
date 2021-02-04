@@ -365,6 +365,39 @@ Rollover conditions are extremely unlikely, thus nothing clever was attempted.
 
 Going forward data must be mapped in a way to limit operations to the bare minimum. This requires replacing a simple list by something more clever.
 
+The idea is to have a list which given a cup label as an index returns the cup label immediately clockwise. Performing the actions has therefore a minimal impact since only the cups which have a different clockwise cup label must be updated. This results in the following function:
+
+```python
+def mix_up_lut(cups: list[int], moves: int) -> list[int]:
+    lut = [-1] * (1 + len(cups))
+    lut[0] = cups[0]
+    for i, c in enumerate(cups):
+        lut[c] = cups[(i + 1) % len(cups)]
+    current_cup = lut[0]
+    for move in range(moves):
+        picked_cups = (
+            lut[current_cup], lut[lut[current_cup]], lut[lut[lut[current_cup]]])
+        next_cup = lut[picked_cups[-1]]
+        destination_cup = current_cup - 1
+        while True:
+            if destination_cup == 0:
+                destination_cup = len(cups)
+            if destination_cup not in picked_cups:
+                break
+            destination_cup -= 1
+        lut[current_cup] = next_cup
+        lut[picked_cups[-1]] = lut[destination_cup]
+        lut[destination_cup] = picked_cups[0]
+        current_cup = next_cup
+    cups = [-1] * (1 + len(cups))
+    ptr = current_cup
+    for i in range(len(cups)):
+        cups[i] = ptr
+        ptr = lut[ptr]
+    cups.pop()
+    return cups
+```
+
 ## Submission Value Computation
 
 > Determine which two cups will end up immediately clockwise of cup 1. What do you get if you multiply their labels together?
@@ -376,14 +409,16 @@ def compute_answer_part_two(cups: deque[int]) -> int:
     following_cups = list(cups)[1:3]
     answer = int(following_cups[0]) * int(following_cups[1])
     return answer
-
 ```
+
 # Summary
 
 * Input handling: simple and happy with the implementation.
 * Part one
     * Iterative computation: simple but many type changes between `list` and `deque`, leaving room for improvement.
     * Puzzle value computation: simple and happy with the implementation.
+* Part two
+    * Though nut to crack. Had to look around for alternate methods and saw some implementations using a mapping. Thought it would be interesting to do using a simple list instead.
 
 [d23-challenge]: https://adventofcode.com/2020/day/23
 [py-list]: https://docs.python.org/3/library/stdtypes.html?highlight=list#list

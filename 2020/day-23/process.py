@@ -14,7 +14,7 @@ def print_part_one(inputs: list[dict[str, any]]) -> None:
     """
     for input_ in inputs:
         cups = decode_input(input_=input_['labels'])
-        cups_list = mix_up_static(cups=cups, moves=input_['moves'])
+        cups_list = mix_up_lut(cups=cups, moves=input_['moves'])
         answer: int = compute_answer(cups=deque(cups_list))
         print(f'Puzzle part one answer is {answer}')
 
@@ -44,7 +44,7 @@ def print_part_two(inputs: list[dict[str, any]]) -> None:
     for input_ in inputs:
         cups = decode_input(input_=input_['labels'])
         cups.extend(1 + i for i in range(len(cups), 10**6))
-        cups = mix_up_static(cups=cups, moves=input_['moves'])
+        cups = mix_up_lut(cups=cups, moves=input_['moves'])
         answer: int = compute_answer_part_two(cups=deque(cups))
         print(f'Puzzle part one answer is {answer}')
 
@@ -147,6 +147,42 @@ def mix_up_static(cups: list[int], moves: int) -> list[int]:
     return cups
 
 
+def mix_up_lut(cups: list[int], moves: int) -> list[int]:
+    """Mix up cups according to the challenge rules repeating a number of moves
+
+    :param cups: list of digits
+    :param moves: number of mixes
+    :return: list of digits after mix up moves
+    """
+    lut = [-1] * (1 + len(cups))
+    lut[0] = cups[0]
+    for i, c in enumerate(cups):
+        lut[c] = cups[(i + 1) % len(cups)]
+    current_cup = lut[0]
+    for move in range(moves):
+        picked_cups = (
+            lut[current_cup], lut[lut[current_cup]], lut[lut[lut[current_cup]]])
+        next_cup = lut[picked_cups[-1]]
+        destination_cup = current_cup - 1
+        while True:
+            if destination_cup == 0:
+                destination_cup = len(cups)
+            if destination_cup not in picked_cups:
+                break
+            destination_cup -= 1
+        lut[current_cup] = next_cup
+        lut[picked_cups[-1]] = lut[destination_cup]
+        lut[destination_cup] = picked_cups[0]
+        current_cup = next_cup
+    cups = [-1] * (1 + len(cups))
+    ptr = current_cup
+    for i in range(len(cups)):
+        cups[i] = ptr
+        ptr = lut[ptr]
+    cups.pop()
+    return cups
+
+
 def dump_cups_with_first(cups: list[int]) -> str:
     """Dump list of cups with highlighting the first one
 
@@ -170,7 +206,7 @@ def main() -> int:
         {'labels': '389125467', 'moves': 100},
         {'labels': '963275481', 'moves': 100},
     ]
-    #print_part_one(inputs=inputs)
+    print_part_one(inputs=inputs)
     inputs = [
         {'labels': '389125467', 'moves': 10**7},
         {'labels': '963275481', 'moves': 10**7},
