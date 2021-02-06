@@ -29,6 +29,7 @@ Day | Challenge | Part One | Part Two
 [Day 21](./2020/day-21) | [Allergen Assessment](./2020/day-21/README.md) | Ok | Ok
 [Day 22](./2020/day-22) | [Crab Combat](./2020/day-22/README.md) | Ok | Ok, lost some time reading too fast (applied max sort which isn't always the case in the second part)
 [Day 23](./2020/day-23) | [Crab Cups](./2020/day-23/README.md) | Ok | Stuck: had to use a list for storing clockwise object
+[Day 24](./2020/day-24) | [Lobby Layout](./2020/day-24/README.md) | - | -
 
 ## Resources
 
