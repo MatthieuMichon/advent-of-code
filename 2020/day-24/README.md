@@ -1,5 +1,11 @@
 # Day 24: Lobby Layout
 
+## Summary
+
+Puzzle | Decoding | Transform | Iterations | Epilogue
+--- | --- | --- | --- | ---
+Day 24 Part One | [`file -> list[list[int]]`](#input-decoding) | [Optimization](#initial-transform) | tbd | tbd
+
 ## Initial Thoughts
 
 > A member of the renovation crew gives you a list of the tiles that need to be flipped over (your puzzle input).
@@ -34,7 +40,9 @@ Steps | Sequence
 
 Not surprisingly, several different paths may lead the same tile. The opposite would mean that simply counting the lines would be yield the answer.
 
-## Input Decoding
+## Puzzle Part One
+
+### Input Decoding
 
 Input contents have the following characteristics:
 
@@ -102,4 +110,41 @@ Quick check:
 ```python
 >>> set(a for p in paths for a in p)
 {330, 270, 210, 150, 90, 30}
+```
+
+### Initial Transform
+
+Each path has a number of steps which when travelled lead to a destination tile. These steps are **commutative**, meaning their order does not affect the destination tile.
+
+```python
+from collections import Counter
+
+
+paths = [Counter(p) for p in paths]
+```
+
+Furthermore pairs of opposite steps (with an angular difference of 180 degrees) cancel out, meaning they can be removed without affecting the destination tile.
+
+```python
+distance = path[angle] - path[180 + angle]
+heading = angle if distance >= 0 else 180 + angle
+optimized_steps.extend([heading] * abs(distance))
+```
+
+The complete optimization method:
+
+```python
+def optimize(paths: list[list[int]]) -> list[list[int]]:
+    paths = [Counter(p) for p in paths]
+    optimized_paths = list()
+    for path in paths:
+        optimized_steps = list()
+        for angle in ANGLES:
+            if angle > 180:
+                break
+            distance = path[angle] - path[180 + angle]
+            heading = angle if distance >= 0 else 180 + angle
+            optimized_steps.extend([heading] * abs(distance))
+        optimized_paths.append(optimized_steps)
+    return optimized_paths
 ```

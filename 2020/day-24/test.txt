@@ -1,0 +1,13 @@
+ne
+e
+se
+sw
+w
+nw
+neswne
+ewe
+senwse
+swnesw
+wew
+nwsenw
+
