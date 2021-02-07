@@ -9,7 +9,7 @@ import os
 import sys
 from collections import Counter
 from pathlib import Path
-
+from typing import Iterator
 
 # Common -----------------------------------------------------------------------
 
@@ -19,6 +19,15 @@ DIRECTION_MAP = {
     'e': '2', 'w': '5',
 }
 ANGLES = [-30 + 60 * int(v) for v in sorted(DIRECTION_MAP.values())]
+
+HEADING_COORDINATES = {
+    30: (1, 1, 0),
+    90: (0, 1, 1),
+    150: (-1, 0, 1),
+    210: (-1, -1, 0),
+    270: (0, -1, -1),
+    330: (1, 0, -1),
+}
 
 
 def read_paths(file: Path) -> list[list[int]]:
@@ -54,8 +63,31 @@ def optimize(paths: list[list[int]]) -> list[list[int]]:
             distance = path[angle] - path[180 + angle]
             heading = angle if distance >= 0 else 180 + angle
             optimized_steps.extend([heading] * abs(distance))
+        loop_sequence = set(30 + 120 * i for i in range(3))
+        while all(angle in optimized_steps for angle in loop_sequence):
+            for angle in loop_sequence:
+                optimized_steps.remove(angle)
+        loop_sequence = set(90 + 120 * i for i in range(3))
+        while all(angle in optimized_steps for angle in loop_sequence):
+            for angle in loop_sequence:
+                optimized_steps.remove(angle)
         optimized_paths.append(optimized_steps)
     return optimized_paths
+
+
+def transform(paths: list[list[int]]) -> Iterator[tuple[int]]:
+    """Transform paths into destination tiles offsets
+
+    :param paths: paths as a list of heading in degrees
+    :return: lists of destination tiles offsets coordinates
+    """
+    for path in paths:
+        coordinates = [0] * 3
+        for step in path:
+            offset_axis = HEADING_COORDINATES[step]
+            for axis, offset_axis in enumerate(offset_axis):
+                coordinates[axis] += offset_axis
+        yield tuple(coordinates)
 
 
 def print_part_one(inputs: list[Path]) -> None:
@@ -66,9 +98,11 @@ def print_part_one(inputs: list[Path]) -> None:
     """
     for file in inputs:
         paths = read_paths(file=file)
+        tiles = list(transform(paths=paths))
+        tiles = Counter(tiles)
+        answer = len([t for t in tiles.values() if t % 2])
+        print(f'Day 24 part one, file: {file}; answer: {answer}')
 
-    paths = optimize(paths=paths)
-    len(paths)
 
 # Common -----------------------------------------------------------------------
 
@@ -80,7 +114,8 @@ def main() -> int:
     """
     inputs = [
         'test.txt',
-        #'example.txt',
+        'example.txt',
+        'input.txt'
     ]
     print_part_one(inputs=[Path(i) for i in inputs])
     return 0

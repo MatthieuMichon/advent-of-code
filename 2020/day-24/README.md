@@ -2,9 +2,9 @@
 
 ## Summary
 
-Puzzle | Decoding | Transform | Iterations | Epilogue
+Puzzle | Decode | Transform | Iterate | Answer
 --- | --- | --- | --- | ---
-Day 24 Part One | [`file -> list[list[int]]`](#input-decoding) | [Optimization](#initial-transform) | tbd | tbd
+Day 24 Part One | [`file -> list[list[int]]`](#input-decoding) | [Coordinate change](#initial-transform) | [Count](#iterative-computing) | [Filter](#answer-calculation)
 
 ## Initial Thoughts
 
@@ -114,7 +114,11 @@ Quick check:
 
 ### Initial Transform
 
-Each path has a number of steps which when travelled lead to a destination tile. These steps are **commutative**, meaning their order does not affect the destination tile.
+#### First Incorrect Implementation
+
+> :warning: **Warning**: The implementation below is not able to remove all redundant paths. It is kept for reference purposes, the [corrected implementation](corrected-implementation) is further below.
+
+Each path has a number of steps which when travelled lead to a destination tile. These steps are **commutative**, meaning their order does not affect the destination tile. The [`collections.Counter`][python-collections-counter] class provides a convenient way for grouping by value these steps.
 
 ```python
 from collections import Counter
@@ -148,3 +152,78 @@ def optimize(paths: list[list[int]]) -> list[list[int]]:
         optimized_paths.append(optimized_steps)
     return optimized_paths
 ```
+
+#### Corrected Implementation
+
+> A **list of the tiles** that need to be flipped over.
+
+Resolving each path into relative coordinates avoids having to search and remove all possible loops patterns and iteration work for factoring on a set of three axis (`0`; `60` and `120` degrees).
+
+Heading | `0°` | `60°` | `120°`
+--- | --- | --- | ---
+30 | 1 | 1 | 0
+90 | 0 | 1 | 1
+150 | -1 | 0 | 1
+210 | -1 | -1 | 0
+270 | 0 | -1 | -1
+330 | -1 | 0 | -1
+
+```python
+HEADING_COORDINATES = {
+    30: (1, 1, 0),
+    90: (0, 1, 1),
+    150: (-1, 0, 1),
+    210: (-1, -1, 0),
+    270: (0, -1, -1),
+    330: (1, 0, -1),
+}
+```
+
+Instead it is much easier to convert a step into a combination of the two remaining axis.
+
+```python
+def transform(paths: list[list[int]]) -> Iterator[tuple[int]]:
+    for path in paths:
+        coordinates = [0] * 3
+        for step in path:
+            offset_axis = HEADING_COORDINATES[step]
+            for axis, offset_axis in enumerate(offset_axis):
+                coordinates[axis] += offset_axis
+        yield tuple(coordinates)
+```
+
+### Iterative Computing
+
+> Each time a tile is identified, it flips from white to black or from black to white.
+
+Tiles flipped an **even number of times** return to their initial state. The [`collections.Counter`][python-collections-counter] class is used again as it provides a neat way for figuring the number of times each path is present in the list.
+
+```python
+tiles = Counter(tiles)
+```
+
+### Answer Calculation
+
+> Each time a tile is identified, it flips from white to black or from black to white.
+
+> How many tiles are left with the black side up.
+
+Finding the answer for the first part is simply a matter of counting the number of tiles which appear odd number of times in the tile list.
+
+```python
+len([t for t in tiles.values() if t % 2])
+``` 
+
+This operation is simple enough to not warrant a dedicated method, thus it is part of the main part one method:
+
+```python
+def print_part_one(inputs: list[Path]) -> None:
+    for file in inputs:
+        paths = read_paths(file=file)
+        tiles = list(transform(paths=paths))
+        tiles = Counter(tiles)
+        answer = len([t for t in tiles.values() if t % 2])
+        print(f'Day 24 part one, file: {file}; answer: {answer}')
+```
+
+[python-collections-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
