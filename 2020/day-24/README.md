@@ -226,4 +226,44 @@ def print_part_one(inputs: list[Path]) -> None:
         print(f'Day 24 part one, file: {file}; answer: {answer}')
 ```
 
+## Puzzle Part Two
+
+### Statement
+
+> Every day, the tiles are **all** flipped according to the following rules:
+>
+> * Any black tile with zero or more than 2 black tiles *immediately adjacent* to it is flipped to white.
+> * Any white tile with exactly 2 black tiles *immediately adjacent* to it is flipped to black.
+
+> **Tiles immediately adjacent** means the six tiles directly touching the tile in question.
+
+This second part uses data computed in the first room.
+
+### Iterative Computing
+
+Iterations consists in:
+
+1. selecting each individual tile
+1. compute its neighbors
+1. update matching tile on next step array
+
+```python
+ROUNDS = 100
+
+
+def print_part_two(inputs: list[Path]) -> None:
+    for file in inputs:
+        paths = read_paths(file=file)
+        tiles = list(transform(paths=paths))
+        tiles = Counter(tiles)
+        for _ in range(ROUNDS):
+            tiles = evolve(tiles=tiles)
+        answer = len([t for t in tiles.values() if t % 2])
+        print(f'Day 24 part two, file: {file}; answer: {answer}')
+```
+
+
+
+### Answer Calculation
+
 [python-collections-counter]: https://docs.python.org/3/library/collections.html#collections.Counter

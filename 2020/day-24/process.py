@@ -44,9 +44,6 @@ def read_paths(file: Path) -> list[list[int]]:
     return paths
 
 
-# Part One  --------------------------------------------------------------------
-
-
 def optimize(paths: list[list[int]]) -> list[list[int]]:
     """Optimize a list of paths
 
@@ -90,6 +87,9 @@ def transform(paths: list[list[int]]) -> Iterator[tuple[int]]:
         yield tuple(coordinates)
 
 
+# Part One  --------------------------------------------------------------------
+
+
 def print_part_one(inputs: list[Path]) -> None:
     """Print answer for part one
 
@@ -102,6 +102,28 @@ def print_part_one(inputs: list[Path]) -> None:
         tiles = Counter(tiles)
         answer = len([t for t in tiles.values() if t % 2])
         print(f'Day 24 part one, file: {file}; answer: {answer}')
+
+
+# Part Two  --------------------------------------------------------------------
+
+
+ROUNDS = 100
+
+
+def print_part_two(inputs: list[Path]) -> None:
+    """Print answer for part two
+
+    :param inputs: list of puzzle input files
+    :return: nothing
+    """
+    for file in inputs:
+        paths = read_paths(file=file)
+        tiles = list(transform(paths=paths))
+        tiles = Counter(tiles)
+        for _ in range(ROUNDS):
+            tiles = evolve(tiles=tiles)
+        answer = len([t for t in tiles.values() if t % 2])
+        print(f'Day 24 part two, file: {file}; answer: {answer}')
 
 
 # Common -----------------------------------------------------------------------
