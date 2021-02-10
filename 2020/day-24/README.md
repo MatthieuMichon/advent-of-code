@@ -239,13 +239,61 @@ def print_part_one(inputs: list[Path]) -> None:
 
 This second part uses data computed in the first room.
 
+```python
+ROUNDS = 100
+
+
+def print_part_two(inputs: list[Path]) -> None:
+    for file in inputs:
+        paths = read_paths(file=file)
+        tiles = list(transform(paths=paths))
+        black_tiles = [t for t, c in Counter(tiles).items() if c % 2]
+        ...
+```
+
 ### Iterative Computing
 
-Iterations consists in:
+Iterations consists in for each day:
 
-1. selecting each individual tile
-1. compute its neighbors
-1. update matching tile on next step array
+#### Area Range Computation
+
+> tiles are all flipped according to the following rules
+
+As stated the area to which the rules apply is not bounded. Outer tiles are all of white colors.
+
+> Any white tile with exactly 2 black tiles immediately adjacent to it is flipped to black.
+
+According to the rule above, white tiles surrounded by white tiles cannot be flipped. Thus any tile which stands outside of the largest box surround black tiles with a border of one tile (to account for cases were several black tiles are lined on a border) will remain unaffected.
+
+```python
+def compute_area_ranges(tiles: list[tuple[int]]) -> list[range]:
+    ranges: list[range] = list()
+    axis_qty = len(tiles[0])
+    for axis in range(axis_qty):
+        values = [t[axis] for t in tiles]
+        ranges.append(range(min(values) - 1, max(values) + 1))
+    return ranges
+
+area_ranges = compute_area_ranges(tiles=today)
+area_tiles = list(itertools.product(*area_ranges))
+```
+
+The [`*`][python-iterable-unpacking] operator unpacks an iterable operand. Meaning it converts a list of ranges in to a number of arguments of type range which are passed to the `itertools.product` method.
+
+#### Flip Rules Calculation
+
+```python
+def list_neighbors(position: tuple, tiles: list[tuple]) -> Iterator[tuple]:
+    axis_qty = len(position)
+    for offset in HEADING_COORDINATES.values():
+        neighbor = tuple(position[axis] + offset[axis]
+                         for axis in range(axis_qty))
+        if neighbor in tiles:
+            yield neighbor
+```
+
+    1. compute its neighbors
+    1. update matching tile on next step array
 
 ```python
 ROUNDS = 100
@@ -255,15 +303,16 @@ def print_part_two(inputs: list[Path]) -> None:
     for file in inputs:
         paths = read_paths(file=file)
         tiles = list(transform(paths=paths))
-        tiles = Counter(tiles)
-        for _ in range(ROUNDS):
-            tiles = evolve(tiles=tiles)
-        answer = len([t for t in tiles.values() if t % 2])
+        black_tiles = [t for t, c in Counter(tiles).items() if c % 2]
+        black_tiles = evolve(black_tiles=black_tiles, rounds=ROUNDS)
+        answer = len(black_tiles)
         print(f'Day 24 part two, file: {file}; answer: {answer}')
 ```
 
+The iterat
 
 
 ### Answer Calculation
 
 [python-collections-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
+[python-iterable-unpacking]: https://docs.python.org/3/tutorial/controlflow.html#unpacking-argument-lists

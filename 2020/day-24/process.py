@@ -5,6 +5,7 @@
 Day 24: Lobby Layout
 """
 
+import itertools
 import os
 import sys
 from collections import Counter
@@ -110,6 +111,41 @@ def print_part_one(inputs: list[Path]) -> None:
 ROUNDS = 100
 
 
+def evolve(black_tiles: list[tuple[int]], rounds: int) -> list[tuple[int]]:
+    """Evolve list of tails for a given number of rounds
+
+    :param black_tiles: list of black tile coordinates
+    :param rounds: number of evolutions
+    :return: list of tile coordinates
+    """
+    def compute_area_ranges(tiles: list[tuple[int]]) -> list[range]:
+        ranges: list[range] = list()
+        axis_qty = len(tiles[0])
+        for axis in range(axis_qty):
+            values = [t[axis] for t in tiles]
+            ranges.append(range(min(values), max(values)))
+        return ranges
+
+    def list_neighbors(position: tuple, tiles: list[tuple]) -> Iterator[tuple]:
+        axis_qty = len(position)
+        for offset in HEADING_COORDINATES.values():
+            neighbor = tuple(position[axis] + offset[axis]
+                             for axis in range(axis_qty))
+            if neighbor in tiles:
+                yield neighbor
+    today = [t[0:2] for t in black_tiles]
+    for round in range(rounds):
+        area = compute_area_ranges(tiles=today)
+        area_tiles = list(itertools.product(*area))
+        for tile in area_tiles:
+            neighbors = list_neighbors(position=tile, tiles=today)
+
+        day = 1 + round
+        if day < 10 or not(day % 10):
+            print(f'Day {day}: {len(tiles)}')
+    return tiles
+
+
 def print_part_two(inputs: list[Path]) -> None:
     """Print answer for part two
 
@@ -120,9 +156,9 @@ def print_part_two(inputs: list[Path]) -> None:
         paths = read_paths(file=file)
         tiles = list(transform(paths=paths))
         tiles = Counter(tiles)
-        for _ in range(ROUNDS):
-            tiles = evolve(tiles=tiles)
-        answer = len([t for t in tiles.values() if t % 2])
+        black_tiles = [t for t, c in tiles.items() if c % 2]
+        tiles = evolve(black_tiles=black_tiles, rounds=ROUNDS)
+        answer = len(tiles)
         print(f'Day 24 part two, file: {file}; answer: {answer}')
 
 
@@ -135,11 +171,12 @@ def main() -> int:
     :return: shell exit code
     """
     inputs = [
-        'test.txt',
+        #'test.txt',
         'example.txt',
         'input.txt'
     ]
-    print_part_one(inputs=[Path(i) for i in inputs])
+    #print_part_one(inputs=[Path(i) for i in inputs])
+    print_part_two(inputs=[Path(i) for i in inputs])
     return 0
 
 
