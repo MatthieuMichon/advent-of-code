@@ -30,6 +30,15 @@ HEADING_COORDINATES = {
     330: (1, 0, -1),
 }
 
+HEX_COORDINATES = {
+    30: (0, 1),
+    90: (1, 0),
+    150: (1, -1),
+    210: (0, -1),
+    270: (-1, 0),
+    330: (-1, 1),
+}
+
 
 def read_paths(file: Path) -> list[list[int]]:
     """Read tile paths from a file
@@ -82,7 +91,8 @@ def transform(paths: list[list[int]]) -> Iterator[tuple[int]]:
     for path in paths:
         coordinates = [0] * 3
         for step in path:
-            offset_axis = HEADING_COORDINATES[step]
+            #offset_axis = HEADING_COORDINATES[step]
+            offset_axis = HEX_COORDINATES[step]
             for axis, offset_axis in enumerate(offset_axis):
                 coordinates[axis] += offset_axis
         yield tuple(coordinates)
@@ -123,27 +133,37 @@ def evolve(black_tiles: list[tuple[int]], rounds: int) -> list[tuple[int]]:
         axis_qty = len(tiles[0])
         for axis in range(axis_qty):
             values = [t[axis] for t in tiles]
-            ranges.append(range(min(values), max(values)))
+            ranges.append(range(min(values) - 2, max(values) + 2))
         return ranges
 
     def list_neighbors(position: tuple, tiles: list[tuple]) -> Iterator[tuple]:
         axis_qty = len(position)
-        for offset in HEADING_COORDINATES.values():
+        for offset in HEX_COORDINATES.values():
             neighbor = tuple(position[axis] + offset[axis]
                              for axis in range(axis_qty))
             if neighbor in tiles:
                 yield neighbor
+
     today = [t[0:2] for t in black_tiles]
     for round in range(rounds):
         area = compute_area_ranges(tiles=today)
         area_tiles = list(itertools.product(*area))
+        tomorrow = list()
         for tile in area_tiles:
-            neighbors = list_neighbors(position=tile, tiles=today)
-
+            black_neighbors = len(list(list_neighbors(
+                position=tile, tiles=today)))
+            if not black_neighbors:
+                continue
+            stay_black = tile in today \
+                            and (0 < black_neighbors < 3)
+            flip_to_black = tile not in today and black_neighbors == 2
+            if flip_to_black or stay_black:
+                tomorrow.append(tile)
         day = 1 + round
         if day < 10 or not(day % 10):
-            print(f'Day {day}: {len(tiles)}')
-    return tiles
+            print(f'Day {day}: {len(tomorrow)}')
+        today = tomorrow
+    return today
 
 
 def print_part_two(inputs: list[Path]) -> None:
