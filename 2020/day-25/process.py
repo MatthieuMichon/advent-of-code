@@ -5,14 +5,9 @@
 Day 25: Combo Breaker
 """
 
-import itertools
 import os
 import sys
-from collections import Counter
 from pathlib import Path
-from typing import Iterator
-
-# Common -----------------------------------------------------------------------
 
 
 def load_public_keys(file: Path) -> tuple[int]:
@@ -26,7 +21,32 @@ def load_public_keys(file: Path) -> tuple[int]:
     return public_keys
 
 
-# Part One  --------------------------------------------------------------------
+def transform(subject_number: int, loop_size: int) -> int:
+    """Transform a subject number and loop size into a public key
+
+    :param subject_number: transformation input value
+    :param loop_size: number of iterations
+    :return: key value
+    """
+    value = subject_number**loop_size % 20201227
+    return value
+
+
+def compute_encryption_key(public_keys: tuple) -> int:
+    """Compute the common encryption key
+
+    :param public_keys: public keys
+    :return: encryption key as integer
+    """
+    card_pk, door_pk = public_keys
+    loop_size: int = 0
+    loop_size_factor = 7
+    while loop_size_factor % 20201227 != card_pk:
+        loop_size += 1
+        loop_size_factor *= 7
+    loop_size += 1
+    encryption_key = transform(subject_number=door_pk, loop_size=loop_size)
+    return encryption_key
 
 
 def print_part_one(inputs: list[Path]) -> None:
@@ -37,7 +57,9 @@ def print_part_one(inputs: list[Path]) -> None:
     """
     for file in inputs:
         pk = load_public_keys(file=file)
-        print(f'Day 24 part one, file: {file}; answer: {pk}')
+        key = compute_encryption_key(public_keys=pk)
+        print(f'Day 25 part one, file: {file}; answer: {key}')
+        assert key == 14897079
 
 
 # Common -----------------------------------------------------------------------

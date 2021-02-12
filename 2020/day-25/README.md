@@ -31,7 +31,7 @@ Its docstring would be:
 
     :param subject_number: transformation input value
     :param loop_size: number of iterations
-    :returns: key value 
+    :return: key value 
     """
 ```
 The algorithm would be as follows:
@@ -96,6 +96,65 @@ def load_public_keys(file: Path) -> tuple[int]:
     return public_keys
 ```
 
+## Implementation
+
+The goal of this puzzle is to compute the encryption key, with the only unknown value being the `loop_size` parameter which controls the number of iterations performed by the `transform()` method.
+
+```python
+def compute_encryption_key(public_keys: tuple) -> int:
+    card_pk, door_pk = public_keys
+    key = card_pk - 1
+    loop_size: int = 0
+    while key != card_pk:
+        loop_size += 1
+        key = transform(subject_number=7, loop_size=loop_size)
+    encryption_key = transform(subject_number=door_pk, loop_size=loop_size)
+    return encryption_key
+```
+
+### Performance Issues
+
+The basic implementation of the transform() method is however not suited for computing results with a loop_size greater than four orders of magnitude.
+
+The critical path being the arithmetical operations performed inside the loop:
+
+```python
+for _ in range(loop_size):
+    value *= subject_number
+    value %= 20201227
+```
+
+The modulus operation can deferred outside of the loop cutting down the total number of operations.
+
+```python
+for _ in range(loop_size):
+    value *= subject_number
+value %= 20201227
+```
+
+Further the repeating multiplication inside the loop is equivalent to the subject number power to the loop size:
+
+```python
+value *= subject_number**loop_size
+value %= 20201227
+```
+
+Although much faster, the processing speed still requires improvement. The next step consists in inlining calls to `transform()`:
+
+```python
+def compute_encryption_key(public_keys: tuple) -> int:
+    card_pk, door_pk = public_keys
+    loop_size: int = 0
+    loop_size_factor = 7
+    while loop_size_factor % 20201227 != card_pk:
+        loop_size += 1
+        loop_size_factor *= 7
+    loop_size += 1
+    encryption_key = transform(subject_number=door_pk, loop_size=loop_size)
+    return encryption_key
+```
+
+The result is now obtain in a few dozen of seconds.
 
 [python-collections-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
 [python-iterable-unpacking]: https://docs.python.org/3/tutorial/controlflow.html#unpacking-argument-lists
