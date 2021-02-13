@@ -4,8 +4,7 @@ Solutions in [Python][py] for the [Advent of Code][aoc] annual programming chall
 
 # 🎄🌟🌟 Advent of Code in Python 🎄🌟🌟
 
-
-**Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language. In this present repository Python 3 is used.
+**Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language, in this repository [Python 3][py] is used.
 
 Annual editions: [2020](#-2020-gettin-crafty-with-it-), 2019, 2018, 2017, 2016, 2015.
 
