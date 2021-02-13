@@ -1,12 +1,21 @@
-# 🎄🌟🌟 Advent of Code 🎄🌟🌟
+Solutions in [Python][py] for the [Advent of Code][aoc] annual programming challenge.
 
-Solutions in Python for the [Advent of Code](https://adventofcode.com/) programming puzzles.
+[![Python 3.9](https://img.shields.io/badge/python-3.9-brightgreen)](https://www.python.org/downloads/release/python-391/)
 
-# 🎄🌟 [2020 Gettin' Crafty With It](./2020/) 🎄🌟
+# 🎄🌟🌟 Advent of Code in Python 🎄🌟🌟
+
+
+**Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language. In this present repository Python 3 is used.
+
+Annual editions: [2020](#-2020-gettin-crafty-with-it-), 2019, 2018, 2017, 2016, 2015.
+
+# 🎄🌟 [2020: Tropical Island](./2020/) 🎄🌟
 
 [![AoC 2020 Banner](./docs/aoc-2020-menu.png)](./2020/)
 
-AoC 2020 is complete! Access directly to anyone of the 25 daily puzzles.
+> After saving Christmas five years in a row, you've decided to take a vacation at a nice resort on a tropical island. *Surely*, Christmas will go on without you.
+
+Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 
 | 日 | 月 | 火 | 水 | 木 | 金 | 土
 |---|---|---|---|---|---|---
@@ -15,7 +24,24 @@ AoC 2020 is complete! Access directly to anyone of the 25 daily puzzles.
 |[13](./2020/day-13) | [14](./2020/day-14) | [15](./2020/day-15) | [16](./2020/day-16) | [17](./2020/day-17) | [18](./2020/day-18) | [19](./2020/day-19)
 |[20](./2020/day-20) | [21](./2020/day-21) | [22](./2020/day-22) | [23](./2020/day-23) | [24](./2020/day-24) | [25](./2020/day-25) | -
 
-# Resources
+# 🎄🌟 [2019: Solar System](./2019/) 🎄🌟
 
-* [AoC subreddit](https://www.reddit.com/r/adventofcode/)
+> Santa has become stranded at the edge of the Solar System while delivering presents to other planets!
+
+| 日 | 月 | 火 | 水 | 木 | 金 | 土
+|---|---|---|---|---|---|---
+| | 
+| | 
+| | 
+| | 
+
+# 🎄🌟 Resources 🎄🌟
+
+* [Advent of Code subreddit](https://www.reddit.com/r/adventofcode/)
+* [Red Blob Games](https://www.redblobgames.com/): interactive visual explanations of math and algorithms
 * [Comprehensive walk-through](https://github.com/mebeim/aoc/blob/master/2020/README.md) by [Marco Bonelli](https://github.com/mebeim)
+
+[py]: https://docs.python.org/3/
+[aoc]: https://adventofcode.com/
+[aoc-2020]: https://adventofcode.com/2020/
+[advent-calendar]: https://en.wikipedia.org/wiki/Advent_calendar
