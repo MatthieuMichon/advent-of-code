@@ -106,7 +106,7 @@ Industry standard practices call for a [UNIX shebang][shebang] in the first line
 
 Command-line argument management is delegated to the [`argparse`][py-argparse] module, which is provided as a standard Python module since quite a while.
 
-## Content Decoding
+## 🧠🌋 Content Decoding 🧠🌋 
 
 A dedicated `load_contents()` method handles content decoding. Standard Python methods are used.
 
@@ -118,22 +118,61 @@ def load_contents(filename: Path) -> list[int]:
 
 Starting from the filename argument, the following operations are performed in sequence:
 
-1. a file object is returned by `open()`
-1. contents of the file object are serialized using `read()`
-1. trailing newlines are removed by calling `strip()`
-1. the string of chars is split into tokens with `split()`
-1. per-item type conversion is done through `map()`
-1. the generator is iterated using `list()`
+1. a file object is returned by [`open()`][py-open]
+1. contents of the file object are serialized using [`read()`][py-read]
+1. trailing newlines are removed by calling [`strip()`][py-strip]
+1. the string of chars is split into tokens with [`split()`][py-split]
+1. per-item type conversion is done through [`map()`][py-map]
+1. the generator is iterated using [`list()`][py-list]
 
-## Puzzle Solving
+## 💡🙋 Puzzle Solving 💡🙋
+
+Solving the first part of the puzzle boils down to performing a [map / reduce][w-map-reduce] operation on the previously loaded contents.
+
+The *map part* consists in applying the calculation listed in the puzzle statement:
+
+> [...] take its mass, divide by three, round down, and subtract 2.
+
+```
+fuel = int(mass / 3) - 2
+```
+
+Expressed in Python language:
+
+```python
+def compute_required_fuel(mass: int) -> int:
+    required_fuel = mass // 3 - 2
+    return required_fuel
+```
+
+The *reduce part* consists in collapsing the list of computed values using the [`sum()`][py-sum] method
+
+```python
+answer = sum(required_fuel_values)
+```
+
+Computed ansmwers:
+
+* example: `34241`
+* input: `3152919`
+
+# 😰🙅 Part Two 😰🙅
 
 
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
+[py-list]: https://docs.python.org/3/library/functions.html#func-list
 [py-main]: https://docs.python.org/3/library/__main__.html
+[py-map]: https://docs.python.org/3/library/functions.html#map
 [py-name]: https://docs.python.org/3/library/stdtypes.html#definition.__name__
+[py-open]: https://docs.python.org/3/library/functions.html#open
+[py-read]: https://docs.python.org/3/library/io.html#io.TextIOBase.read
+[py-split]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.split
+[py-strip]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.strip
+[py-sum]: https://docs.python.org/3/library/functions.html#sum
 
+[w-map-reduce]: https://en.wikipedia.org/wiki/MapReduce
 [shebang]: https://en.wikipedia.org/wiki/Shebang_(Unix)
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
