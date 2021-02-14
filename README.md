@@ -6,11 +6,11 @@ Solutions in [Python][py] for the [Advent of Code][aoc] annual programming chall
 
 **Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language, in this repository [Python 3][py] is used.
 
-Annual editions: [2020](#-2020-gettin-crafty-with-it-), 2019, 2018, 2017, 2016, 2015.
+Annual editions: [2020](#-2020-tropical-island-), [2019](#-2019-solar-system-), 2018, 2017, 2016, 2015.
 
 # 🎄🌟 [2020: Tropical Island](./2020/) 🎄🌟
 
-[![AoC 2020 Banner](./docs/aoc-2020-menu.png)](./2020/)
+[![AoC 2020 Banner](./docs/aoc-2020-menu.png)](./2020)
 
 > After saving Christmas five years in a row, you've decided to take a vacation at a nice resort on a tropical island. *Surely*, Christmas will go on without you.
 
@@ -23,13 +23,13 @@ Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 |[13](./2020/day-13) | [14](./2020/day-14) | [15](./2020/day-15) | [16](./2020/day-16) | [17](./2020/day-17) | [18](./2020/day-18) | [19](./2020/day-19)
 |[20](./2020/day-20) | [21](./2020/day-21) | [22](./2020/day-22) | [23](./2020/day-23) | [24](./2020/day-24) | [25](./2020/day-25) | -
 
-# 🎄🌟 [2019: Solar System](./2019/) 🎄🌟
+# 🎄🌟 [2019: Solar System](./2019) 🎄🌟
 
 > Santa has become stranded at the edge of the Solar System while delivering presents to other planets!
 
 | 日 | 月 | 火 | 水 | 木 | 金 | 土
 |---|---|---|---|---|---|---
-| | 
+| [1](./2019/day-1) | 
 | | 
 | | 
 | | 
