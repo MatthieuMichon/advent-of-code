@@ -8,7 +8,7 @@ Solutions in [Python][py] for the [2019 edition][aoc-2019] of the [Advent of Cod
 
 Puzzle | Links | Main Topics | Part One | Part Two
 --- | --- | --- | --- | --- |
-[Day 1: The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] / [Reddit][reddit-2019-1]| - | - | -
+[Day 1: The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] / [Reddit][reddit-2019-1]| - | 👌 | -
 
 [py]: https://docs.python.org/3/
 [aoc]: https://adventofcode.com/

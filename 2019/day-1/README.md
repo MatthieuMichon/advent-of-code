@@ -41,7 +41,7 @@ The answer is the total of all the results obtained for each computation.
 
 This questions is consistent with the previous statement.
 
-# 📃➡️ Input File Format 📃➡️
+# 📃➡️ Input Contents Format 📃➡️
 
 ```
 51590
@@ -54,11 +54,13 @@ This questions is consistent with the previous statement.
 
 The personal puzzle input consists in a number of lines, with each line containing one integer encoded as a string. 
 
-## 🔰📃➡ Example File 🔰📃➡
+## 🔰📃➡ Example Contents Format 🔰📃➡
 
-Using the same encoding for the reference contents and the input contents allows using an identical code path for both. The only drawback appears that automating value checking is more complex.
+Using the same encoding for the reference contents and the input contents allows using an identical code path for both.
 
-However since the example test set consists of just a few input value and a single result, a manual check is still adequate at this scale.
+A drawback is that doing so makes automatic testing is more complex.
+
+With just a few input values and a single result, a manual check is just fine, and thus how I go forward.
 
 ```
 12
@@ -67,8 +69,72 @@ However since the example test set consists of just a few input value and a sing
 100756
 ```
 
+# ➡🙋 Answer Format ➡🙋
+
+The answer is described as a sum, meaning that it can simply be a printout in the console.
+
+# ⚙️🚀 Implementation ⚙🚀
+
+## 🖐️⌨️ Command Line Interface 🖐️🙌️
+
+I chosen to implement all command line interface handling matters in a `main()` method, which receives no arguments and returns an integer used as the exit code passed back to the shell.
+
+```python
+#!/usr/bin/env python
+import argparse
+import sys
+
+
+EXIT_SUCCESS = 0
+
+
+def main() -> int:
+    args = parse_args()
+    contents = load_contents(filename=Path(args.filename))
+    answer = solve(contents=contents)
+    print(answer)
+    return EXIT_SUCCESS
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+``` 
+
+Using stand-alone Python script taking a filename as argument and printing the answer in the terminal allows easy profiling and allows using different contents stored under different filenames without having to edit the script source code.
+
+Industry standard practices call for a [UNIX shebang][shebang] in the first line of the script, and checking [`__name__`][py-name] against [`__main__`][py-main]. Furthermore, proper command line etiquette requires scripts to return `0` for normal behavior and a non-zero value in case of error. In Python the proper way is to rely on [`sys.exit()`][py-exit]. 
+
+Command-line argument management is delegated to the [`argparse`][py-argparse] module, which is provided as a standard Python module since quite a while.
+
+## Content Decoding
+
+A dedicated `load_contents()` method handles content decoding. Standard Python methods are used.
+
+```python
+def load_contents(filename: Path) -> list[int]:
+    contents = list(map(int, open(filename).read().strip().split(os.linesep)))
+    return contents
+```
+
+Starting from the filename argument, the following operations are performed in sequence:
+
+1. a file object is returned by `open()`
+1. contents of the file object are serialized using `read()`
+1. trailing newlines are removed by calling `strip()`
+1. the string of chars is split into tokens with `split()`
+1. per-item type conversion is done through `map()`
+1. the generator is iterated using `list()`
+
+## Puzzle Solving
+
 
 [py]: https://docs.python.org/3/
+[py-argparse]: https://docs.python.org/3/library/argparse.html
+[py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
+[py-main]: https://docs.python.org/3/library/__main__.html
+[py-name]: https://docs.python.org/3/library/stdtypes.html#definition.__name__
+
+[shebang]: https://en.wikipedia.org/wiki/Shebang_(Unix)
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-2019-1]: https://adventofcode.com/2019/day/1
