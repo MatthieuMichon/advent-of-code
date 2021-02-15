@@ -3,7 +3,7 @@ Solution in [Python][py] for the [day 1 puzzle][aoc-2019-1] of the [2019 edition
 # 🎄🌟🌟 The Tyranny of the Rocket Equation 🎄🌟🌟
 
 * Part one: [statement](#-puzzle-statement-with-annotations-) / [implementation](#-implementation-)
-* Part two: [statement](#-part-two-) / implementation
+* Part two: [statement](#-part-two-) / [implementation](#-solver-implementation-)
 
 # 🔍📖 Puzzle Statement with Annotations 🔍📖
 
@@ -154,10 +154,12 @@ The *reduce part* consists in collapsing the list of computed values using the [
 answer = sum(required_fuel_values)
 ```
 
-Computed ansmwers:
+Computed answers:
 
-* example: `34241`
-* input: `3152919`
+```shell
+$ ./day-1.py input.txt --part 1
+3152919
+```
 
 # 😰🙅 Part Two 😰🙅
 
@@ -181,7 +183,7 @@ This means that the total can no longer be computed as final step, as was sugges
 
 > Then, treat the fuel amount you just calculated as the input mass and repeat the process, continuing until a fuel requirement is zero or negative.
 
-This means that after computing the total, it must be incremented again by the fuel required for the mass of itself. This cycle is repeated until the exit condition being when a zero or negative fuel requirement is obtained.
+After computing the total, it must be incremented with the fuel required for the mass of itself. This is a textbook [single recursion][w-single-recursion], where a cycle is repeated until the exit condition, which here is when a zero or negative fuel requirement is obtained.
 
 > For example:
 > 
@@ -189,7 +191,11 @@ This means that after computing the total, it must be incremented again by the f
 > * At first, a module of mass 1969 requires 654 fuel. Then, this fuel requires `216` more fuel `(654 / 3 - 2)`. 216 then requires 70 more fuel, which requires 21 fuel, which requires 5 fuel, which requires no further fuel. So, the total fuel required for a module of mass `1969` is `654 + 216 + 70 + 21 + 5 = 966`.
 > * The fuel required by a module of mass `100756` and its fuel is: `33583 + 11192 + 3728 + 1240 + 411 + 135 + 43 + 12 + 2 = 50346`.
 
+The last operation being a subtraction by `2`, means that negative fuel values are possible.
+
 > What is the sum of the fuel requirements for all of the modules on your spacecraft when also taking into account the mass of the added fuel? (Calculate the fuel requirements for each module separately, then add them all up at the end.)
+
+The sum across all the modules is the same as part one, meaning this part will be reused.
 
 ## 🤔🤯 Solver Implementation 🤔🤯
 
@@ -225,7 +231,14 @@ def compute_recursive_required_fuel(mass: int) -> int:
     return total_fuel
 ```
 
-# Further Improvements 🤯
+Computed answers:
+
+```shell
+$ ./day-1.py input.txt --part 2
+4726527
+```
+
+# 🚀✨ Further Improvements 🚀✨
 
 Processing speed could be improved by inlining the `compute_required_fuel()` method into `compute_recursive_required_fuel()`, thus reducing by half the number of function calls. However the input contents was processed in a fraction of a second making this improvement irrelevant.
 
@@ -250,3 +263,4 @@ Processing speed could be improved by inlining the `compute_required_fuel()` met
 [reddit-2019-1]: https://www.reddit.com/e4axxe
 [advent-calendar]: https://en.wikipedia.org/wiki/Advent_calendar
 [rocket-equation]: https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation
+[w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion
