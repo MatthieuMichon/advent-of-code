@@ -44,7 +44,7 @@ The answer is the total of all the results obtained for each computation.
 
 This questions is consistent with the previous statement.
 
-# 📃➡ Input Contents Format 📃➡️
+# 📃➡ Input Contents Format 📃➡
 
 ```
 51590
@@ -78,9 +78,9 @@ The answer is described as a sum, meaning that it can simply be a printout in th
 
 # ⚙🚀 Implementation ⚙🚀
 
-## 🖐⌨ Command Line Interface 🖐️🙌️
+## 🖐⌨ Command Line Interface 🖐️⌨
 
-I chosen to implement all command line interface handling matters in a `main()` method, which receives no arguments and returns an integer used as the exit code passed back to the shell.
+I have chosen to implement all command line interface handling matters in a `main()` method, which receives no arguments and returns an integer used as the exit code passed back to the shell.
 
 ```python
 #!/usr/bin/env python
@@ -165,7 +165,7 @@ Computed ansmwers:
 
 > During the second Go / No Go poll, the Elf in charge of the Rocket Equation Double-Checker stops the launch sequence. Apparently, you forgot to include additional fuel for the fuel you just added.
 
-What a surprise!
+Can't say that I'm surprised!
 
 > Fuel itself requires fuel just like a module - take its mass, divide by three, round down, and subtract 2.
 
@@ -191,7 +191,43 @@ This means that after computing the total, it must be incremented again by the f
 
 > What is the sum of the fuel requirements for all of the modules on your spacecraft when also taking into account the mass of the added fuel? (Calculate the fuel requirements for each module separately, then add them all up at the end.)
 
+## 🤔🤯 Solver Implementation 🤔🤯
 
+> Fuel itself requires fuel just like a module
+
+Computing the fuel requires some sort of looping or recursion. Being more interesting, the later will be used. The overall inputs and outputs remain however the same:
+
+* Input: mass as integer
+* Output: fuel quantity as integer
+
+```python
+def compute_recursive_required_fuel(mass: int) -> int:
+    ...
+    return total_required_fuel
+```
+
+Internally the function performs the following sequence:
+
+1. Convert its argument `mass` into `fuel` by calling `compute_required_fuel()`.
+1. Compare the value `fuel` with zero.
+    * If `fuel` is equal or lower than zero, then it returns the value `0`.
+1. Compute `extra_fuel` by calling itself `compute_recursive_required_fuel()` but the value of `fuel` is passed as the `mass` argument.
+1. The `total_fuel` is computed by adding `extra_fuel` to `fuel`.
+1. The value of `total_fuel` is returned.
+
+```python
+def compute_recursive_required_fuel(mass: int) -> int:
+    fuel = compute_required_fuel(mass=mass)
+    if fuel <= 0:
+        return 0
+    extra_fuel = compute_recursive_required_fuel(mass=fuel)
+    total_fuel = fuel + extra_fuel
+    return total_fuel
+```
+
+# Further Improvements 🤯
+
+Processing speed could be improved by inlining the `compute_required_fuel()` method into `compute_recursive_required_fuel()`, thus reducing by half the number of function calls. However the input contents was processed in a fraction of a second making this improvement irrelevant.
 
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html

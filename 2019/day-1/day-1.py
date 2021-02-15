@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""Advent of Code Programming Puzzles
+
+2019 Edition - Day One
+Puzzle Solution in Python
+"""
+
 import argparse
 import logging
 import os
@@ -25,27 +31,58 @@ def load_contents(filename: Path) -> list[int]:
     return contents
 
 
+# Puzzle Solving Methods -------------------------------------------------------
+
+
+def compute_required_fuel(mass: int) -> int:
+    """Compute required fuel from a mass
+
+    :param mass: mass value
+    :return: required fuel quantity
+    """
+    required_fuel = mass // 3 - 2
+    return required_fuel
+
+
 def solve(contents: list[int]):
     """Solve part one of the puzzle
 
     :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-
-    def compute_required_fuel(mass: int) -> int:
-        """Compute required fuel from a mass
-
-        :param mass: mass value
-        :return: fuel value
-        """
-        required_fuel = mass // 3 - 2
-        return required_fuel
-
     mass_values = contents
     fuel_values = [compute_required_fuel(mass) for mass in mass_values]
     answer = sum(fuel_values)
     return answer
 
+
+def compute_recursive_required_fuel(mass: int) -> int:
+    """Compute required fuel from a mass taking the weight of fuel into account
+
+    :param mass: mass value
+    :return: total required fuel quantity
+    """
+    fuel = compute_required_fuel(mass=mass)
+    if fuel <= 0:
+        return 0
+    extra_fuel = compute_recursive_required_fuel(mass=fuel)
+    total_fuel = fuel + extra_fuel
+    return total_fuel
+
+
+def solve_part_two(contents: list[int]):
+    """Solve part two of the puzzle
+
+    :param contents: list of integers
+    :return: answer for the part one of the puzzle
+    """
+    mass_values = contents
+    fuel_values = [compute_recursive_required_fuel(mass) for mass in mass_values]
+    answer = sum(fuel_values)
+    return answer
+
+
+# Support Methods --------------------------------------------------------------
 
 def configure_logger(verbose: bool):
     """Configure logging
@@ -69,7 +106,7 @@ def parse_arguments() -> argparse.Namespace:
 
     :return: list of decoded arguments
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     pa = parser.add_argument
     pa('filename', type=str, help='input contents filename')
     pa('-p', '--part', type=int, help='solve only the given part')
