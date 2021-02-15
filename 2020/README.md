@@ -1,38 +1,128 @@
-# advent-of-code
+Solutions in [Python][py] for the [2020 edition][aoc-2020] of the [Advent of Code][aoc] annual programming challenge.
 
-My submissions to [adventofdcode.com](https://adventofcode.com/) (advent calendar of small programming puzzles).
+Annual editions in Python: **2020**, [2019](/2020). 
 
-# 2020
+# 🎄🌟🌟 Advent of Code 2020: Tropical Island 🎄🌟🌟
 
-Day | Challenge | Part One | Part Two
---- | --- | --- | ---
-[Day 1](./day-1) | [Report Repair](./day-1/README.md) | Ok | Ok
-[Day 2](./day-2) | [Password Philosophy](./day-2/README.md) | Ok | Ok
-[Day 3](./day-3) | [Toboggan Trajectory](./day-3/README.md) | Ok | Ok
-[Day 4](./day-4) | [Passport Processing](./day-4/README.md) | Ok | Ok
-[Day 5](./day-5) | [Binary Boarding](./day-5/README.md) | Ok | Ok
-[Day 6](./day-6) | [Custom Customs](./day-6/README.md) | Ok | Ok
-[Day 7](./day-7) | [Handy Haversacks](./day-7/README.md) | Ok | Long: several tries on the nested function
-[Day 8](./day-8) | [Handheld Halting](./day-8/README.md) | Ok | Long: had to narrow down a PC vs step index inversion
-[Day 9](./day-9) | [Encoding Error](./day-9/README.md) | Ok | Ok
-[Day 10](./day-10) | [Adapter Array](./day-10/README.md) | Ok | Stuck: had to do a forward walking w/ back-track
-[Day 11](./day-11) | [Seating System](./day-11/README.md) | Ok | Ok
-[Day 12](./day-12) | [Rain Risk](./day-12/README.md) | Ok | Had bad rounding issues (``int`` vs ``round``)
-[Day 13](./day-13) | [Shuttle Search](./day-13/README.md) | Ok | First try was way too slow, trick was to multiply bus IDs
-[Day 14](./day-14) | [Docking Data](./day-14/README.md) | Ok | Ok
-[Day 15](./day-15) | [Rambunctious Recitation](./day-15/README.md) | Ok | Ok
-[Day 16](./day-16) | [Ticket Translation](./day-16/README.md) | Ok | First try was naive, hopefully field constraints where not sneaky. 
-[Day 17](./day-17) | [Conway Cubes](./day-17/README.md) | Ok | Ok
-[Day 18](./day-18) | [Operation Order](./day-18/README.md) | Interesting! used the shunting-yard algorithm and RPN evaluation | Ok
-[Day 19](./day-19) | [Monster Messages](./day-19/README.md) | Interesting! used a top-down graph traversal | Stuck: had to hard-code top of rule dependency graph 
-[Day 20](./day-20) | [Jurassic Jigsaw](./day-20/README.md) | Ok | Stuck: had to use recursion for reconstructing the image
-[Day 21](./day-21) | [Allergen Assessment](./day-21/README.md) | Ok | Ok
-[Day 22](./day-22) | [Crab Combat](./day-22/README.md) | Ok | Ok, lost some time reading too fast (applied max sort which isn't always the case in the second part)
-[Day 23](./day-23) | [Crab Cups](./day-23/README.md) | Ok | Stuck: had to use a list for storing clockwise object
-[Day 24](./day-24) | [Lobby Layout](./day-24/README.md) | First try was too naive | Ok but long runtime (several minutes)
-[Day 25](./day-25) | [Combo Breaker](./day-25/README.md) | Ok, required several performance improvement rounds | -
+> After saving Christmas five years in a row, you've decided to take a vacation at a nice resort on a tropical island. *Surely*, Christmas will go on without you.
+
+Tag | Description
+--- | ---
+👌 | Completed without issues 
+🤔 | Substantial thinking required 
+🐢 | Long answer computation time  
+🤯 | Implementation had to be completely rewritten several times
+🏳 | Stuck, had to read the relevant mega-thread for guidance 
+
+Day | Puzzle Title | Links | Topics | Part One | Part Two
+--- | --- | --- | --- | --- | --- |
+1 | [Report Repair](/2020/day-1) | [AoC][aoc-2020-1] - [Reddit][reddit-2020-1] | - | 👌 | 👌
+2 | [Password Philosophy](/2020/day-2) | [AoC][aoc-2020-2] - [Reddit][reddit-2020-2] | - | 👌 | 👌
+3 | [Toboggan Trajectory](/2020/day-3) | [AoC][aoc-2020-3] - [Reddit][reddit-2020-3] | - | 👌 | 👌
+4 | [Passport Processing](/2020/day-4) | [AoC][aoc-2020-4] - [Reddit][reddit-2020-4] | - | 👌 | 👌
+5 | [Binary Boarding](/2020/day-5) | [AoC][aoc-2020-5] - [Reddit][reddit-2020-5] | - | 👌 | 👌
+6 | [Custom Customs](/2020/day-6) | [AoC][aoc-2020-6] - [Reddit][reddit-2020-6] | - | 👌 | 👌
+7 | [Handy Haversacks](/2020/day-7) | [AoC][aoc-2020-7] - [Reddit][reddit-2020-7] | - | 👌 | 🤯
+8 | [Handheld Halting](/2020/day-8) | [AoC][aoc-2020-8] - [Reddit][reddit-2020-8] | - | 👌 | 🤯
+9 | [Encoding Error](/2020/day-9) | [AoC][aoc-2020-9] - [Reddit][reddit-2020-9] | - | 👌 | 👌
+10 | [Adapter Array](/2020/day-10) | [AoC][aoc-2020-10] - [Reddit][reddit-2020-10] | - | 👌 | 🏳️
+11 | [Seating System](/2020/day-11) | [AoC][aoc-2020-11] - [Reddit][reddit-2020-11] | - | 👌 | 👌
+12 | [Rain Risk](/2020/day-12) | [AoC][aoc-2020-12] - [Reddit][reddit-2020-12] | - | 👌 | 🤔
+13 | [Shuttle Search](/2020/day-13) | [AoC][aoc-2020-13] - [Reddit][reddit-2020-13] | - | 👌 | 🤔🐢
+14 | [Docking Data](/2020/day-14) | [AoC][aoc-2020-14] - [Reddit][reddit-2020-14] | - | 👌 | 👌
+15 | [Rambunctious Recitation](/2020/day-15) | [AoC][aoc-2020-15] - [Reddit][reddit-2020-15] | - | 👌 | 👌
+16 | [Ticket Translation](/2020/day-16) | [AoC][aoc-2020-16] - [Reddit][reddit-2020-16] | - | 👌 | 🤔 
+17 | [Conway Cubes](/2020/day-17) | [AoC][aoc-2020-17] - [Reddit][reddit-2020-17] | - | 👌 | 👌
+18 | [Operation Order](/2020/day-18) | [AoC][aoc-2020-18] - [Reddit][reddit-2020-18] | [RPN][w-rpn] | 👌 | 👌
+19 | [Monster Messages](/2020/day-19) | [AoC][aoc-2020-19] - [Reddit][reddit-2020-19] | [Graph traversal][w-graph] | 👌 | ️🏳
+20 | [Jurassic Jigsaw](/2020/day-20) | [AoC][aoc-2020-20] - [Reddit][reddit-2020-20] | - | 👌 | 🏳
+21 | [Allergen Assessment](/2020/day-21) | [AoC][aoc-2020-21] - [Reddit][reddit-2020-21] | - | 👌 | 👌
+22 | [Crab Combat](/2020/day-22) | [AoC][aoc-2020-22] - [Reddit][reddit-2020-22] | - | 👌 | 🤔
+23 | [Crab Cups](/2020/day-23) | [AoC][aoc-2020-23] - [Reddit][reddit-2020-23] | - | 👌 | 🏳️
+24 | [Lobby Layout](/2020/day-24) | [AoC][aoc-2020-24] - [Reddit][reddit-2020-24] | - | 🤔 | 👌🐢
+25 | [Combo Breaker](/2020/day-25) | [AoC][aoc-2020-25] - [Reddit][reddit-2020-25] | - | 👌🐢 | 50 🌟
+
+## Notable Puzzles
+
+### Day 10: Adapter Array
+
+Stuck on part two, had to refer to the subreddit megathread.
+
+I decided that relying on a forward walking with a back-track was the best way forward.
+
+### Day 19: Monster Messages
+
+Stuck: had to hard-code top of rule dependency graph 
+
+### Day 20: Jurassic Jigsaw
+
+Stuck: had to use recursion for reconstructing the image
+
+### Day 23: Crab Cups
+
+Stuck: had to use a list for storing clockwise object
 
 ## Resources
 
 * [AoC subreddit](https://www.reddit.com/r/adventofcode/)
 * [Comprehensive walk-through](https://github.com/mebeim/aoc/blob/master/2020/README.md) by [Marco Bonelli](https://github.com/mebeim)
+
+[aoc]: https://adventofcode.com/
+[aoc-2020]: https://adventofcode.com/2020/
+[aoc-2020-1]: https://adventofcode.com/2020/day/1
+[aoc-2020-1]: https://adventofcode.com/2020/day/1
+[aoc-2020-2]: https://adventofcode.com/2020/day/2
+[aoc-2020-3]: https://adventofcode.com/2020/day/3
+[aoc-2020-4]: https://adventofcode.com/2020/day/4
+[aoc-2020-5]: https://adventofcode.com/2020/day/5
+[aoc-2020-6]: https://adventofcode.com/2020/day/6
+[aoc-2020-7]: https://adventofcode.com/2020/day/7
+[aoc-2020-8]: https://adventofcode.com/2020/day/8
+[aoc-2020-9]: https://adventofcode.com/2020/day/9
+[aoc-2020-10]: https://adventofcode.com/2020/day/10
+[aoc-2020-11]: https://adventofcode.com/2020/day/11
+[aoc-2020-12]: https://adventofcode.com/2020/day/12
+[aoc-2020-13]: https://adventofcode.com/2020/day/13
+[aoc-2020-14]: https://adventofcode.com/2020/day/14
+[aoc-2020-15]: https://adventofcode.com/2020/day/15
+[aoc-2020-16]: https://adventofcode.com/2020/day/16
+[aoc-2020-17]: https://adventofcode.com/2020/day/17
+[aoc-2020-18]: https://adventofcode.com/2020/day/18
+[aoc-2020-19]: https://adventofcode.com/2020/day/19
+[aoc-2020-20]: https://adventofcode.com/2020/day/20
+[aoc-2020-21]: https://adventofcode.com/2020/day/21
+[aoc-2020-22]: https://adventofcode.com/2020/day/22
+[aoc-2020-23]: https://adventofcode.com/2020/day/23
+[aoc-2020-24]: https://adventofcode.com/2020/day/24
+[aoc-2020-25]: https://adventofcode.com/2020/day/25
+
+[py]: https://docs.python.org/3/
+
+[reddit-2020-1]: https://www.reddit.com/k4e4lm
+[reddit-2020-2]: https://www.reddit.com/k52psu
+[reddit-2020-3]: https://www.reddit.com/k5qsrk
+[reddit-2020-4]: https://www.reddit.com/k6e8sw
+[reddit-2020-5]: https://www.reddit.com/k71h6r
+[reddit-2020-6]: https://www.reddit.com/k7ndux
+[reddit-2020-7]: https://www.reddit.com/k8a31f
+[reddit-2020-8]: https://www.reddit.com/k8xw8h
+[reddit-2020-9]: https://www.reddit.com/k9lfwj
+[reddit-2020-10]: https://www.reddit.com/ka8z8x
+[reddit-2020-11]: https://www.reddit.com/kaw6oz
+[reddit-2020-12]: https://www.reddit.com/kbj5me
+[reddit-2020-13]: https://www.reddit.com/kc4njx
+[reddit-2020-14]: https://www.reddit.com/kcr1ct
+[reddit-2020-15]: https://www.reddit.com/kdf85p
+[reddit-2020-16]: https://www.reddit.com/ke2qp6
+[reddit-2020-17]: https://www.reddit.com/keqsfa
+[reddit-2020-18]: https://www.reddit.com/kfeldk
+[reddit-2020-19]: https://www.reddit.com/kg1mro
+[reddit-2020-20]: https://www.reddit.com/kgo01p
+[reddit-2020-21]: https://www.reddit.com/khaiyk
+[reddit-2020-22]: https://www.reddit.com/khyjgv
+[reddit-2020-23]: https://www.reddit.com/kimluc
+[reddit-2020-24]: https://www.reddit.com/kj96iw
+[reddit-2020-25]: https://www.reddit.com/kjtg7y
+
+[w-graph]: https://en.wikipedia.org/wiki/Graph_traversal
+[w-rpn]: https://en.wikipedia.org/wiki/Reverse_Polish_notation

@@ -87,8 +87,14 @@ def main() -> int:
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
     contents = load_contents(filename=Path(args.filename))
-    answer = solve(contents=contents)
-    print(answer)
+    compute_part_one = not args.part or 1 == args.part
+    compute_part_two = not args.part or 2 == args.part
+    if compute_part_one:
+        answer = solve(contents=contents)
+        print(answer)
+    if compute_part_two:
+        answer = solve_part_two(contents=contents)
+        print(answer)
     return EXIT_SUCCESS
 
 
