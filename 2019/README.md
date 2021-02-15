@@ -6,10 +6,23 @@ Annual editions in Python: [2020](/2020), **2019**.
 
 > Santa has become stranded at the edge of the Solar System while delivering presents to other planets! To accurately calculate his position in space, safely align his warp drive, and return to Earth in time to save Christmas, he needs you to bring him *measurements* from fifty stars.
 
+Tag | Description
+--- | ---
+⏱ | Not started
+👌 | Completed without issues 
+🤔 | Substantial thinking required 
+🐢 | Long answer computation time  
+🤯 | Implementation had to be completely rewritten several times
+🏳 | Stuck, had to read the relevant mega-thread for guidance 
+
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
-1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Memoization][w-memoization] | 👌 | -
+1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
+2 | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| - | ⏱ | ⏱
 
+# Resources
+
+* [Advent of Code subreddit][reddit]
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -42,6 +55,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 
 [py]: https://docs.python.org/3/
 
+[reddit]: https://www.reddit.com/r/adventofcode/
 [reddit-2019-1]: https://www.reddit.com/e4axxe
 [reddit-2019-2]: https://www.reddit.com/e4u0rw
 [reddit-2019-3]: https://www.reddit.com/e5bz2w
@@ -69,3 +83,4 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [reddit-2019-25]: https://www.reddit.com/efca4m
 
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
+[w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion

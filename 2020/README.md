@@ -1,6 +1,6 @@
 Solutions in [Python][py] for the [2020 edition][aoc-2020] of the [Advent of Code][aoc] annual programming challenge.
 
-Annual editions in Python: **2020**, [2019](/2020). 
+Annual editions in Python: **2020**, [2019](/2019). 
 
 # 🎄🌟🌟 Advent of Code 2020: Tropical Island 🎄🌟🌟
 
