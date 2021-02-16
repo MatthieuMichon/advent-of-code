@@ -10,7 +10,6 @@ import argparse
 import logging
 import os
 import sys
-from pathlib import Path
 
 
 EXIT_SUCCESS = 0
@@ -20,7 +19,7 @@ LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(module)s - '
 log = logging.getLogger(__name__)
 
 
-def load_contents(filename: Path) -> list[int]:
+def load_contents(filename: str) -> list[int]:
     """Load contents from the given file
 
     :param filename: filename as string
@@ -123,7 +122,7 @@ def main() -> int:
     args = parse_arguments()
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
-    contents = load_contents(filename=Path(args.filename))
+    contents = load_contents(filename=args.filename)
     compute_part_one = not args.part or 1 == args.part
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
