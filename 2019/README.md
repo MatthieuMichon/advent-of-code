@@ -18,7 +18,7 @@ Tag | Description
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
 1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
-2 | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| - | ⏱ | ⏱
+2 | [1202 Program Alarm](/2019/day-2) | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | ⏱
 
 # Resources
 
@@ -84,3 +84,4 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
 [w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion
+[w-vn]: https://en.wikipedia.org/wiki/Virtual_machine
