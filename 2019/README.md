@@ -18,7 +18,9 @@ Tag | Description
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
 1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
-2 | [1202 Program Alarm](/2019/day-2) | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | ⏱
+2 | [1202 Program Alarm](/2019/day-2) | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
+3 | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]|  | ⏱ | ⏱
+
 
 # Resources
 

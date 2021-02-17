@@ -18,6 +18,14 @@ LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(module)s - '
 log = logging.getLogger(__name__)
 
 
+# Common Methods ---------------------------------------------------------------
+
+
+ADD = 1
+MUL = 2
+HALT = 99
+
+
 def load_contents(filename: str) -> list[int]:
     """Load contents from the given file
 
@@ -29,25 +37,20 @@ def load_contents(filename: str) -> list[int]:
     return contents
 
 
-# Puzzle Solving Methods -------------------------------------------------------
-
-ADD = 1
-MUL = 2
-HALT = 99
-
-
-def patch(program: list[int]) -> list[int]:
+def patch(program: list[int], noun: int, verb: int) -> list[int]:
     """Restore the gravity assist program
 
     :param program: Intcode program
+    :param noun: updated noun value
+    :param verb: updated verb value
     :return: patched Intcode program
     """
-    program[1] = 12
-    program[2] = 2
+    program[1] = noun
+    program[2] = verb
     return program
 
 
-def solve(contents: list[int]):
+def execute_program(contents: list[int], noun: int, verb: int):
     """Solve part one of the puzzle
 
     :param contents: list of integers
@@ -67,8 +70,7 @@ def solve(contents: list[int]):
         if instruction == MUL:
             return operand_a * operand_b
 
-    input_program = len(contents) > 12
-    program = patch(program=contents) if input_program else contents
+    program = patch(program=contents, noun=noun, verb=verb)
     pc = 0
     instr = program[pc]
     while instr in [ADD, MUL]:
@@ -82,6 +84,48 @@ def solve(contents: list[int]):
         instr = program[pc]
     answer = program[0]
     return answer
+
+
+# Puzzle Solving Methods -------------------------------------------------------
+
+
+def solve(contents: list[int]) -> int:
+    """Solve part one of the puzzle
+
+    :param contents: list of integers
+    :return: answer for the part one of the puzzle
+    """
+
+    input_program = len(contents) > 12
+    if input_program:
+        noun = 12
+        verb = 2
+    else:
+        noun = 9
+        verb = 10
+    answer = execute_program(contents=contents, noun=noun, verb=verb)
+    return answer
+
+
+REQUESTED_OUTPUT = 19690720
+
+
+def solve_part_two(contents: list[int]) -> int:
+    """Solve part one of the puzzle
+
+    :param contents: list of integers
+    :return: answer for the part one of the puzzle
+    """
+    input_program = len(contents) > 12
+    upper_bound = 100 if input_program else len(contents)
+    for noun in range(upper_bound):
+        for verb in range(upper_bound):
+            first_position = execute_program(
+                contents=contents.copy(), noun=noun, verb=verb)
+            if REQUESTED_OUTPUT == first_position:
+                log.info(f'noun: {noun}, verb: {verb}')
+                answer = 100 * noun + verb
+                return answer
 
 
 # Support Methods --------------------------------------------------------------
@@ -126,15 +170,15 @@ def main() -> int:
     args = parse_arguments()
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
-    contents = load_contents(filename=args.filename)
     compute_part_one = not args.part or 1 == args.part
     compute_part_two = not args.part or 2 == args.part
-    compute_part_two = False
     if compute_part_one:
+        contents = load_contents(filename=args.filename)
         answer = solve(contents=contents)
         print(answer)
     if compute_part_two:
-        #answer = solve_part_two(contents=contents)
+        contents = load_contents(filename=args.filename)
+        answer = solve_part_two(contents=contents)
         print(answer)
     return EXIT_SUCCESS
 
