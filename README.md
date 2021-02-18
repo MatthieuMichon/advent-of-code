@@ -2,6 +2,11 @@ Solutions in [Python][py] for the [Advent of Code][aoc] annual programming chall
 
 [![Python 3.9](https://img.shields.io/badge/python-3.9-brightgreen)](https://www.python.org/downloads/release/python-391/)
 
+
+<p align="center">
+<img src="./docs/aoc-tree.png" width="120" height="200" />
+</p>
+
 # 🎄🌟🌟 Advent of Code in Python 🎄🌟🌟
 
 **Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language, in this repository [Python 3][py] is used.
@@ -29,7 +34,7 @@ Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 
 | 日 | 月 | 火 | 水 | 木 | 金 | 土
 |---|---|---|---|---|---|---
-| [1](./2019/day-1) | [2](./2019/day-2)
+| [1](./2019/day-1) | [2](./2019/day-2) | [3](./2019/day-3)
 | - | 
 | - | 
 | - | 

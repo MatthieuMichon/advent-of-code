@@ -70,7 +70,7 @@ def execute_program(contents: list[int], noun: int, verb: int):
         if instruction == MUL:
             return operand_a * operand_b
 
-    program = patch(program=contents, noun=noun, verb=verb)
+    program = patch(program=contents.copy(), noun=noun, verb=verb)
     pc = 0
     instr = program[pc]
     while instr in [ADD, MUL]:
@@ -121,7 +121,7 @@ def solve_part_two(contents: list[int]) -> int:
     for noun in range(upper_bound):
         for verb in range(upper_bound):
             first_position = execute_program(
-                contents=contents.copy(), noun=noun, verb=verb)
+                contents=contents, noun=noun, verb=verb)
             if REQUESTED_OUTPUT == first_position:
                 log.info(f'noun: {noun}, verb: {verb}')
                 answer = 100 * noun + verb
