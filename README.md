@@ -1,7 +1,6 @@
-Solutions in [Python][py] for the [Advent of Code][aoc] annual programming challenge.
-
 [![Python 3.9](https://img.shields.io/badge/python-3.9-brightgreen)](https://www.python.org/downloads/release/python-391/)
 
+Solutions in [Python][py] for the [Advent of Code][aoc] annual programming challenge.
 
 <p align="center">
 <img src="./docs/aoc-tree.png" width="120" height="200" />
