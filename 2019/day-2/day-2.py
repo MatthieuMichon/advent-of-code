@@ -111,7 +111,7 @@ REQUESTED_OUTPUT = 19690720
 
 
 def solve_part_two(contents: list[int]) -> int:
-    """Solve part one of the puzzle
+    """Solve part two of the puzzle
 
     :param contents: list of integers
     :return: answer for the part one of the puzzle

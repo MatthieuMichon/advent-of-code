@@ -217,6 +217,79 @@ answer = min(intersection_distances)
 return answer
 ```
 
+Contents | Answer
+--- | ---
+[`example.txt`](./example.txt) | `6`; `159`; `135`
+[`input.txt`](./input.txt) | `2050`
+
+
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Description
+
+> It turns out that this circuit is very timing-sensitive; you actually need to minimize the signal delay.
+
+Shit just got real!
+
+> To do this, calculate the number of steps each wire takes to reach each intersection; choose the intersection where the sum of both wires' steps is lowest.
+
+Luckily for us we choose to rely on steps (i.e segments) as the primary type for computing the answer.
+
+> If a wire visits a position on the grid multiple times, use the steps value from the first time it visits that position when calculating the total value of a specific intersection.
+
+This will complicate things a tad.
+
+> The number of steps a wire takes is the total number of grid squares the wire has entered to get to that location, including the intersection being considered. Again consider the example from above:
+>
+> ```
+> ...........
+> .+-----+...
+> .|.....|...
+> .|..+--X-+.
+> .|..|..|.|.
+> .|.-X--+.|.
+> .|..|....|.
+> .|.......|.
+> .o-------+.
+> ...........
+> ```
+> 
+> In the above example, the intersection closest to the central port is reached after 8+5+5+2 = 20 steps by the first wire and 7+6+4+3 = 20 steps by the second wire for a total of 20+20 = 40 steps.
+> 
+> However, the top-right intersection is better: the first wire takes only 8+5+2 = 15 and the second wire takes only 7+6+2 = 15, a total of 15+15 = 30 steps.
+
+Having the complete list of intersections is required for this problem.
+
+> Here are the best steps for the extra examples from above:
+> 
+> ```
+> R75,D30,R83,U83,L12,D49,R71,U7,L72
+> U62,R66,U55,R34,D71,R55,D58,R83 = 610 steps
+> R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+> U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = 410 steps
+> ```
+> 
+> What is the fewest combined steps the wires must take to reach an intersection?
+
+The computation of the answer as described here is not compatible with one from part one: a new function computing the number of steps from the central port is required.
+
+## 🤔🤯 Solver Implementation
+
+Computing the number of steps on a given wire separating the central port to an intersection requires a function determining if a given location is crossed by a segment.
+
+```python
+def crosses(segment: tuple[tuple[int, int]], location: tuple[int, int]) -> bool:
+    x, y = location
+    ax, ay = segment[0]
+    bx, by = segment[1]
+    if ax == bx == x and min(ay, by) < y < max(ay, by):
+        return True
+    if ay == by == y and min(ax, bx) < x < max(ax, bx):
+        return True
+    return False
+```
+
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about
