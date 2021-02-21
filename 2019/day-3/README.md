@@ -95,7 +95,7 @@ The method starts with the usual string of calls: [`open()`][py-open]; [`read()`
 Conversion of tokens into 2-d grid coordinates is implemented in a [`convert_token()`][src-convert] method.
 
 ```python
-def convert_token(token: str) -> tuple[int]:
+def convert_token(token: str) -> tuple[int, int]:
     direction, length = token[:1], int(token[1:])
     assert direction in ['R', 'L', 'U', 'D']
     if direction in ['R', 'U']:
@@ -163,8 +163,59 @@ A segment consists in the coordinates of its two corners. Its distance with resp
 * A horizontal segment between `(2, 8)` and `(7, 8)` is `2 + 8`
 * A vertical segment between `(-4, 2)` and `(-4, -8)` is `4`
 
-The first step is to compute the list of segments.
+The first step is to build a list of segments from each wire. A [generator][py-generator] function goes through all the offset and yields two points corresponding to a given segment extremities. 
 
+```python
+def enumerate_segments(wire: list[tuple[int]]) -> Iterator[tuple[tuple[int]]]:
+    last_corner = (0, 0)
+    for offset in wire:
+        corner = tuple(map(operator.add, last_corner, offset))
+        yield tuple([last_corner, corner])
+```
+
+An intersection involves one horizontal and one vertical segment, the segments from each wire must be separated into two lists depending on their orientation. 
+
+Luckily, each segments is at a right angle meaning they alternate between horizontal and vertical. Knowing this simplifies sorting.
+
+```python
+even_segments = [s for i, s in enumerate(segments) if 0 == i % 2]
+odd_segments = [s for i, s in enumerate(segments) if 1 == i % 2]
+even_are_vertical = even_segments[0][0][0] == even_segments[0][1][0]
+horizontal = odd_segments if even_are_vertical else even_segments
+vertical = even_segments if even_are_vertical else odd_segments
+segments_by_orientation['horizontal'].append(horizontal)
+segments_by_orientation['vertical'].append(vertical)
+```
+
+Once all the segments for their respective wire are mapped depending on their orientation, finding the intersections is simply a matter of performing a cross match. Thus the group at index `i` is matched with the group of the opposite wire at index `1 - i`.
+
+```python
+intersection_distances = []
+for i, hgroud in enumerate(segments_by_orientation['horizontal']):
+    for sh in hgroud:
+        vgroup = segments_by_orientation['vertical'][1 - i]
+        for sv in vgroup:
+            if intersects([sh, sv]):
+                intersection_distances.append(sum(map(abs, intersect_location([sh, sv]))))
+```
+
+The `intersect_location()` computes the location where segments intersect:
+
+```python
+def intersect_location(segments: tuple[tuple[tuple[int, int]]]) -> tuple[int, int]:
+    if segments[0][0][0] == segments[0][1][0]:
+        return (segments[0][0][0], segments[1][0][1])
+    else:
+        return (segments[1][0][0], segments[0][0][1])
+
+```
+
+This leaves computing the answer which is just a matter of find the smallest value.
+
+```python
+answer = min(intersection_distances)
+return answer
+```
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -174,6 +225,7 @@ The first step is to compute the list of segments.
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
+[py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
 [py-list]: https://docs.python.org/3/library/stdtypes.html#list
 [py-main]: https://docs.python.org/3/library/__main__.html
 [py-map]: https://docs.python.org/3/library/functions.html#map
@@ -189,3 +241,4 @@ The first step is to compute the list of segments.
 [w-comma]: https://en.wikipedia.org/wiki/Comma#Computing
 [w-newline]: https://en.wikipedia.org/wiki/Newline
 [w-taxicab-geometry]: https://en.wikipedia.org/wiki/Taxicab_geometry
+[w-distance]: https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points

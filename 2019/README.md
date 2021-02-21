@@ -19,7 +19,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
 1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
 2 | [1202 Program Alarm](/2019/day-2) | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
-3 | [Crossed Wires](/2019/day-3) | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Geometry][w-segment] | ⏱ | ⏱
+3 | [Crossed Wires](/2019/day-3) | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | ⏱
 
 
 # Resources
@@ -84,7 +84,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [reddit-2019-24]: https://www.reddit.com/eewjtt
 [reddit-2019-25]: https://www.reddit.com/efca4m
 
+[w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
-[w-segment]: https://en.wikipedia.org/wiki/Line_segment
 [w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion
 [w-vn]: https://en.wikipedia.org/wiki/Virtual_machine
