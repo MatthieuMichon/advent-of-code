@@ -72,22 +72,22 @@ def enumerate_segments(wire: list[tuple[int, int]]) \
         last_corner = corner
 
 
-def measure_distance(segment: tuple[tuple[int, int]]) -> float:
-    """
-
-    :param segment:
-    :return:
-    """
-    a, b = segment[0:2]
-    px = b[0] - a[0]
-    py = b[1] - a[1]
-    norm = px * px + py * py
-    u = (-a[0] * px - a[1] * py) / float(norm)
-    u = min(1, max(u, 0))
-    x = a[0] + u * px
-    y = a[1] + u * py
-    dist = (x * x + y * y)
-    return dist
+# def measure_distance(segment: tuple[tuple[int, int]]) -> float:
+#     """
+#
+#     :param segment:
+#     :return:
+#     """
+#     a, b = segment[0:2]
+#     px = b[0] - a[0]
+#     py = b[1] - a[1]
+#     norm = px * px + py * py
+#     u = (-a[0] * px - a[1] * py) / float(norm)
+#     u = min(1, max(u, 0))
+#     x = a[0] + u * px
+#     y = a[1] + u * py
+#     dist = (x * x + y * y)
+#     return dist
 
 
 def measure_manhattan_distance(segment: tuple[tuple[int, int]]) -> int:
@@ -177,6 +177,32 @@ def crosses(segment: tuple[tuple[int, int]], location: tuple[int, int]) -> bool:
     return False
 
 
+def measure_length(segment: tuple[tuple[int, int]]) -> int:
+    """Measure length of the given segment
+
+    :param segment: segment
+    :return: segment length
+    """
+    length = 0
+    length += abs(segment[1][0] - segment[0][0])
+    length += abs(segment[1][1] - segment[0][1])
+    return length
+
+
+def measure_distance(segment: tuple[tuple[int, int]],
+                     location: tuple[int, int]) -> int:
+    """Measure distance between start of segment and a location
+
+    :param segment: segment
+    :param location: location
+    :return: distance between start of segment and a location
+    """
+    length = 0
+    length += abs(location[0] - segment[0][0])
+    length += abs(location[1] - segment[0][1])
+    return length
+
+
 # Solving Methods --------------------------------------------------------------
 
 
@@ -232,17 +258,31 @@ def solve_part_two(contents: list[list[tuple[int, int]]]) -> int:
         vertical = even_segments if even_are_vertical else odd_segments
         segments_by_orientation['horizontal'].append(horizontal)
         segments_by_orientation['vertical'].append(vertical)
-    intersection_locations = []
+    intersections = dict()
     for i, hgroud in enumerate(segments_by_orientation['horizontal']):
         for sh in hgroud:
             vgroup = segments_by_orientation['vertical'][1 - i]
             for sv in vgroup:
                 if intersects((sh, sv)):
-                    intersection_locations.append(intersect_location((sh, sv)))
+                    intersections[intersect_location((sh, sv))] = (sh, sv)
                     log.debug('intersect: '
                               f'{intersect_location((sh, sv))}, {sh}, {sv}')
-    log.debug(f'Found {len(intersection_locations)} intersections')
-    answer = -1
+    log.debug(f'Found {len(intersections)} intersections')
+    segments_per_wires = [list(enumerate_segments(wire=w))
+                          for w in contents[0:2]]
+    combined_steps_list = list()
+    for location, intersect_segments in intersections.items():
+        combined_steps = 0
+        for segments in segments_per_wires:
+            for segment in segments:
+                if not crosses(segment=segment, location=location):
+                    combined_steps += measure_length(segment=segment)
+                else:
+                    combined_steps += measure_distance(
+                        segment=segment, location=location)
+                    break
+        combined_steps_list.append(combined_steps)
+    answer = min(combined_steps_list)
     return answer
 
 

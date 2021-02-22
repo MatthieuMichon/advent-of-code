@@ -275,20 +275,41 @@ The computation of the answer as described here is not compatible with one from 
 
 ## 🤔🤯 Solver Implementation
 
-Computing the number of steps on a given wire separating the central port to an intersection requires a function determining if a given location is crossed by a segment.
+The solver requires cycling through all the intersections. This computation was already implemented as part of the `solve()` method from part one and provides the following elements:
+
+* `segments_by_orientation`
+* `intersections`
 
 ```python
-def crosses(segment: tuple[tuple[int, int]], location: tuple[int, int]) -> bool:
-    x, y = location
-    ax, ay = segment[0]
-    bx, by = segment[1]
-    if ax == bx == x and min(ay, by) < y < max(ay, by):
-        return True
-    if ay == by == y and min(ax, bx) < x < max(ax, bx):
-        return True
-    return False
+segments_per_wires = [list(enumerate_segments(wire=w))
+                      for w in contents[0:2]]
+combined_steps_list = list()
+for location, intersect_segments in intersections.items():
+    combined_steps = 0
+    for segments in segments_per_wires:
+        for segment in segments:
+            if not crosses(segment=segment, location=location):
+                combined_steps += measure_length(segment=segment)
+            else:
+                combined_steps += measure_distance(
+                    segment=segment, location=location)
+                break
+    combined_steps_list.append(combined_steps)
 ```
 
+Computing the number of steps on a given wire separating the central port to an intersection requires a `cross()` method determining if a given location is crossed by a segment.
+
+The computation of the answer remains straight forward.
+
+```python
+answer = min(combined_steps_list)
+return answer
+```
+
+Contents | Answer
+--- | ---
+[`example.txt`](./example.txt) | `30`; `610`; `410`
+[`input.txt`](./input.txt) | `21666`
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
