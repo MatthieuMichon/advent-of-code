@@ -37,13 +37,71 @@ Iterating it is!
 
 The input is only 13 characters long, meaning that input contents can be passed directly through the command line instead of relying on a file.
 
+```shell
+$ ./day-4.py 168630-718098
+```
+
 # ⚙🚀 Implementation
 
 ## 💾🔍 Content Decoding
 
+The solving method is likely to process the numbers by doing a per-digit processing, meaning that a list of digits is expected to be more convenient than a simple integer containing all the digits.
 
+```python
+def decode(argument: str) -> tuple[list[int], ...]:
+    char_lists = map(list, argument.split('-'))
+    range_ = tuple(list(map(int, clist)) for clist in char_lists)
+    return range_
+```
+
+> 📝 **Note**
+> 
+> This method could be avoided by hard-coding the input `168630-718098` directly into the `solve()` method. However, this would be no fun and sometimes I an in the mood of taking the long way home.
 
 ## 💡🙋 Puzzle Solving
+
+For the fun lets use a depth-first recursion. The goal is to repeat the following operations:
+1. Test if the two last digits are in descending order (i.e `digits[-1] < digits[-2]`), if `True` return zero.
+1. Test if all digits are present, if `True` then
+    1. Test if two or more adjacent digits are the same (see note below), if `True` return `1` since the corresponding password is valid. Oppositely return zero.
+1. Not all digits are present, we compute lower and upper ranges.
+1. Loop over all ten digits
+    1. Append this digit to the digits computed in parent.
+    1. Expedite iteration (i.e `continue` iterating) if the obtained value is out of the range.
+    1. If the obtained is in range than call recursively the function, accumulate the result.
+1. Return the accumulated value.
+       
+> 📝 **Note**
+> 
+> Since digits are equal or increasing the further to the right, if two digits are identical they must be adjacent, thus this test is implemented simply by comparing lengths of the [`list`][py-list] against length of the [`set`][py-set].
+
+```python
+def count_pwd(range_: tuple[list[int], ...],
+              digits: list[int], length: int) -> int:
+    digit_index = len(digits)
+    decreasing_digit = digit_index >= 2 and digits[-1] < digits[-2]
+    if decreasing_digit:
+        return 0
+    stop = digit_index == length
+    if stop:
+        same_adjacent_digits = len(set(digits)) < len(digits)
+        return 1 if same_adjacent_digits else 0
+    min_digits = range_[0][:1+digit_index]
+    max_digits = range_[1][:1+digit_index]
+    pwd_count = 0
+    for next_digit in range(10):
+        next_digits = digits.copy()
+        next_digits.append(next_digit)
+        if not min_digits <= next_digits <= max_digits:
+            continue
+        pwd_count += count_pwd(
+            range_=range_, digits=next_digits, length=length)
+    return pwd_count
+```
+
+Contents | Answer
+--- | ---
+`168630-718098` | `1686`
 
 
 # 😰🙅 Part Two
@@ -72,6 +130,7 @@ The input is only 13 characters long, meaning that input contents can be passed 
 [py-name]: https://docs.python.org/3/library/stdtypes.html#definition.__name__
 [py-open]: https://docs.python.org/3/library/functions.html#open
 [py-read]: https://docs.python.org/3/library/io.html#io.TextIOBase.read
+[py-set]: https://docs.python.org/3/library/stdtypes.html#set
 [py-split]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.split
 [py-string]: https://docs.python.org/3/library/stdtypes.html#textseq
 [py-strip]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.strip
