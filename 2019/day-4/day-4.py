@@ -9,6 +9,7 @@ Puzzle Solution in Python
 import argparse
 import logging
 import sys
+from collections import Counter
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +26,9 @@ def decode(argument: str) -> tuple[list[int], ...]:
     char_lists = map(list, argument.split('-'))
     range_ = tuple(list(map(int, clist)) for clist in char_lists)
     return range_
+
+
+# Solving Methods --------------------------------------------------------------
 
 
 def count_pwd(range_: tuple[list[int], ...],
@@ -57,9 +61,6 @@ def count_pwd(range_: tuple[list[int], ...],
     return pwd_count
 
 
-# Solving Methods --------------------------------------------------------------
-
-
 def solve(contents: tuple[list[int], ...]) -> int:
     """Solve the first part of the puzzle
 
@@ -72,14 +73,52 @@ def solve(contents: tuple[list[int], ...]) -> int:
     return pwd_count
 
 
+def count_pwd_part_two(range_: tuple[list[int], ...],
+                       digits: list[int], length: int) -> int:
+    """Recursively count passwords with a list of prefix digits
+
+    :param range_: min and max number
+    :param digits: list of prefix digits
+    :param length: expected password length
+    :return: number of passwords matching requirements
+    """
+    digit_index = len(digits)
+    decreasing_digit = digit_index >= 2 and digits[-1] < digits[-2]
+    if decreasing_digit:
+        return 0
+    stop = digit_index == length
+    if stop:
+        same_adjacent_digits = len(set(digits)) < len(digits)
+        if not same_adjacent_digits:
+            return 0
+        for digit, encounters in Counter(digits).most_common():
+            if 2 == encounters:
+                return 1
+        return 0
+    min_digits = range_[0][:1+digit_index]
+    max_digits = range_[1][:1+digit_index]
+    pwd_count = 0
+    for next_digit in range(10):
+        next_digits = digits.copy()
+        next_digits.append(next_digit)
+        if not min_digits <= next_digits <= max_digits:
+            continue
+        pwd_count += count_pwd_part_two(
+            range_=range_, digits=next_digits, length=length)
+    return pwd_count
+
+
 def solve_part_two(contents: tuple[list[int], ...]) -> int:
     """Solve the second part of the puzzle
 
     :param contents: list of offsets per wire
     :return: answer of the puzzle
     """
-    answer = -1
-    return answer
+    length: int = len(contents[0])
+    digits = list()
+    pwd_count = count_pwd_part_two(
+        range_=contents, digits=digits, length=length)
+    return pwd_count
 
 
 # Support Methods --------------------------------------------------------------

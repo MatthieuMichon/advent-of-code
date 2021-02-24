@@ -108,12 +108,43 @@ Contents | Answer
 
 ## 🥺👉👈 Annotated Description
 
+> An Elf just remembered one more important detail: the two adjacent matching digits are not part of a larger group of matching digits.
 
+~~This means that adjacent matching digits must be of even length.~~
+This means that one out more group of adjacent digits is exactly two chars wide.
 
+> Given this additional criterion, but still ignoring the range rule, the following are now true:
+>
+> ```
+> 112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
+> 123444 no longer meets the criteria (the repeated 44 is part of a larger group of 444).
+> 111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
+> ```
+
+Understood.
+
+> How many different passwords within the range given in your puzzle input meet all of the criteria?
+
+Same logic for computing the answer.
 
 ## 🤔🤯 Solver Implementation
 
+A first solution consists in relying on a [`Counter()`][py-counter] object and check once all the digits are computed that there is at least one digit which is encountered two times.
 
+```python
+if stop:
+    same_adjacent_digits = len(set(digits)) < len(digits)
+    if not same_adjacent_digits:
+        return 0
+    for digit, encounters in Counter(digits).most_common():
+        if 2 == encounters:
+            return 1
+    return 0
+```
+
+Contents | Answer
+--- | ---
+`168630-718098` | `1145`
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -122,6 +153,7 @@ Contents | Answer
 
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html
+[py-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
 [py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
 [py-list]: https://docs.python.org/3/library/stdtypes.html#list
