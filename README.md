@@ -33,7 +33,7 @@ Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 
 | 日 | 月 | 火 | 水 | 木 | 金 | 土
 |---|---|---|---|---|---|---
-| [1](./2019/day-1) | [2](./2019/day-2) | [3](./2019/day-3) | [4](./2019/day-4)
+| [1](./2019/day-1) | [2](./2019/day-2) | [3](./2019/day-3) | [4](./2019/day-4) | [5](./2019/day-5)
 | - | 
 | - | 
 | - | 
@@ -44,7 +44,7 @@ Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 * [Red Blob Games](https://www.redblobgames.com/): interactive visual explanations of math and algorithms
 * [Comprehensive walk-through](https://github.com/mebeim/aoc/blob/master/2020/README.md) by [Marco Bonelli](https://github.com/mebeim)
 
-[py]: https://docs.python.org/3/
 [aoc]: https://adventofcode.com/
 [aoc-2020]: https://adventofcode.com/2020/
 [advent-calendar]: https://en.wikipedia.org/wiki/Advent_calendar
+[py]: https://docs.python.org/3/
