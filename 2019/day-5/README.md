@@ -123,20 +123,66 @@ def load_contents(filename: str) -> list[int]:
 
 ## 💡🙋 Puzzle Solving
 
-Instructions lengths depending on the opcode:
+The solving process is simplified from day 2.
+
+The first instruction: an `input` with opcode `0d3`, is hard coded before entering the iterative section.
 
 ```python
-INSTR_MAP = {
-    1: {'length': 4},
-    2: {'length': 4},
-    3: {'length': 2},
-    4: {'length': 2},
-    99: {'length': 0},
-}
+def execute_program(contents: list[int], input: int) -> int:
+    instr_ptr = 0
+    assert contents[instr_ptr] == 3
+    contents[contents[1]] = input
+    instr_ptr = 2
+    output = -1
+    while instr_ptr != -1:
+        (instr_ptr, output) = execute(
+            instr_ptr=instr_ptr, contents=contents, last_output=output)
+    return output
 ```
 
-The execution function needs to be improved for dealing with these variable length instructions.
+```python
+def execute(instr_ptr: int, contents: list[int], last_output: int) -> (int, int):
+    instr = contents[instr_ptr]
+    opcode = int(str(instr)[-2:])
+    param_modes = decode_modes(instruction=instr)
+    output = last_output
+    arguments = list()
+    for i, mode in enumerate(param_modes):
+        argument = contents[instr_ptr + i + 1]
+        position_mode = 0 == mode
+        if position_mode:
+            arguments.append(contents[argument])
+        else:
+            arguments.append(argument)
+    if opcode == 1:
+        result = sum(arguments[:-1])
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        contents[result_ptr] = result
+    elif opcode == 2:
+        result = reduce(operator.mul, arguments[:-1], 1)
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        contents[result_ptr] = result
+    elif opcode == 3:
+        raise Exception
+    elif opcode == 4:
+        output = arguments[0]
+        log.info(f'output: {output}')
+    elif opcode == 99:
+        return -1, last_output
+    next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+    return next_instr, output
+```
 
+Answer computation consists in using the last value assigned to the `output` variable.
+
+```python
+output = execute_program(contents=contents, input_=1)
+return output
+```
+
+Contents | Answer
+--- | ---
+[`input.txt`](./input.txt) | `12234644`
 
 
 [aoc]: https://adventofcode.com/

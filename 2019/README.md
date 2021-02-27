@@ -17,11 +17,11 @@ Tag | Description
 
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
-1 | [The Tyranny of the Rocket Equation](/2019/day-1) | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
-2 | [1202 Program Alarm](/2019/day-2) | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
-3 | [Crossed Wires](/2019/day-3) | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | 👌
-4 | [Secure Container](/2019/day-4) | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | 👌 | 👌
-5 | [Sunny with a Chance of Asteroids](/2019/day-5) | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| - | ⏱ | ⏱
+[1](/2019/day-1) | The Tyranny of the Rocket Equation | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
+[2](/2019/day-2) | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
+[3](/2019/day-3) | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | 👌
+[4](/2019/day-4) | Secure Container | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | 👌 | 👌
+[5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | 👌 | ⏱
 
 # Resources
 

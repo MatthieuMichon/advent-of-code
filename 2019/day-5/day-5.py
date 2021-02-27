@@ -8,7 +8,9 @@ Puzzle Solution in Python
 
 import argparse
 import logging
+import operator
 import sys
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -16,11 +18,13 @@ log = logging.getLogger(__name__)
 # Common Methods ---------------------------------------------------------------
 
 
-ADD = 1
-MUL = 2
-WR = 3
-RD = 4
-HALT = 99
+INSTR_MAP = {
+    1: {'length': 4},
+    2: {'length': 4},
+    3: {'length': 2},
+    4: {'length': 2},
+    99: {'length': 0},
+}
 
 
 def load_contents(filename: str) -> list[int]:
@@ -34,18 +38,81 @@ def load_contents(filename: str) -> list[int]:
     return contents
 
 
+def decode_modes(instruction: int) -> list[int]:
+    """Decode argument modes
+
+    :param instruction: instruction
+    :return: list of argument modes
+    """
+    opcode = int(str(instruction)[-2:])
+    instr_args_qty = INSTR_MAP[opcode]['length'] - 1
+    modes_str = list(str(instruction)[:-2])
+    modes = list(reversed([int(m) for m in modes_str]))
+    modes = list(modes) + [0] * (instr_args_qty - len(modes))
+    log.debug(f'instr {instruction} -> modes {modes}')
+    return modes
+
+
+def execute(instr_ptr: int, contents: list[int], last_output: int) -> (int, int):
+    """Execute the selected instruction
+
+    :param instr_ptr: index
+    :param contents: list of integers
+    :param last_output: previous output value from last instruction
+    :return: True if continue
+    """
+    instr = contents[instr_ptr]
+    opcode = int(str(instr)[-2:])
+    param_modes = decode_modes(instruction=instr)
+    assert opcode in INSTR_MAP
+    output = last_output
+    arguments = list()
+    for i, mode in enumerate(param_modes):
+        argument = contents[instr_ptr + i + 1]
+        position_mode = 0 == mode
+        if position_mode:
+            log.debug(f'arg #{i}, ptr: {argument} val: {contents[argument]}')
+            arguments.append(contents[argument])
+        else:
+            log.debug(f'arg #{i}, val: {argument}')
+            arguments.append(argument)
+    if opcode == 1:
+        result = sum(arguments[:-1])
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        contents[result_ptr] = result
+    elif opcode == 2:
+        result = reduce(operator.mul, arguments[:-1], 1)
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        contents[result_ptr] = result
+    elif opcode == 3:
+        raise Exception
+    elif opcode == 4:
+        output = arguments[0]
+        log.info(f'output: {output}')
+    elif opcode == 99:
+        return -1, last_output
+    next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+    return next_instr, output
+
+
 # Puzzle Solving Methods -------------------------------------------------------
 
 
-def execute_program(contents: list[int], input: int):
+def execute_program(contents: list[int], input_: int) -> int:
     """Solve part one of the puzzle
 
     :param contents: list of integers
-    :param input: list of integers
+    :param input_: list of integers
     :return: output value
     """
-    ...
+    instr_ptr = 0
+    assert contents[instr_ptr] == 3
+    contents[contents[1]] = input_
+    instr_ptr = 2
     output = -1
+    while instr_ptr != -1:
+        (instr_ptr, output) = execute(
+            instr_ptr=instr_ptr, contents=contents, last_output=output)
     return output
 
 
@@ -55,8 +122,7 @@ def solve(contents: list[int]) -> int:
     :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-
-    output = execute_program(contents=contents, input=1)
+    output = execute_program(contents=contents, input_=1)
     return output
 
 
@@ -64,8 +130,7 @@ def solve(contents: list[int]) -> int:
 
 
 EXIT_SUCCESS = 0
-LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(module)s - '
-              '%(funcName)s - %(message)s')
+LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(message)s')
 
 
 def configure_logger(verbose: bool):
