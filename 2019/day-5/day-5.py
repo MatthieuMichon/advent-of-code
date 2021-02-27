@@ -10,11 +10,6 @@ import argparse
 import logging
 import sys
 
-
-EXIT_SUCCESS = 0
-LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(module)s - '
-              '%(funcName)s - %(message)s')
-
 log = logging.getLogger(__name__)
 
 
@@ -29,53 +24,29 @@ HALT = 99
 
 
 def load_contents(filename: str) -> list[int]:
-    """Load contents from the given file
+    """Load and convert contents from file
 
-    :param filename: filename as string
-    :return: list of integers
+    :param filename: input filename
+    :return: list of integer values
     """
     contents = list(map(int, open(filename).read().strip().split(',')))
     log.info(f'Loaded {len(contents)} values from {filename}')
     return contents
 
 
-def execute_program(contents: list[int], noun: int, verb: int):
+# Puzzle Solving Methods -------------------------------------------------------
+
+
+def execute_program(contents: list[int], input: int):
     """Solve part one of the puzzle
 
     :param contents: list of integers
-    :return: answer for the part one of the puzzle
+    :param input: list of integers
+    :return: output value
     """
-
-    def execute(instruction: int, operand_a: int, operand_b: int) -> int:
-        """Evaluate operands using the given arithmetic instruction
-
-        :param instruction: Intcode arithmetic instruction
-        :param operand_a: first operand
-        :param operand_b: second operand
-        :return: result of the arithmetical instruction
-        """
-        if instruction == ADD:
-            return operand_a + operand_b
-        if instruction == MUL:
-            return operand_a * operand_b
-
-    program = contents.copy()
-    pc = 0
-    instr = program[pc]
-    while instr in [ADD, MUL]:
-        a_ptr, b_ptr, r_ptr = program[pc + 1:pc + 4]
-        a, b = [program[ptr] for ptr in [a_ptr, b_ptr]]
-        program[r_ptr] = execute(instruction=instr, operand_a=program[a_ptr],
-                                 operand_b=program[b_ptr])
-        log.debug(f'pc: {pc:02x}, instr: {instr:02d}, a_ptr:{a_ptr}, a:{a}, '
-                  f'b_ptr: {b_ptr}, b: {b}')
-        pc += 4
-        instr = program[pc]
-    answer = program[0]
-    return answer
-
-
-# Puzzle Solving Methods -------------------------------------------------------
+    ...
+    output = -1
+    return output
 
 
 def solve(contents: list[int]) -> int:
@@ -85,10 +56,16 @@ def solve(contents: list[int]) -> int:
     :return: answer for the part one of the puzzle
     """
 
-    return -1
+    output = execute_program(contents=contents, input=1)
+    return output
 
 
 # Support Methods --------------------------------------------------------------
+
+
+EXIT_SUCCESS = 0
+LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(module)s - '
+              '%(funcName)s - %(message)s')
 
 
 def configure_logger(verbose: bool):

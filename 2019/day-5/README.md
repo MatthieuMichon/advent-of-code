@@ -109,6 +109,10 @@ So all the outputs should be zero except for the last one.
 
 Looking at the [`input.txt`](./input.txt) file, the contents are a list of integers (some negatives, but most are positives) separated by comas [`,`][w-comma].
 
+# ⚙🚀 Implementation
+
+## 💾🔍 Content Decoding
+
 This encoding is identical to one used in [2019 day-2](../day-2), thus it is reused without any changes.
 
 ```python
@@ -116,6 +120,24 @@ def load_contents(filename: str) -> list[int]:
     contents = list(map(int, open(filename).read().strip().split(',')))
     return contents
 ```
+
+## 💡🙋 Puzzle Solving
+
+Instructions lengths depending on the opcode:
+
+```python
+INSTR_MAP = {
+    1: {'length': 4},
+    2: {'length': 4},
+    3: {'length': 2},
+    4: {'length': 2},
+    99: {'length': 0},
+}
+```
+
+The execution function needs to be improved for dealing with these variable length instructions.
+
+
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
