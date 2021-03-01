@@ -21,7 +21,8 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [2](/2019/day-2) | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
 [3](/2019/day-3) | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | 👌
 [4](/2019/day-4) | Secure Container | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | 👌 | 👌
-[5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | 👌 | ⏱
+[5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | 👌 | 👌
+
 
 # Resources
 

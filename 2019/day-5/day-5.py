@@ -23,6 +23,10 @@ INSTR_MAP = {
     2: {'length': 4},
     3: {'length': 2},
     4: {'length': 2},
+    5: {'length': 3},
+    6: {'length': 3},
+    7: {'length': 4},
+    8: {'length': 4},
     99: {'length': 0},
 }
 
@@ -80,18 +84,51 @@ def execute(instr_ptr: int, contents: list[int], last_output: int) -> (int, int)
         result = sum(arguments[:-1])
         result_ptr = contents[instr_ptr + len(param_modes)]
         contents[result_ptr] = result
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
     elif opcode == 2:
         result = reduce(operator.mul, arguments[:-1], 1)
         result_ptr = contents[instr_ptr + len(param_modes)]
         contents[result_ptr] = result
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
     elif opcode == 3:
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
         raise Exception
     elif opcode == 4:
         output = arguments[0]
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
         log.info(f'output: {output}')
+    elif opcode == 5:
+        non_zero = 0 != arguments[0]
+        if non_zero:
+            next_instr = arguments[1]
+        else:
+            next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+    elif opcode == 6:
+        zero = 0 == arguments[0]
+        if zero:
+            next_instr = arguments[1]
+        else:
+            next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+    elif opcode == 7:
+        less_than = arguments[0] < arguments[1]
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        log.debug(f'contents: {contents}; result_pt {result_ptr}')
+        if less_than:
+            contents[result_ptr] = 1
+        else:
+            contents[result_ptr] = 0
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+    elif opcode == 8:
+        equals = arguments[0] == arguments[1]
+        result_ptr = contents[instr_ptr + len(param_modes)]
+        if equals:
+            contents[result_ptr] = 1
+        else:
+            contents[result_ptr] = 0
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
     elif opcode == 99:
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
         return -1, last_output
-    next_instr = instr_ptr + INSTR_MAP[opcode]['length']
     return next_instr, output
 
 
@@ -113,6 +150,7 @@ def execute_program(contents: list[int], input_: int) -> int:
     while instr_ptr != -1:
         (instr_ptr, output) = execute(
             instr_ptr=instr_ptr, contents=contents, last_output=output)
+    log.debug(f'contents: {contents}')
     return output
 
 
@@ -123,6 +161,16 @@ def solve(contents: list[int]) -> int:
     :return: answer for the part one of the puzzle
     """
     output = execute_program(contents=contents, input_=1)
+    return output
+
+
+def solve_part_two(contents: list[int]) -> int:
+    """Solve part two of the puzzle
+
+    :param contents: list of integers
+    :return: answer for the part one of the puzzle
+    """
+    output = execute_program(contents=contents, input_=5)
     return output
 
 
@@ -173,15 +221,15 @@ def main() -> int:
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
     compute_part_one = not args.part or 1 == args.part
-    compute_part_two = False #not args.part or 2 == args.part
+    compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = load_contents(filename=args.filename)
         answer = solve(contents=contents)
         print(answer)
     if compute_part_two:
         contents = load_contents(filename=args.filename)
-        #answer = solve_part_two(contents=contents)
-        #print(answer)
+        answer = solve_part_two(contents=contents)
+        print(answer)
     return EXIT_SUCCESS
 
 

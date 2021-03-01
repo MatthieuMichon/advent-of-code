@@ -203,8 +203,17 @@ Meaning we can expect some new instructions!
 
 Jump instructions! This will require some refactoring!
 
+Code | Operation | Total Length
+--- | --- | ---
+`5` | `jump-if-true` | `3`
+`6` | `jump-if-false` | `3`
+`7` | `less than` | `4`
+`8` | `equals` | `4`
+
 > Like all instructions, these instructions need to support parameter modes as described above.
-> 
+
+Ok.
+
 > Normally, after an instruction is finished, the instruction pointer increases by the number of values in that instruction. However, if the instruction modifies the instruction pointer, that value is used and the instruction pointer is not automatically increased.
 
 Seems legit.
@@ -232,6 +241,49 @@ Seems legit.
 > This time, when the TEST diagnostic program runs its input instruction to get the ID of the system to test, provide it 5, the ID for the ship's thermal radiator controller. This diagnostic test suite only outputs one number, the diagnostic code.
 > 
 > What is the diagnostic code for system ID 5?
+
+## 🤔🤯 Solver Implementation
+
+Work in part two consists in adding the four new instructions and processing logic.
+
+```python
+elif opcode == 5:
+    non_zero = 0 != arguments[0]
+    if non_zero:
+        next_instr = arguments[1]
+    else:
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+elif opcode == 6:
+    zero = 0 == arguments[0]
+    if zero:
+        next_instr = arguments[1]
+    else:
+        next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+elif opcode == 7:
+    less_than = arguments[0] < arguments[1]
+    result_ptr = contents[instr_ptr + len(param_modes)]
+    if less_than:
+        contents[result_ptr] = 1
+    else:
+        contents[result_ptr] = 0
+    next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+elif opcode == 8:
+    equals = arguments[0] == arguments[1]
+    result_ptr = contents[instr_ptr + len(param_modes)]
+    if equals:
+        contents[result_ptr] = 1
+    else:
+        contents[result_ptr] = 0
+    next_instr = instr_ptr + INSTR_MAP[opcode]['length']
+```
+
+Contents | Answer
+--- | ---
+[`input.txt`](./input.txt) | `3508186`
+
+# 🚀✨ Further Improvements 🚀✨
+
+Several portions of the code could be refactored.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
