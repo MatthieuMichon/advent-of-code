@@ -41,6 +41,66 @@ Body | Example
 `C` | Sun
 `D` | Galactic Center
 
+> For example, suppose you have the following map:
+> 
+> ```
+> COM)B
+> B)C
+> C)D
+> D)E
+> E)F
+> B)G
+> G)H
+> D)I
+> E)J
+> J)K
+> K)L
+> ```
+> 
+> Visually, the above map of orbits looks like this:
+> 
+> ```
+>         G - H       J - K - L
+>        /           /
+> COM - B - C - D - E - F
+>                \
+>                 I
+> ```
+> 
+> In this visual representation, when two objects are connected by a line, the one on the right directly orbits the one on the left.
+> 
+> Here, we can count the total number of orbits as follows:
+> 
+>     D directly orbits C and indirectly orbits B and COM, a total of 3 orbits.
+>     L directly orbits K and indirectly orbits J, E, D, C, B, and COM, a total of 7 orbits.
+>     COM orbits nothing.
+> 
+> The total number of direct and indirect orbits in this example is 42.
+
+Computing the number of orbits can be compared as a graph traversal. 
+
+> What is the total number of direct and indirect orbits in your map data?
+
+Indeed.
+
+# 📃➡ Input Contents Format
+
+Content files, [`example.txt`](./example.txt) and [`input.txt`](./input.txt), contain a number of lines with two alphanumeric identifiers separated by a single closing parenthesis.
+
+# ⚙🚀 Implementation
+
+## 💾🔍 Content Decoding
+
+The most practical output format after decoding will be a list of tuples. Each tuple representing a pair of objects, the second one orbiting the first one.
+
+Thus, we need the [`open()`][py-open]; [`read()`][py-read]; [`strip()`][py-strip] and [`split()`][py-split] methods.
+
+```python
+def load_contents(filename: str) -> list[tuple]:
+    lines = open(filename).read().strip().split(os.linesep)
+    contents = [tuple(l.split(')')) for l in lines]
+    return contents
+```
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
