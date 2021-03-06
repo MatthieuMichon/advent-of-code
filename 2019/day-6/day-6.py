@@ -18,6 +18,9 @@ log = logging.getLogger(__name__)
 # Common Methods ---------------------------------------------------------------
 
 
+COM = 'COM'
+
+
 def load_contents(filename: str) -> list[tuple]:
     """Load and convert contents from file
 
@@ -30,6 +33,15 @@ def load_contents(filename: str) -> list[tuple]:
     return contents
 
 
+def expand_orbited_objects(orbiters: dict[str], orbiter: str) -> list[str]:
+    orbited_objects = list()
+    orbited = orbiters[orbiter]
+    orbited_objects.append(orbited)
+    if COM != orbited:
+        orbited_objects.extend(expand_orbited_objects(orbiters, orbited))
+    return orbited_objects
+
+
 # Puzzle Solving Methods -------------------------------------------------------
 
 
@@ -39,8 +51,15 @@ def solve(contents: list[tuple]) -> int:
     :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-    output = -1
-    return output
+    orbiters = dict()
+    for orbited, orbiter in contents:
+        orbiters[orbiter] = orbited
+    orbited_objects = dict()
+    for orbiter in orbiters:
+        orbited_objects[orbiter] = expand_orbited_objects(
+            orbiters=orbiters, orbiter=orbiter)
+    answer = sum(len(v) for v in orbited_objects.values())
+    return answer
 
 
 def solve_part_two(contents: list[tuple]) -> int:

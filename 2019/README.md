@@ -22,8 +22,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [3](/2019/day-3) | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | 👌
 [4](/2019/day-4) | Secure Container | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | 👌 | 👌
 [5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | 👌 | 👌
-[6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| - | ⏱ | ⏱
-
+[6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| [Graph Traversal][w-graph] | 👌 | ⏱
 
 # Resources
 
@@ -88,6 +87,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [reddit-2019-25]: https://www.reddit.com/efca4m
 
 [w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
+[w-graph]: https://en.wikipedia.org/wiki/Graph_traversal
 [w-logic]: https://en.wikipedia.org/wiki/Logic
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
 [w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion

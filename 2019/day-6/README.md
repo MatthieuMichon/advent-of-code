@@ -93,7 +93,13 @@ Content files, [`example.txt`](./example.txt) and [`input.txt`](./input.txt), co
 
 The most practical output format after decoding will be a list of tuples. Each tuple representing a pair of objects, the second one orbiting the first one.
 
-Thus, we need the [`open()`][py-open]; [`read()`][py-read]; [`strip()`][py-strip] and [`split()`][py-split] methods.
+Starting from a filename encoded as a [`str`][py-string] object, the following sequence of operations are required:
+
+1. Open and read the file, with the usual [`open()`][py-open] and [`read()`][py-read] methods.
+1. Remove the trailing line return, using [`strip()`][py-strip].
+1. Split the single string into a [`list`][py-list] of strings using [`split()`][py-split] on new line boundaries with [`os.linesep`][py-linesep].
+1. For each item of the list of strings
+    1. Split the string using a closing parenthesis `)` as separator.
 
 ```python
 def load_contents(filename: str) -> list[tuple]:
@@ -101,6 +107,80 @@ def load_contents(filename: str) -> list[tuple]:
     contents = [tuple(l.split(')')) for l in lines]
     return contents
 ```
+
+## 💡🙋 Puzzle Solving
+
+The answer as stated in the puzzle, consists in the total of direct and indirect orbits.
+
+> What is the total number of direct and indirect orbits in your map data?
+
+Direct orbits correspond to the contents extracted from the input file. The indirect orbits require to compute all the paths between objects separated by distance of two or greater.
+
+A first brute force approach to this problem would consist in building a per-object map which points to a list of other objects it relates to. The algorithm in this case requires computing a map of objects which orbit another object, which is the reverse of the contents extracted from the file.
+
+1. Initialize a new map.
+1. For each (`orbited`, `orbiter`) tuple in the content list.
+    1. Create a new `orbiter` entry in the map referencing the `orbited` object.
+
+```python
+orbiters = dict()
+for orbited, orbiter in contents:
+    orbiters[orbiter] = orbited
+```
+
+The next step consists in expanding all the possible dependencies.
+
+1. Initialize a new map.
+1. For each orbiter in the `orbiters` map
+    1. Expand the list of orbited objects.
+
+The expansion of an object into the list of all objects it orbits around is easier done using a recursive method, taking the `orbiters` along a single `orbiter`, and returns a list of objects.
+
+1. Initialize an empty list.
+1. Lookup the object around which the `orbiter` orbits around.
+1. Append the orbited object to the list.
+1. Test if the orbited object is equal to `COM`, the *universal Center of Mass*:
+    * If not equal, then call again this method and append its result to the list before returning it.
+1. Return the list of orbited objects.
+
+```python
+COM = 'COM'
+
+def expand_orbited_objects(orbiters: list[tuple], orbiter: str) -> list[str]:
+    orbited_objects = list()
+    orbited = orbiters[orbiter]
+    orbited_objects.append(orbited)
+    if COM != orbited:
+       orbited_objects.extend(expand_orbited_objects(orbiters, orbited))
+    return orbited_objects
+```
+
+Computing the answer is just a mater of counting all the items for all the orbiters.
+
+```python
+answer = sum(len(v) for v in orbited_objects.values())
+```
+
+The solving method pieced together:
+
+```python
+def solve(contents: list[tuple]) -> int:
+    orbiters = dict()
+    for orbited, orbiter in contents:
+        orbiters[orbiter] = orbited
+    orbited_objects = dict()
+    for orbiter in orbiters:
+        orbited_objects[orbiter] = expand_orbited_objects(
+            orbiters=orbiters, orbiter=orbiter)
+    output = sum(len(v) for v in orbited_objects.values())
+    return output
+```
+
+Contents | Answer
+--- | ---
+[`example.txt`](./input.txt) | `42`
+[`input.txt`](./input.txt) | `151345`
+
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -117,6 +197,7 @@ def load_contents(filename: str) -> list[tuple]:
 [py-map]: https://docs.python.org/3/library/functions.html#map
 [py-name]: https://docs.python.org/3/library/stdtypes.html#definition.__name__
 [py-open]: https://docs.python.org/3/library/functions.html#open
+[py-linesep]: https://docs.python.org/3/library/os.html#os.linesep
 [py-read]: https://docs.python.org/3/library/io.html#io.TextIOBase.read
 [py-set]: https://docs.python.org/3/library/stdtypes.html#set
 [py-split]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.split
