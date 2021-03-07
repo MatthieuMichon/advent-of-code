@@ -181,6 +181,103 @@ Contents | Answer
 [`example.txt`](./input.txt) | `42`
 [`input.txt`](./input.txt) | `151345`
 
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Description
+
+> Now, you just need to figure out how many orbital transfers you (YOU) need to take to get to Santa (SAN).
+> 
+> You start at the object YOU are orbiting; your destination is the object SAN is orbiting. An orbital transfer lets you move from any object to an object orbiting or orbited by that object.
+> 
+> For example, suppose you have the following map:
+> 
+> ```
+> COM)B
+> B)C
+> C)D
+> D)E
+> E)F
+> B)G
+> G)H
+> D)I
+> E)J
+> J)K
+> K)L
+> K)YOU
+> I)SAN
+> ```
+> 
+> Visually, the above map of orbits looks like this:
+> 
+> ```
+>                           YOU
+>                          /
+>         G - H       J - K - L
+>        /           /
+> COM - B - C - D - E - F
+>                \
+>                 I - SAN
+> ```
+> 
+> In this example, YOU are in orbit around K, and SAN is in orbit around I. To move from K to I, a minimum of 4 orbital transfers are required:
+> 
+> ```
+>     K to J
+>     J to E
+>     E to D
+>     D to I
+> ```
+
+It appears that a lot of materials can be reused from part one, notably the per-orbited objects.
+
+> Afterward, the map of orbits looks like this:
+> 
+> ```
+>         G - H       J - K - L
+>        /           /
+> COM - B - C - D - E - F
+>                \
+>                 I - SAN
+>                  \
+>                   YOU
+> ```
+
+Understood.
+
+> What is the minimum number of orbital transfers required to move from the object YOU are orbiting to the object SAN is orbiting? (Between the objects they are orbiting - not between YOU and SAN.)
+
+## 🤔🤯 Solver Implementation
+
+First things would be to check that the `YOU` and `SAN`.
+
+```python
+>>> 'YOU' in orbited_objects
+True
+>>> 'SAN' in orbited_objects
+True
+```
+
+Using the [`set`][py-set] object, we can easily factorize common orbited objects by both `YOU` and `SAN` objects. Thus the part two is for once quite straight forward to implement:
+
+```python
+def solve_part_two(contents: list[tuple]) -> int:
+    orbiters = map_orbiters(contents=contents)
+    orbited_objects = map_orbited_objects(orbiters=orbiters)
+    san_orbited_objects = set(orbited_objects['SAN'])
+    you_orbited_objects = set(orbited_objects['YOU'])
+    unique_orbited_objects = you_orbited_objects ^ san_orbited_objects
+    answer = len(unique_orbited_objects)
+    return answer
+```
+
+Contents | Answer
+--- | ---
+[`example_part2.txt`](./input.txt) | `4`
+[`input.txt`](./input.txt) | `391`
+
+# 🚀✨ Further Improvements 🚀✨
+
+The recursive implementation of the `expand_orbited_objects()` method could be simplified using an iterator yielding list items.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/

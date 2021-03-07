@@ -33,6 +33,31 @@ def load_contents(filename: str) -> list[tuple]:
     return contents
 
 
+def map_orbiters(contents: list[tuple]) -> dict[str, str]:
+    """Convert list of orbited, orbiters objects into a map
+
+    :param contents: list of string tuples
+    :return: per-orbiter mapping
+    """
+    orbiters = dict()
+    for orbited, orbiter in contents:
+        orbiters[orbiter] = orbited
+    return orbiters
+
+
+def map_orbited_objects(orbiters: dict[str, str]) -> dict[str, list]:
+    """Convert list of orbited, orbiters objects into a map
+
+    :param orbiters: per-orbiter mapping
+    :return: per-orbited object mapping
+    """
+    orbited_objects = dict()
+    for orbiter in orbiters:
+        orbited_objects[orbiter] = expand_orbited_objects(
+            orbiters=orbiters, orbiter=orbiter)
+    return orbited_objects
+
+
 def expand_orbited_objects(orbiters: dict[str], orbiter: str) -> list[str]:
     orbited_objects = list()
     orbited = orbiters[orbiter]
@@ -48,16 +73,11 @@ def expand_orbited_objects(orbiters: dict[str], orbiter: str) -> list[str]:
 def solve(contents: list[tuple]) -> int:
     """Solve part one of the puzzle
 
-    :param contents: list of integers
+    :param contents: list of string tuples
     :return: answer for the part one of the puzzle
     """
-    orbiters = dict()
-    for orbited, orbiter in contents:
-        orbiters[orbiter] = orbited
-    orbited_objects = dict()
-    for orbiter in orbiters:
-        orbited_objects[orbiter] = expand_orbited_objects(
-            orbiters=orbiters, orbiter=orbiter)
+    orbiters = map_orbiters(contents=contents)
+    orbited_objects = map_orbited_objects(orbiters=orbiters)
     answer = sum(len(v) for v in orbited_objects.values())
     return answer
 
@@ -68,8 +88,13 @@ def solve_part_two(contents: list[tuple]) -> int:
     :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-    output = -1
-    return output
+    orbiters = map_orbiters(contents=contents)
+    orbited_objects = map_orbited_objects(orbiters=orbiters)
+    san_orbited_objects = set(orbited_objects['SAN'])
+    you_orbited_objects = set(orbited_objects['YOU'])
+    unique_orbited_objects = you_orbited_objects ^ san_orbited_objects
+    answer = len(unique_orbited_objects)
+    return answer
 
 
 # Support Methods --------------------------------------------------------------
