@@ -2,7 +2,7 @@
 
 """Advent of Code Programming Puzzles
 
-2019 Edition - Day 6
+2019 Edition - Day 7
 Puzzle Solution in Python
 """
 
@@ -17,82 +17,41 @@ log = logging.getLogger(__name__)
 # Common Methods ---------------------------------------------------------------
 
 
-COM = 'COM'
-
-
-def load_contents(filename: str) -> list[tuple]:
+def load_contents(filename: str) -> list[list[int]]:
     """Load and convert contents from file
 
     :param filename: input filename
-    :return: list of string tuples
+    :return: list of integer lists with variable length
     """
     lines = open(filename).read().strip().split(os.linesep)
-    contents = [tuple(l.split(')')) for l in lines]
-    log.info(f'Loaded {len(contents)} values from {filename}')
+    contents = [list(map(int, l.split(','))) for l in lines]
+    log.info(f'Loaded {len(contents)} lists from {filename}, '
+             f'with a total of {sum(len(l) for l in contents)} instructions')
     return contents
-
-
-def map_orbiters(contents: list[tuple]) -> dict[str, str]:
-    """Convert list of orbited, orbiters objects into a map
-
-    :param contents: list of string tuples
-    :return: per-orbiter mapping
-    """
-    orbiters = dict()
-    for orbited, orbiter in contents:
-        orbiters[orbiter] = orbited
-    return orbiters
-
-
-def map_orbited_objects(orbiters: dict[str, str]) -> dict[str, list]:
-    """Convert list of orbited, orbiters objects into a map
-
-    :param orbiters: per-orbiter mapping
-    :return: per-orbited object mapping
-    """
-    orbited_objects = dict()
-    for orbiter in orbiters:
-        orbited_objects[orbiter] = expand_orbited_objects(
-            orbiters=orbiters, orbiter=orbiter)
-    return orbited_objects
-
-
-def expand_orbited_objects(orbiters: dict[str], orbiter: str) -> list[str]:
-    orbited_objects = list()
-    orbited = orbiters[orbiter]
-    orbited_objects.append(orbited)
-    if COM != orbited:
-        orbited_objects.extend(expand_orbited_objects(orbiters, orbited))
-    return orbited_objects
 
 
 # Puzzle Solving Methods -------------------------------------------------------
 
 
-def solve(contents: list[tuple]) -> int:
+def solve(contents: list[int]) -> int:
     """Solve part one of the puzzle
 
-    :param contents: list of string tuples
+    :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-    orbiters = map_orbiters(contents=contents)
-    orbited_objects = map_orbited_objects(orbiters=orbiters)
-    answer = sum(len(v) for v in orbited_objects.values())
+    ...
+    answer = -1
     return answer
 
 
-def solve_part_two(contents: list[tuple]) -> int:
+def solve_part_two(contents: list[int]) -> int:
     """Solve part two of the puzzle
 
     :param contents: list of integers
     :return: answer for the part one of the puzzle
     """
-    orbiters = map_orbiters(contents=contents)
-    orbited_objects = map_orbited_objects(orbiters=orbiters)
-    san_orbited_objects = set(orbited_objects['SAN'])
-    you_orbited_objects = set(orbited_objects['YOU'])
-    unique_orbited_objects = you_orbited_objects ^ san_orbited_objects
-    answer = len(unique_orbited_objects)
+    ...
+    answer = -1
     return answer
 
 
@@ -100,7 +59,7 @@ def solve_part_two(contents: list[tuple]) -> int:
 
 
 EXIT_SUCCESS = 0
-LOG_FORMAT = ('%(asctime)s - %(levelname)s - %(message)s')
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 
 
 def configure_logger(verbose: bool):
@@ -146,12 +105,14 @@ def main() -> int:
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = load_contents(filename=args.filename)
-        answer = solve(contents=contents)
-        print(answer)
+        for i, c in enumerate(contents):
+            answer = solve(contents=c)
+            print(f'index {i}, answer: {answer}')
     if compute_part_two:
         contents = load_contents(filename=args.filename)
-        answer = solve_part_two(contents=contents)
-        print(answer)
+        for i, c in enumerate(contents):
+            answer = solve_part_two(contents=c)
+            print(f'index {i}, answer: {answer}')
     return EXIT_SUCCESS
 
 

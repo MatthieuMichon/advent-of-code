@@ -93,10 +93,10 @@ First thing when having to design an input decoder is to understand how input co
 
 For instance the puzle input contents fit on a single line of text, whereas we have several examples meaning several lines. The smart thing to do would be to handle both.
 
-Input | Lines
---- | ---
-[`examples.txt`](./examples.txt) | `3`
-[`input.txt`](./input.txt) | `1`
+Input | Lines | Total Length
+--- | --- | ---
+[`examples.txt`](./examples.txt) | 3 | 76
+[`input.txt`](./input.txt) | 1 | 523
 
 Looking into the contents themselves, they consist in one or more lines listing a series of integers separated by [`coma`][w-comma]: `,` characters. 
 
