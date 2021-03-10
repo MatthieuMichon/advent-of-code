@@ -128,6 +128,98 @@ def load_contents(filename: str) -> list[list[int]]:
 
 ## 💡🙋 Puzzle Solving
 
+As usual I opted to rely on a several layers of methods for solving this puzzle. The first one is a high-level `solve()` method. This method takes a single list of `Intcode` data a executes a couple of steps.
+
+> :memo: **Note**:
+> 
+> Some steps could be fused together, but for clarity are executed a part.
+
+1. Initialize a `amp_outputs` list receiving per-combination output values.
+2. Pre-computes all `phase settings` combinations. The [`intertools`][py-itertools] library provides the [`permutations()`][py-itertools-permutations] which matches our use case.
+
+```python
+    phase_settings = itertools.permutations(
+        iterable=range(*PHASE_RANGE), r=AMPLIFIERS)
+```
+
+2. Iterate for each `phase setting`
+   1. Clear `amp_input` value.
+   1. Iterate for each amplifier stage
+      1. Get the relevant `phase setting` from the list for the current stage.
+      1. Get a fresh copy of the `Intcode` contents, as it is likely they will be modified.
+      1. Call a method, `compute_output_signal()` executing the `Intcode` contents and yielding the output for the given amplifier stage.
+      1. Loop the output to the input value
+   1. Append to final output value after going through all amplifier stages.
+
+```python
+ for phase_setting in phase_settings:
+     amp_input = 0
+     amp_output = 0
+     for amp in range(AMPLIFIERS):
+         amp_phase_setting = phase_setting[amp]
+         temp_contents = contents.copy()
+         amp_output = compute_output_signal(
+             data=temp_contents, input_=amp_input,
+             phase=amp_phase_setting)
+         amp_input = amp_output
+     amp_outputs.append(amp_output)
+```
+
+The `compute_output_signal()` computes the computation of the output yielded by a single amplifier stage. It serializes input values retrieved by the `RD` instructions and execute instructions, stopping only when a `HALT` instruction is encountered.
+
+```python
+def compute_output_signal(data: list[int], input_: int, phase: int) -> int:
+    inputs = [phase, input_]
+    opcode_ptr: int = 0
+    output: int = 0
+    while data[opcode_ptr] != Intcode.HALT:
+        opcode_ptr, inputs, output = execute_opcode(
+            data=data, opcode_ptr=opcode_ptr, inputs=inputs)
+    return output
+```
+
+The `execute_opcode()` does the heavy-lifting:
+
+1. Fetches the instruction for the given opcode pointer.
+1. Decodes the instruction into: an opcode; and a list of per-argument parameter modes.
+1. Fetches input argument values depending on their corresponding parameter modes.
+1. Executes the opcode.
+   * If relevant, computes the pointer to the output value.
+   * If relevant, computes the output value and assigns via the pointer.
+   * Computes the new opcode pointer value.
+1. Returns a list of the opcode pointer value; input values lists; output value.
+
+```python
+def execute_opcode(data: list[int], opcode_ptr: int,
+                   inputs: list[int]) -> [int, list[int], any]:
+    instruction = data[opcode_ptr]
+    opcode, parameter_modes = decode_instruction(instruction)
+    assert Intcode(opcode) in opcode_map
+    opcode_args = fetch_arguments(data=data, opcode_ptr=opcode_ptr,
+                                  parameter_modes=parameter_modes)
+    output = None
+    if opcode == Intcode.ADD:
+        ...
+    elif opcode == Intcode.MUL:
+        ...
+    ...
+    elif opcode == Intcode.HALT:
+        raise Exception
+    return opcode_ptr, inputs, output
+```
+
+Computing the output is simply a matter of getting the highest output value at the end of the `solve()` method.
+
+```python
+ answer = max(amp_outputs)
+ return answer
+```
+
+Contents | Answer
+--- | ---
+[`input.txt`](./input.txt) | `118936`
+
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about
@@ -139,8 +231,12 @@ def load_contents(filename: str) -> list[list[int]]:
 [py-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
 [py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
+[py-itertools]: https://docs.python.org/3/library/itertools.html
+[py-itertools-permutations]: https://docs.python.org/3/library/itertools.html#itertools.permutations
 [py-list]: https://docs.python.org/3/library/stdtypes.html#list
 [py-main]: https://docs.python.org/3/library/__main__.html
+[py-math]: https://docs.python.org/3/library/math.html
+[py-math-comb]: https://docs.python.org/3/library/math.html#math.comb
 [py-map]: https://docs.python.org/3/library/functions.html#map
 [py-name]: https://docs.python.org/3/library/stdtypes.html#definition.__name__
 [py-open]: https://docs.python.org/3/library/functions.html#open

@@ -63,7 +63,7 @@ def execute(instr_ptr: int, contents: list[int], last_output: int) -> (int, int)
     :param instr_ptr: index
     :param contents: list of integers
     :param last_output: previous output value from last instruction
-    :return: True if continue
+    :return: next instruction pointer, output integer
     """
     instr = contents[instr_ptr]
     opcode = int(str(instr)[-2:])
