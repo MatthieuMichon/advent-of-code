@@ -75,7 +75,6 @@ def decode_instruction(instruction: int) -> [int, list[int]]:
     opcode = int(''.join(map(str, digits[-2:])))
     parameters = opcode_map[opcode]['parameters']
     modes = list(reversed(digits[:-2])) + [0] * (parameters - max(0, len(digits) - 2))
-    log.debug(f'[{instruction}]: opcode {opcode}, parameters {modes}')
     return opcode, modes
 
 
@@ -89,7 +88,6 @@ def fetch_arguments(data: list[int], opcode_ptr: int,
     :return: opcode argument values
     """
     arguments = list()
-    log.debug(f'@{opcode_ptr}->[{data[opcode_ptr]}], modes: {parameter_modes}')
     for i, parameter_mode in enumerate(parameter_modes):
         argument_address = opcode_ptr + 1 + i
         assert parameter_mode in ParameterMode.__members__.values()
@@ -100,9 +98,7 @@ def fetch_arguments(data: list[int], opcode_ptr: int,
             argument = data[argument_address]
         else:
             raise Exception
-        log.debug(f' - arg #{i}: mode {parameter_mode} addr {argument_address} val {argument}')
         arguments.append(argument)
-    log.debug(f'@{opcode_ptr}->[{data[opcode_ptr]}], args: {arguments}')
     return arguments
 
 
@@ -116,7 +112,6 @@ def execute_opcode(data: list[int], opcode_ptr: int,
     :return: next opcode pointer, updated input stack, output value or nothing
     """
     instruction = data[opcode_ptr]
-    log.debug(f'Executing @{opcode_ptr}->[{instruction}]')
     opcode, parameter_modes = decode_instruction(instruction)
     assert Intcode(opcode) in opcode_map
     opcode_args = fetch_arguments(data=data, opcode_ptr=opcode_ptr,
@@ -172,7 +167,6 @@ def execute_opcode(data: list[int], opcode_ptr: int,
         opcode_ptr += opcode_map[opcode]['parameters'] + 2
     elif opcode == Intcode.HALT:
         raise Exception
-    #assert output is not None
     return opcode_ptr, inputs, output
 
 
@@ -203,11 +197,8 @@ def compute_output_signal(
     while data[opcode_ptr] != Intcode.HALT:
         opcode_ptr, inputs, output = execute_opcode(
             data=data, opcode_ptr=opcode_ptr, inputs=inputs)
-        #assert output is not None
         if output is not None:
-            log.debug(f'yield output: {output}')
             return False, opcode_ptr, output
-    log.info(f'got halt instruction @{opcode_ptr}')
     return True, opcode_ptr, output
 
 
@@ -226,9 +217,9 @@ def solve(contents: list[int]) -> int:
         for amp in range(AMPLIFIERS):
             amp_phase_setting = phase_setting[amp]
             temp_contents = contents.copy()
-            amp_output = list(compute_output_signal(
+            halt, instruction_ptr, amp_output = compute_output_signal(
                 data=temp_contents, input_=amp_input,
-                phase=amp_phase_setting))[0]
+                phase=amp_phase_setting)
             amp_input = amp_output
         amp_outputs.append(amp_output)
     answer = max(amp_outputs)
@@ -258,7 +249,10 @@ def solve_part_two(contents: list[int]) -> int:
             halt, instruction_ptr, output = compute_output_signal(
                 data=per_stage_software[amp], input_=amp_input,
                 phase=amp_phase_setting, instruction_ptr=per_stage_instruction_ptr[amp])
-            if not output is None:
+            log.debug(f'iter #{iter}, stage {amp}: iptr {instruction_ptr}, output {output}')
+            assert contents != per_stage_software[amp]
+            assert instruction_ptr != 0
+            if output is not None:
                 amp_output = output
             per_stage_instruction_ptr[amp] = instruction_ptr
             amp_input = amp_output
@@ -275,7 +269,7 @@ def solve_part_two(contents: list[int]) -> int:
 
 
 EXIT_SUCCESS = 0
-LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+LOG_FORMAT = '# %(msecs)-3d - %(funcName)-32s - %(levelname)-8s - %(message)s'
 
 
 def configure_logger(verbose: bool):

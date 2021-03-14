@@ -217,7 +217,7 @@ Computing the output is simply a matter of getting the highest output value at t
 
 Contents | Answer
 --- | ---
-[`examples.txt`](./input.txt) | `[43210, 54321, 65210]`
+[`examples.txt`](./examples.txt) | `[43210, 54321, 65210]`
 [`input.txt`](./input.txt) | `118936`
 
 # 😰🙅 Part Two
@@ -291,6 +291,27 @@ per_stage_software = [contents.copy() for _ in range(AMPLIFIERS)]
 
 Furthermore, the current instruction pointer must be saved for each amplifier stage.
 
+> :ng: **Unexpected Behavior**:
+> 
+> A first implementation of the part two solver `solve_part_two()`, although yielded the expected values when run against the [`examples_part_two.txt`](./examples_part_two.txt), produced invalid results on the [`input.txt`](./input.txt) file. 
+
+```python
+# 250 - solve_part_two                   - DEBUG    - iter #40, stage 0: iptr 514, output 28019459
+# 250 - solve_part_two                   - DEBUG    - iter #41, stage 1: iptr 352, output 28019461
+# 250 - solve_part_two                   - DEBUG    - iter #42, stage 2: iptr 433, output 28019463
+# 250 - solve_part_two                   - DEBUG    - iter #43, stage 3: iptr 190, output 28019465
+# 250 - solve_part_two                   - DEBUG    - iter #44, stage 4: iptr 271, output 56038930
+# 250 - solve_part_two                   - DEBUG    - iter #45, stage 0: iptr 522, output 56038931
+# 250 - solve_part_two                   - DEBUG    - iter #46, stage 1: iptr 360, output 56038933
+# 250 - solve_part_two                   - DEBUG    - iter #47, stage 2: iptr 441, output 56038934
+# 250 - solve_part_two                   - DEBUG    - iter #48, stage 3: iptr 198, output 56038935
+# 250 - solve_part_two                   - DEBUG    - iter #49, stage 4: iptr 279, output 56038936
+# 250 - solve_part_two                   - DEBUG    - iter #50, stage 0: iptr 522, output 0
+# 250 - solve_part_two                   - DEBUG    - iter #51, stage 1: iptr 360, output 0
+# 250 - solve_part_two                   - DEBUG    - iter #52, stage 2: iptr 441, output 0
+# 250 - solve_part_two                   - DEBUG    - iter #53, stage 3: iptr 198, output 0
+# 250 - solve_part_two                   - DEBUG    - iter #54, stage 4: iptr 279, output 0
+```
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
