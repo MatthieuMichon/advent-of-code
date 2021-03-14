@@ -9,7 +9,8 @@ Annual editions in Python: [2020](/2020), **2019**.
 Tag | Description
 --- | ---
 ⏱ | Not started
-👌 | Completed without issues 
+⭐ | Completed without issues
+⭐⭐ | Fairly easy
 🤔 | Substantial thinking required 
 🐢 | Long answer computation time  
 🤯 | Implementation had to be completely rewritten several times
@@ -17,13 +18,14 @@ Tag | Description
 
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
-[1](/2019/day-1) | The Tyranny of the Rocket Equation | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | 👌 | 👌
-[2](/2019/day-2) | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | 👌 | 👌
-[3](/2019/day-3) | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | 👌 | 👌
-[4](/2019/day-4) | Secure Container | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | 👌 | 👌
-[5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | 👌 | 👌
-[6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| [Graph Traversal][w-graph] | 👌 | 👌
-[7](/2019/day-7) | Amplification Circuit | [AoC][aoc-2019-7] - [Reddit][reddit-2019-7]| [Virtual machine][w-vn] | 👌 | ⏱
+[1](/2019/day-1) | The Tyranny of the Rocket Equation | [AoC][aoc-2019-1] - [Reddit][reddit-2019-1]| [Single recursion][w-single-recursion] | ⭐ | ⭐
+[2](/2019/day-2) | 1202 Program Alarm | [AoC][aoc-2019-2] - [Reddit][reddit-2019-2]| [Virtual machine][w-vn] | ⭐ | ⭐
+[3](/2019/day-3) | Crossed Wires | [AoC][aoc-2019-3] - [Reddit][reddit-2019-3]| [Arithmetic geometry][w-ari-geom] | ⭐ | ⭐
+[4](/2019/day-4) | Secure Container | [AoC][aoc-2019-4] - [Reddit][reddit-2019-4]| [Logic][w-logic] | ⭐ | ⭐
+[5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | ⭐ | ⭐
+[6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| [Graph Traversal][w-graph] | ⭐ | ⭐
+[7](/2019/day-7) | Amplification Circuit | [AoC][aoc-2019-7] - [Reddit][reddit-2019-7]| [Virtual machine][w-vn] | ⭐ | ⭐⭐
+[8](/2019/day-8) | Space Image Format | [AoC][aoc-2019-8] - [Reddit][reddit-2019-8]| - | ⏱ | ⏱
 
 # Resources
 
