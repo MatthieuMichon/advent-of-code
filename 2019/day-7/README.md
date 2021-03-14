@@ -313,6 +313,22 @@ Furthermore, the current instruction pointer must be saved for each amplifier st
 # 250 - solve_part_two                   - DEBUG    - iter #54, stage 4: iptr 279, output 0
 ```
 
+Issue is likely to be related to the last feedback loop, during which all stages terminated reaching an halt instruction and yielded the value zero.
+
+The end of the Intcode sequence differs between the examples and the input:
+
+```
+# input.txt
+   ...,101,1,9,9,4,9,99
+
+# examples_part_two.txt
+   ...,1005,28,6,99,0,0,5
+   ...,1005,56,6,99,0,0,0,0,10
+```
+
+The [`input.txt`](./input.txt) file finishes with the `HALT` instruction, which is not the case with both inputs of the [`examples_part_two.txt`](./examples_part_two.txt).
+
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about
