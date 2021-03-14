@@ -328,6 +328,24 @@ The end of the Intcode sequence differs between the examples and the input:
 
 The [`input.txt`](./input.txt) file finishes with the `HALT` instruction, which is not the case with both inputs of the [`examples_part_two.txt`](./examples_part_two.txt).
 
+Tracing back this zero value leads to `compute_output_signal()` which upon processing a single `HALT` instruction will shortcut and return with `output` set to `0` 🤦
+
+The correction turns out to be trivial.
+```diff
+     else:
+         inputs = [input_]
+     opcode_ptr: int = instruction_ptr
+-    output: int = 0
++    output = None
+     while data[opcode_ptr] != Intcode.HALT:
+         opcode_ptr, inputs, output = execute_opcode(
+             data=data, opcode_ptr=opcode_ptr, inputs=inputs)
+```
+
+Contents | Answer
+--- | ---
+[`examples_part_two.txt`](./examples.txt) | `[139629729, 18216]`
+[`input.txt`](./input.txt) | `57660948`
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/

@@ -193,7 +193,7 @@ def compute_output_signal(
     else:
         inputs = [input_]
     opcode_ptr: int = instruction_ptr
-    output: int = 0
+    output = None
     while data[opcode_ptr] != Intcode.HALT:
         opcode_ptr, inputs, output = execute_opcode(
             data=data, opcode_ptr=opcode_ptr, inputs=inputs)
