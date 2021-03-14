@@ -281,6 +281,17 @@ Just some examples, which will require a new [`examples_part_two.txt`](./example
 
 The answer to be computed remains the same.
 
+## 🤔🤯 Solver Implementation
+
+The puzzle states about the *Amplifier Controller Software* that it must not be restarted, instead it should be continue receiving and sending signals until it halts. This requires creating a list of such software instructions for each amplifier stage.
+
+```python
+per_stage_software = [contents.copy() for _ in range(AMPLIFIERS)]
+```
+
+Furthermore, the current instruction pointer must be saved for each amplifier stage.
+
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about

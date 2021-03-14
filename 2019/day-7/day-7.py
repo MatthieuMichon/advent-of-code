@@ -172,6 +172,7 @@ def execute_opcode(data: list[int], opcode_ptr: int,
         opcode_ptr += opcode_map[opcode]['parameters'] + 2
     elif opcode == Intcode.HALT:
         raise Exception
+    #assert output is not None
     return opcode_ptr, inputs, output
 
 
@@ -180,9 +181,12 @@ def execute_opcode(data: list[int], opcode_ptr: int,
 
 AMPLIFIERS: int = 5
 PHASE_RANGE: tuple = (0, 5)
+PHASE_RANGE_PART_TWO: tuple = (5, 10)
 
 
-def compute_output_signal(data: list[int], input_: int, phase: int) -> int:
+def compute_output_signal(
+        data: list[int], input_: int, phase: int,
+        instruction_ptr: int = 0) -> [bool, int, int]:
     """Compute output signal value for an amplifier stage
 
     :param data: list of Intcode instructions
@@ -190,13 +194,21 @@ def compute_output_signal(data: list[int], input_: int, phase: int) -> int:
     :param phase: amplifier stage phase setting
     :return: output value
     """
-    inputs = [phase, input_]
-    opcode_ptr: int = 0
+    if instruction_ptr == 0:
+        inputs = [phase, input_]
+    else:
+        inputs = [input_]
+    opcode_ptr: int = instruction_ptr
     output: int = 0
     while data[opcode_ptr] != Intcode.HALT:
         opcode_ptr, inputs, output = execute_opcode(
             data=data, opcode_ptr=opcode_ptr, inputs=inputs)
-    return output
+        #assert output is not None
+        if output is not None:
+            log.debug(f'yield output: {output}')
+            return False, opcode_ptr, output
+    log.info(f'got halt instruction @{opcode_ptr}')
+    return True, opcode_ptr, output
 
 
 def solve(contents: list[int]) -> int:
@@ -214,9 +226,9 @@ def solve(contents: list[int]) -> int:
         for amp in range(AMPLIFIERS):
             amp_phase_setting = phase_setting[amp]
             temp_contents = contents.copy()
-            amp_output = compute_output_signal(
+            amp_output = list(compute_output_signal(
                 data=temp_contents, input_=amp_input,
-                phase=amp_phase_setting)
+                phase=amp_phase_setting))[0]
             amp_input = amp_output
         amp_outputs.append(amp_output)
     answer = max(amp_outputs)
@@ -227,10 +239,35 @@ def solve_part_two(contents: list[int]) -> int:
     """Solve part two of the puzzle
 
     :param contents: list of integers
-    :return: answer for the part one of the puzzle
+    :return: answer for the part two of the puzzle
     """
-    ...
-    answer = -1
+    amp_outputs = list()
+    phase_settings = itertools.permutations(
+        iterable=range(*PHASE_RANGE_PART_TWO), r=AMPLIFIERS)
+    for phase_setting in phase_settings:
+        amp_input = 0
+        amp_output = 0
+        per_stage_software = [contents.copy() for _ in range(AMPLIFIERS)]
+        per_stage_instruction_ptr = [0 for _ in range(AMPLIFIERS)]
+        amp = 0
+        iter = 0
+        while True:
+            if iter > 5:
+                assert per_stage_software[amp] != 0
+            amp_phase_setting = phase_setting[amp]
+            halt, instruction_ptr, output = compute_output_signal(
+                data=per_stage_software[amp], input_=amp_input,
+                phase=amp_phase_setting, instruction_ptr=per_stage_instruction_ptr[amp])
+            if not output is None:
+                amp_output = output
+            per_stage_instruction_ptr[amp] = instruction_ptr
+            amp_input = amp_output
+            if halt and (amp == 4):
+                break
+            amp = (amp + 1) % AMPLIFIERS
+            iter += 1
+        amp_outputs.append(amp_output)
+    answer = max(amp_outputs)
     return answer
 
 
@@ -286,12 +323,12 @@ def main() -> int:
         contents = load_contents(filename=args.filename)
         for i, c in enumerate(contents):
             answer = solve(contents=c)
-            print(f'index {i}, answer: {answer}')
+            print(f'part one: index {i}, answer: {answer}')
     if compute_part_two:
         contents = load_contents(filename=args.filename)
         for i, c in enumerate(contents):
             answer = solve_part_two(contents=c)
-            print(f'index {i}, answer: {answer}')
+            print(f'part two: index {i}, answer: {answer}')
     return EXIT_SUCCESS
 
 
