@@ -2,10 +2,91 @@ Solution in [Python][py] for the [day 8 puzzle][aoc-2019-8] of the [2019 edition
 
 # 🎄🌟🌟 Space Image Format 🎄🌟🌟
 
+# 🔍📖 Annotated Puzzle Statement
+
+> The Elves' spirits are lifted when they realize you have an opportunity to reboot one of their Mars rovers, and so they are curious if you would spend a brief sojourn on Mars. You land your ship near the rover.
+
+TIL a new word: `sojourn` 📚
+```
+sojourn (noun):
+ - a temporary stay
+   Middle English: from Old French sojourner, based on Latin sub- ‘under’ + late Latin diurnum ‘day’.
+```
+
+> When you reach the rover, you discover that it's already in the process of rebooting! It's just waiting for someone to enter a BIOS password. The Elf responsible for the rover takes a picture of the password (your puzzle input) and sends it to you via the Digital Sending Network.
+
+Have a feeling this network reliability will turn out to be questionable.
+
+> Unfortunately, images sent via the Digital Sending Network aren't encoded with any normal encoding; instead, they're encoded in a special Space Image Format. None of the Elves seem to remember why this is the case. They send you the instructions to decode it.
+
+All long as these images are not animated.
+
+> Images are sent as a series of digits that each represent the color of a single pixel. The digits fill each row of the image left-to-right, then move downward to the next row, filling rows top-to-bottom until every pixel of the image is filled.
+
+So nothing too fancy for the moment.
+
+> Each image actually consists of a series of identically-sized layers that are filled in this way. So, the first digit corresponds to the top-left pixel of the first layer, the second digit corresponds to the pixel to the right of that on the same layer, and so on until the last digit, which corresponds to the bottom-right pixel of the last layer.
+
+Are we correct assuming these layers are stacked?
+
+> For example, given an image `3` pixels wide and `2` pixels tall, the image data `123456789012` corresponds to the following image layers:
+> 
+> ```
+> Layer 1: 123
+>          456
+> 
+> Layer 2: 789
+>          012
+> ```
+
+Ok this appears conspicuously easy, most likely I missed something.
+
+> The image you received is `25` pixels wide and `6` pixels tall.
+>
+> To make sure the image wasn't corrupted during transmission, the Elves would like you to find the layer that contains the fewest 0 digits. On that layer, what is the number of 1 digits multiplied by the number of 2 digits?
+
+Ok sounds fun!
+
+# 📃➡ Input Contents Format
+
+Input contents are characterized with three different attributes, listed in the table below.
+
+Attribute | Type | Size | Description
+--- | --- | --- | ---
+Width | Integer | Several digits | Image width in pixels
+Height | Integer | Several digits | Image height in pixels
+Data | String | Up to 15'000 | Image pixels
+
+The [Python][py] programming language comes with built-in [JSON] codec read methods such as [`json.load()`][py-json-load].
+
+```json
+{
+  "width": 3,
+  "height": 2,
+  "data": "123456789012"
+}
+```
+
+# ⚙🚀 Implementation
+
+## 💾🔍 Content Decoding
+
+With input contents being encoded in JSON decoding them is quite trivial. It is simply a mater of calling [`open()`][py-open] and passing the results to [`json.load()`][py-json-load].
+
+```python
+def load_contents(filename: str) -> map:
+    contents = json.load(fp=open(filename))
+    return contents
+```
+
+
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about
 [aoc-2019-8]: https://adventofcode.com/2019/day/8
+
+[json]: https://www.json.org/json-en.html
 
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html
@@ -13,6 +94,7 @@ Solution in [Python][py] for the [day 8 puzzle][aoc-2019-8] of the [2019 edition
 [py-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
 [py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
+[py-json-load]: https://docs.python.org/3/library/json.html#json.load
 [py-itertools]: https://docs.python.org/3/library/itertools.html
 [py-itertools-permutations]: https://docs.python.org/3/library/itertools.html#itertools.permutations
 [py-list]: https://docs.python.org/3/library/stdtypes.html#list
