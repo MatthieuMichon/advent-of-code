@@ -79,6 +79,42 @@ def load_contents(filename: str) -> map:
     return contents
 ```
 
+## 💡🙋 Puzzle Solving
+
+The answer refers to a specific `layer`, meaning that the input data contents must be split into a number of layers.
+
+> ... the Elves would like you to find the layer that contains the fewest 0 digits.
+
+The data length of individual layers is known from start, making this operation easy to implement.
+
+```python
+def splice_data(data: str, width: int, height: int) -> list[str]:
+    layer_length = width * height
+    assert 0 == len(data) % layer_length
+    layers = list()
+    for i in range(0, len(data), layer_length):
+        layers.append(data[i:i + layer_length])
+    return layers
+```
+
+The following operation consists in finding the layer with the fewest number of 0 digits. The [`Counter`][py-counter] is well suited for this sort of computation.
+
+```python
+occurences = [collection.Counter(l) for l in layers]
+```
+
+Last action remaining is computing the index of the layer with the least quantity of zeros. And performing the final multiplication
+
+```python
+layer_least_zeroes = occurences.index(min(occurences))
+layer_least_zeroes_occurence = Counter(layers[layer_least_zeroes])
+answer = layer_least_zeroes_occurence['1'] * layer_least_zeroes_occurence['2']
+```
+
+Contents | Answer
+--- | ---
+[`example.txt`](./example.txt) | `1`
+[`input.txt`](./input.txt) | `2064`
 
 
 [aoc]: https://adventofcode.com/

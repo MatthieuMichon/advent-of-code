@@ -10,7 +10,7 @@ import argparse
 import json
 import logging
 import sys
-
+from collections import Counter
 log = logging.getLogger(__name__)
 
 
@@ -27,16 +27,37 @@ def load_contents(filename: str) -> map:
     return contents
 
 
+def splice_data(data: str, width: int, height: int) -> list[str]:
+    """Splice a data chunk into a number of layers
+
+    :param data: Image pixels
+    :param width: Image width in pixels
+    :param height: Image height in pixels
+    :return: List of layer of pixels
+    """
+    layer_length = width * height
+    assert 0 == len(data) % layer_length
+    layers = list()
+    for i in range(0, len(data), layer_length):
+        layers.append(data[i:i + layer_length])
+    return layers
+
+
 # Puzzle Solving Methods -------------------------------------------------------
 
 
-def solve(contents: list[int]) -> int:
+def solve(contents: map) -> int:
     """Solve part one of the puzzle
 
     :param contents: decoded puzzle contents
     :return: answer for the part one of the puzzle
     """
-    answer = -1
+    layers = splice_data(**contents)
+    occurences = [Counter(l)['0'] for l in layers]
+    layer_least_zeroes = occurences.index(min(occurences))
+    layer_least_zeroes_occurence = Counter(layers[layer_least_zeroes])
+    answer = layer_least_zeroes_occurence['1'] \
+             * layer_least_zeroes_occurence['2']
     return answer
 
 

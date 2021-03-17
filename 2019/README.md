@@ -25,7 +25,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [5](/2019/day-5) | Sunny with a Chance of Asteroids | [AoC][aoc-2019-5] - [Reddit][reddit-2019-5]| [Virtual machine][w-vn] | ⭐ | ⭐
 [6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| [Graph Traversal][w-graph] | ⭐ | ⭐
 [7](/2019/day-7) | Amplification Circuit | [AoC][aoc-2019-7] - [Reddit][reddit-2019-7]| [Virtual machine][w-vn] | ⭐ | ⭐⭐
-[8](/2019/day-8) | Space Image Format | [AoC][aoc-2019-8] - [Reddit][reddit-2019-8]| - | ⏱ | ⏱
+[8](/2019/day-8) | Space Image Format | [AoC][aoc-2019-8] - [Reddit][reddit-2019-8]| [Bitmap][w-bitmap] | ⭐ | ⏱
 
 # Resources
 
@@ -90,6 +90,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [reddit-2019-25]: https://www.reddit.com/efca4m
 
 [w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
+[w-bitmap]: https://en.wikipedia.org/wiki/Bitmap
 [w-graph]: https://en.wikipedia.org/wiki/Graph_traversal
 [w-logic]: https://en.wikipedia.org/wiki/Logic
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
