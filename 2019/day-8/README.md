@@ -116,6 +116,94 @@ Contents | Answer
 [`example.txt`](./example.txt) | `1`
 [`input.txt`](./input.txt) | `2064`
 
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Description
+
+> Now you're ready to decode the image. The image is rendered by stacking the layers and aligning the pixels with the same positions in each layer. The digits indicate the color of the corresponding pixel: 0 is black, 1 is white, and 2 is transparent.
+
+These transparent pixels seem interesting!
+
+> The layers are rendered with the first layer in front and the last layer in back. So, if a given position has a transparent pixel in the first and second layers, a black pixel in the third layer, and a white pixel in the fourth layer, the final image would have a black pixel at that position.
+
+No surprises here!
+
+> For example, given an image 2 pixels wide and 2 pixels tall, the image data 0222112222120000 corresponds to the following image layers:
+> 
+> ```
+> Layer 1: 02
+>          22
+> 
+> Layer 2: 11
+>          22
+> 
+> Layer 3: 22
+>          12
+> 
+> Layer 4: 00
+>          00
+> ```
+> 
+> Then, the full image can be found by determining the top visible pixel in each position:
+> ```
+>     The top-left pixel is black because the top layer is 0.
+>     The top-right pixel is white because the top layer is 2 (transparent), but the second layer is 1.
+>     The bottom-left pixel is white because the top two layers are 2, but the third layer is 1.
+>     The bottom-right pixel is black because the only visible pixel in that position is 0 (from layer 4).
+> ```
+> So, the final image looks like this:
+> 
+> 01
+> 10
+
+Sounds good.
+
+> What message is produced after decoding your image?
+
+Message huh?! Extracting one from an image may be a though part to script...
+
+## 🤔🤯 Solver Implementation
+
+The whole process operates on a per-pixel basis, thus the first thing is to convert the list of layers into a list pixels. This constitutes a textbook usage of [`zip()`].
+
+```python
+pixels = [''.join(l) for l in list(zip(*layers))]
+```
+
+Next step is flattening transparent layers.
+
+```python
+def flatten(pixel: str) -> str:
+    """Flatten layers into a single value
+
+    :param pixel: list of layers as string
+    :return: color
+    """
+    for layer in pixel:
+        if layer != '2':
+            return layer
+
+...
+
+pixels = list(map(flatten, layers_per_pixel))
+```
+
+Final operation is printing the results.
+```python
+pixels = [' ' if p == '0' else '#' for p in pixels]
+for i in range(0, len(pixels), contents['width']):
+    print(f'{"".join(pixels[i:i+contents["width"]])}')
+```
+
+Contents | Answer
+--- | ---
+[`input.txt`](./input.txt) | `KAUZA`
+
+# 🚀✨ Further Improvements
+
+The `flatten()` method could be improved for handling the complete image and yield on per-pixel basis.
+
+Still, the main improvement would be to automatically get the text from the array of pixels. 
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -148,3 +236,4 @@ Contents | Answer
 [py-strip]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.strip
 [py-sum]: https://docs.python.org/3/library/functions.html#sum
 [py-tuple]: https://docs.python.org/3/library/stdtypes.html#tuple
+[py-zip]: https://docs.python.org/3/library/functions.html#zip

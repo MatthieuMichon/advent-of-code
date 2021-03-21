@@ -43,6 +43,17 @@ def splice_data(data: str, width: int, height: int) -> list[str]:
     return layers
 
 
+def flatten(pixel: str) -> str:
+    """Flatten layers into a single value
+
+    :param pixel: list of layers as string
+    :return: color
+    """
+    for layer in pixel:
+        if layer != '2':
+            return layer
+
+
 # Puzzle Solving Methods -------------------------------------------------------
 
 
@@ -53,20 +64,26 @@ def solve(contents: map) -> int:
     :return: answer for the part one of the puzzle
     """
     layers = splice_data(**contents)
-    occurences = [Counter(l)['0'] for l in layers]
-    layer_least_zeroes = occurences.index(min(occurences))
-    layer_least_zeroes_occurence = Counter(layers[layer_least_zeroes])
-    answer = layer_least_zeroes_occurence['1'] \
-             * layer_least_zeroes_occurence['2']
+    occurrences = [Counter(l)['0'] for l in layers]
+    layer_least_zeroes = occurrences.index(min(occurrences))
+    layer_least_zeroes_occurrence = Counter(layers[layer_least_zeroes])
+    answer = layer_least_zeroes_occurrence['1'] \
+        * layer_least_zeroes_occurrence['2']
     return answer
 
 
-def solve_part_two(contents: list[int]) -> int:
+def solve_part_two(contents: map) -> int:
     """Solve part two of the puzzle
 
     :param contents: decoded puzzle contents
     :return: answer for the part two of the puzzle
     """
+    layers = splice_data(**contents)
+    layers_per_pixel = [''.join(l) for l in list(zip(*layers))]
+    pixels = list(map(flatten, layers_per_pixel))
+    pixels = [' ' if p == '0' else '#' for p in pixels]
+    for i in range(0, len(pixels), contents['width']):
+        print(f'{"".join(pixels[i:i+contents["width"]])}')
     answer = -1
     return answer
 
@@ -125,8 +142,8 @@ def main() -> int:
         print(f'part one: answer: {answer}')
     if compute_part_two:
         contents = load_contents(filename=args.filename)
-        answer = solve(contents=contents)
-        print(f'part two: answer: {answer}')
+        answer = solve_part_two(contents=contents)
+        #print(f'part two: answer: {answer}')
     return EXIT_SUCCESS
 
 
