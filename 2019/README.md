@@ -27,6 +27,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [6](/2019/day-6) | Universal Orbit Map | [AoC][aoc-2019-6] - [Reddit][reddit-2019-6]| [Graph Traversal][w-graph] | ⭐ | ⭐
 [7](/2019/day-7) | Amplification Circuit | [AoC][aoc-2019-7] - [Reddit][reddit-2019-7]| [Virtual machine][w-vn] | ⭐ | ⭐⭐
 [8](/2019/day-8) | Space Image Format | [AoC][aoc-2019-8] - [Reddit][reddit-2019-8]| [Bitmap][w-bitmap] | ⭐ | ⭐🤨
+[9](/2019/day-9) | Sensor Boost | [AoC][aoc-2019-9] - [Reddit][reddit-2019-9]| ⏱ | ⏱ | ⏱
 
 # Resources
 
