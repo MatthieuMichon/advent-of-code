@@ -71,7 +71,21 @@ Executing again the program with the keycode as an input yields the answer, got 
 
 ## 💾🔍 Content Decoding
 
+As the name implies, this puzzle input consists in *Intcode*. Accordingly, expected contents coming out of the decoder is a list of integers. For a change the `load_contents()` method relies on a [`iterator`][py-iterator] instead of using a plain [`return`][py-return] statement. 
+
+The method yields a single list of integers depending on the number of lines, allowing for packing all examples in a single file.
+
+```python
+def load_contents(filename: str) -> Iterator[list[int]]:
+    lines = open(filename).read().strip().split(os.linesep)
+    for line in lines:
+        yield [int(token) for token in line.split(',')]
+```
+
 ## 💡🙋 Puzzle Solver
+
+Because we can and ftw, I'm in the mood of trying something different rather than plainly copy / pasting code from day 5.
+
 
 Contents | Answer
 --- | ---
@@ -101,6 +115,7 @@ Contents | Answer
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
 [py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
 [py-json-load]: https://docs.python.org/3/library/json.html#json.load
+[py-iterator]: https://docs.python.org/3/reference/expressions.html#yield-expressions
 [py-itertools]: https://docs.python.org/3/library/itertools.html
 [py-itertools-permutations]: https://docs.python.org/3/library/itertools.html#itertools.permutations
 [py-list]: https://docs.python.org/3/library/stdtypes.html#list
@@ -112,6 +127,7 @@ Contents | Answer
 [py-open]: https://docs.python.org/3/library/functions.html#open
 [py-linesep]: https://docs.python.org/3/library/os.html#os.linesep
 [py-read]: https://docs.python.org/3/library/io.html#io.TextIOBase.read
+[py-return]: https://docs.python.org/3/reference/simple_stmts.html#the-return-statement
 [py-set]: https://docs.python.org/3/library/stdtypes.html#set
 [py-split]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.split
 [py-string]: https://docs.python.org/3/library/stdtypes.html#textseq
