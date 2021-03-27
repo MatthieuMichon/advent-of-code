@@ -11,9 +11,39 @@ import logging
 import os
 import sys
 
+from collections import ChainMap
+from enum import IntEnum
+from types import SimpleNamespace as sn
 from typing import Iterator
 
 log = logging.getLogger(__name__)
+
+INTCODE_INSTR_MOD = 100
+ISA = {
+    2: sn(name='Add', input_args=0, load_args=2, store_args=1, output_args=0),
+}
+
+
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+
+class Mode(IntEnum):
+    POSITION = 0
+    IMMEDIATE = 1
+    RELATIVE = 2
+
+
+class OpcodeError(Error):
+    """Exception raised for unsupported opcode.
+
+    Attributes:
+        opcode -- opcode value
+    """
+
+    def __init__(self, opcode: int):
+        self.opcode = opcode
 
 
 # Common Methods ---------------------------------------------------------------
@@ -30,12 +60,58 @@ def load_contents(filename: str) -> Iterator[list[int]]:
         yield [int(token) for token in line.split(',')]
 
 
+def decode(instruction: int) -> [int, list[int]]:
+    """Decode instruction into opcode and load modes
+
+    :param instruction: instruction
+    :return: opcode and list modes per loaded arguments
+    """
+    opcode = instruction % INTCODE_INSTR_MOD
+    if opcode not in ISA:
+        raise OpcodeError(opcode)
+    loaded_args = ISA[opcode].load_args
+    modes_int = instruction // INTCODE_INSTR_MOD
+    modes = [Mode(int(m)) for m in reversed(str(modes_int))]
+    leading_zero_modes = [Mode.IMMEDIATE] * (loaded_args - len(modes))
+    padded_modes = modes + leading_zero_modes
+    return opcode, padded_modes
+
+
+def execute_program(
+        ram: dict[int, int],
+        instruction_pointer: int,
+        input_stack: list[int]) -> list[int]:
+    """Execute an Intcode program stored in RAM
+
+    :param ram: memory contents mapping
+    :param instruction_pointer: initial instruction pointer value
+    :param input_stack: initial input value list
+    :return: output values
+    """
+    output_values = list()
+    while True:
+        instruction = ram[instruction_pointer]
+        opcode, load_modes = decode(instruction=instruction)
+        halt = opcode == ISA.halt.opcode
+        if halt:
+            break
+    return  output_values
+
+
 # Solver Methods ---------------------------------------------------------------
 
 
-def solve(contents) -> int:
-    ...
-    return -1
+def solve(contents: [int]) -> int:
+    """Solve puzzle part one
+
+    :param contents: Intcode program
+    :return: puzzle answer
+    """
+    mem = {k: v for k, v in enumerate(contents)}
+    inputs = [1]
+    outputs = execute_program(
+        ram=mem, instruction_pointer=0, input_stack=inputs)
+    return outputs[0]
 
 
 def solve_part_two(contents) -> int:

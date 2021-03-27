@@ -86,6 +86,40 @@ def load_contents(filename: str) -> Iterator[list[int]]:
 
 Because we can and ftw, I'm in the mood of trying something different rather than plainly copy / pasting code from day 5.
 
+Thus [ISA][w-isa] details are stored in a `ISA` map. Each map entries points to a [`SimpleNamespace`][py-sn] instance, encoding information listed below.
+
+Entry | Description
+--- | ---
+`name` | Human readable name
+`input_args` | number of arguments popped from the `inputs` list
+`load_args` | number of arguments loaded by the instruction
+`store_args` | number of arguments stored by the instruction
+`output_args` | number of arguments pushed in the `outputs` list
+
+```python
+from types import SimpleNamespace as sn
+
+ISA = {
+    2: sn(name='Add', input_args=0, load_args=2, store_args=1, output_args=0),
+}
+```
+
+The first methode is `decode()` converting an instruction into its opcode and list modes applying to its loaded arguments.
+
+```python
+INTCODE_INSTR_MOD = 100
+
+def decode(instruction: int) -> [int, list[int]]:
+    opcode = instruction % INTCODE_INSTR_MOD
+    if opcode not in ISA:
+        raise OpcodeError(opcode)
+    loaded_args = ISA[opcode].load_args
+    modes_int = instruction // INTCODE_INSTR_MOD
+    modes = [Mode(int(m)) for m in reversed(str(modes_int))]
+    leading_zero_modes = [Mode.IMMEDIATE] * (loaded_args - len(modes))
+    padded_modes = modes + leading_zero_modes
+    return opcode, padded_modes
+```
 
 Contents | Answer
 --- | ---
@@ -129,9 +163,12 @@ Contents | Answer
 [py-read]: https://docs.python.org/3/library/io.html#io.TextIOBase.read
 [py-return]: https://docs.python.org/3/reference/simple_stmts.html#the-return-statement
 [py-set]: https://docs.python.org/3/library/stdtypes.html#set
+[py-sn]: https://docs.python.org/3/library/types.html#types.SimpleNamespace
 [py-split]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.split
 [py-string]: https://docs.python.org/3/library/stdtypes.html#textseq
 [py-strip]: https://docs.python.org/3/library/stdtypes.html?highlight=strip#str.strip
 [py-sum]: https://docs.python.org/3/library/functions.html#sum
 [py-tuple]: https://docs.python.org/3/library/stdtypes.html#tuple
 [py-zip]: https://docs.python.org/3/library/functions.html#zip
+
+[w-isa]: https://en.wikipedia.org/wiki/Instruction_set_architecture
