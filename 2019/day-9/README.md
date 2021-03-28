@@ -86,7 +86,7 @@ def load_contents(filename: str) -> Iterator[list[int]]:
 
 Because we can and ftw, I'm in the mood of trying something different rather than plainly copy / pasting code from day 5.
 
-Thus [ISA][w-isa] details are stored in a `ISA` map. Each map entries points to a [`SimpleNamespace`][py-sn] instance, encoding information listed below.
+Thus [ISA] details are stored in a `ISA` map. Each map entries points to a [`SimpleNamespace`][py-sn] instance, encoding information listed below.
 
 Entry | Description
 --- | ---
@@ -95,14 +95,30 @@ Entry | Description
 `load_args` | number of arguments loaded by the instruction
 `store_args` | number of arguments stored by the instruction
 `output_args` | number of arguments pushed in the `outputs` list
+`jump` | boolean indicating if the instruction may override the instruction pointer
 
 ```python
 from types import SimpleNamespace as sn
 
 ISA = {
-    2: sn(name='Add', input_args=0, load_args=2, store_args=1, output_args=0),
+    1: sn(name='Add', input_args=0, load_args=2, store_args=1, output_args=0, jump=False),
+    # ...
+    99: sn(name='Halt', input_args=0, load_args=0, store_args=0, output_args=0, jump=False),
 }
 ```
+
+Opcode | Mnemonic | Name | Input Args | Load Args | Store Args | Output Args | Jump
+--- | --- | --- | --- | --- | --- | --- | ---
+`1` | `Add` | Add | 0 | 2 | 1 | 0 | ❌
+`2` | `Mul` | Multiply | 0 | 2 | 1 | 0 | ❌
+`3` | `In` | Read input value | 1 | 0 | 1 | 0 | ❌
+`4` | `Out` | Write output value | 0 | 1 | 0 | 1 | ❌
+`5` | `JNZ` | Jump if non-zero | 0 | 2 | 0 | 0 | ✔️
+`6` | `JZ` | Jump if zero | 0 | 2 | 0 | 0 | ✔️
+`7` | `LT` | Assign if lower | 0 | 2 | 1 | 0 | ❌
+`8` | `Eq` | Assign if equal | 0 | 2 | 1 | 0 | ❌
+`9` | `RBS` | Shift `relative_base` value  | 0 | 1 | 0 | 0 | ❌
+`99` | `Halt` | Halt processing  | 0 | 0 | 0 | 0 | ❌
 
 The first methode is `decode()` converting an instruction into its opcode and list modes applying to its loaded arguments.
 
@@ -121,8 +137,192 @@ def decode(instruction: int) -> [int, list[int]]:
     return opcode, padded_modes
 ```
 
+> :ng: **Unexpected Behavior**:
+> 
+> The first implementation was operating under the assumption stated in day 5:
+> 
+> ```
+> Parameters that an instruction writes to will never be in immediate mode.
+> ```
+> 
+> It turns out that such parameters (named `stored operand` in my implementation) can be in modes different from the immediate mode. Thankfully this issue was pointed out in the list of instructions being incorrectly implemented.
+> Furthermore a bug affects the `leading_zero_modes` variable, which was duplicating `Mode.IMMEDIATE` instead of `Mode.POSITION`.
+
+The correct `decode()` method now being:
+
+```python
+def decode(instruction: int) -> [int, list[int]]:
+    opcode = instruction % INTCODE_INSTR_MOD
+    if opcode not in ISA:
+        raise OpcodeError(opcode=opcode)
+    args_qty = ISA[opcode].load_args + ISA[opcode].store_args
+    modes_int = instruction // INTCODE_INSTR_MOD
+    modes = [Mode(int(m)) for m in reversed(str(modes_int))]
+    leading_zero_modes = [Mode.POSITION] * (args_qty - len(modes))
+    padded_modes = modes + leading_zero_modes
+    return opcode, padded_modes
+```
+
+The processing pipeline is broken in the usual steps, starting with the *fetch* stage.
+
+```python
+def fetch(
+        instruction_pointer: int,
+        load_modes: list[int],
+        ram: dict[int, int],
+        relative_base: int,
+        opcode:int,
+        input_stack: list[int]) -> list[int]:
+    operands = list()
+    if ISA[opcode].input_args > 0:
+        for _ in range(ISA[opcode].input_args):
+            operands.append(input_stack.pop())
+    else:
+        for i, mode in enumerate(load_modes):
+            pointer = instruction_pointer + 1 + i
+            contents = ram[pointer]
+            if mode == Mode.IMMEDIATE:
+                operands.append(contents)
+            elif mode == Mode.POSITION:
+                operands.append(ram.get(contents, DEFAULT_RAM_VALUE))
+            elif mode == Mode.RELATIVE:
+                operands.append(ram[relative_base + contents])
+            else:
+                raise Exception
+    return operands
+```
+
+Next up is `execute()`, nothing fancy here.
+
+```python
+def execute(opcode:int , operands: list[int]) -> int:
+    result = None
+    if ISA[opcode].name == 'Add':
+        result = sum(operands)
+    if ISA[opcode].name == 'Mul':
+        result = operands[0] * operands[1]
+    if ISA[opcode].name == 'In':
+        result = operands[0]
+    if ISA[opcode].name == 'Out':
+        result = operands[0]
+    if ISA[opcode].name == 'LT':
+        result = 1 if operands[0] < operands[1] else 0
+    if ISA[opcode].name == 'Eq':
+        result = 1 if operands[0] == operands[1] else 0
+    if ISA[opcode].name == 'JNZ':
+        result = operands[1]
+    if ISA[opcode].name == 'JZ':
+        result = operands[1]
+    if ISA[opcode].name == 'RBS':
+        result = operands[0]
+    assert result is not None
+    return result
+```
+
+The store() method however had to be updated for handling different result operand modes.
+
+> :memo: **Note**:
+> 
+> For some reason, there are no stored arguments using the *immediate mode*.
+
+```python
+def store(
+        opcode: int,
+        store_mode: int,
+        output: int,
+        instruction_pointer: int,
+        ram: dict[int, int],
+        relative_base: int) -> None:
+    no_store = ISA[opcode].store_args == 0
+    if no_store:
+        return
+    if store_mode == Mode.RELATIVE:
+        store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
+        store_pointer = relative_base + ram.get(store_pointer_address, DEFAULT_RAM_VALUE)
+    elif store_mode == Mode.POSITION:
+        store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
+        store_pointer = ram[store_pointer_address]
+    else:
+        raise Exception
+    ram[store_pointer] = output
+    return
+```
+
+The remaining methods deal with updating the rest of the internal state.
+
+```python
+def push_output(opcode: int, output: int) -> list[int]:
+    output_ = list()
+    if ISA[opcode].name == 'Out':
+        output_.append(output)
+    return output_
+```
+
+```python
+def shift_base(opcode: int, output: int) -> int:
+    shift = 0
+    if ISA[opcode].name == 'RBS':
+        shift = output
+    return shift
+```
+
+```python
+def jump_next_instruction(
+        opcode: int,
+        instruction_pointer: int,
+        operands: list[int], output: int) -> int:
+    next_instruction = instruction_pointer + 1 + \
+                       ISA[opcode].load_args + ISA[opcode].store_args
+    if ISA[opcode].name in ['Add', 'Mul', 'RBS', 'LT', 'Eq', 'In', 'Out']:
+        pass
+    elif ISA[opcode].name == 'JNZ':
+        non_zero = operands[0] != 0
+        next_instruction = operands[1] if non_zero else next_instruction
+    elif ISA[opcode].name == 'JZ':
+        non_zero = operands[0] == 0
+        next_instruction = operands[1] if non_zero else next_instruction
+    else:
+        raise Exception
+    return next_instruction
+```
+
+Finally all these methods are orchestrated by an `execute_program()` function.
+
+```python
+def execute_program(
+        ram: dict[int, int],
+        instruction_pointer: int,
+        input_stack: list[int]) -> list[int]:
+    output_values = list()
+    relative_base = 0
+    while True:
+        instruction = ram[instruction_pointer]
+        opcode, operand_modes = decode(instruction=instruction)
+        halt = ISA[opcode].name == 'Halt'
+        if halt:
+            break
+        load_modes = operand_modes[:ISA[opcode].load_args]
+        operands = fetch(instruction_pointer=instruction_pointer,
+                         load_modes=load_modes, ram=ram,
+                         relative_base=relative_base,
+                         opcode=opcode, input_stack=input_stack)
+        output = execute(opcode=opcode, operands=operands)
+        store_mode = operand_modes[-ISA[opcode].store_args:][0]
+        store(opcode=opcode, store_mode=store_mode, output=output,
+              instruction_pointer=instruction_pointer, ram=ram,
+              relative_base=relative_base)
+        output_values.extend(push_output(opcode=opcode, output=output))
+        relative_base += shift_base(opcode=opcode, output=output)
+        next_instruction_pointer = jump_next_instruction(
+            opcode=opcode, instruction_pointer=instruction_pointer,
+            operands=operands, output=output)
+        instruction_pointer = next_instruction_pointer
+    return output_values
+```
+
 Contents | Answer
 --- | ---
+[`input.txt`](./input.txt) | `3497884671`
 
 # 😰🙅 Part Two
 
