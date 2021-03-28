@@ -285,7 +285,7 @@ def execute_program(
 # Solver Methods ---------------------------------------------------------------
 
 
-def solve(contents: [int]) -> int:
+def solve(contents: [int]) -> list[int]:
     """Solve puzzle part one
 
     :param contents: Intcode program
@@ -298,9 +298,17 @@ def solve(contents: [int]) -> int:
     return outputs
 
 
-def solve_part_two(contents) -> int:
-    ...
-    return -1
+def solve_part_two(contents) -> list[int]:
+    """Solve puzzle part one
+
+    :param contents: Intcode program
+    :return: puzzle answer
+    """
+    mem = {k: v for k, v in enumerate(contents)}
+    inputs = [2]
+    outputs = execute_program(
+        ram=mem, instruction_pointer=0, input_stack=inputs)
+    return outputs
 
 
 # Support Methods --------------------------------------------------------------
