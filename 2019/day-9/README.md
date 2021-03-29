@@ -86,7 +86,7 @@ def load_contents(filename: str) -> Iterator[list[int]]:
 
 Because we can and ftw, I'm in the mood of trying something different rather than plainly copy / pasting code from day 5.
 
-Thus [ISA] details are stored in a `ISA` map. Each map entries points to a [`SimpleNamespace`][py-sn] instance, encoding information listed below.
+Thus [ISA][w-isa] details are stored in a `ISA` map. Each map entries points to a [`SimpleNamespace`][py-sn] instance, encoding information listed below.
 
 Entry | Description
 --- | ---
