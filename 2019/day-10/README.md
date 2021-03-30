@@ -139,6 +139,11 @@ We start with these simple requirements:
 * Each row is a list of binary values: `#` or `.`.
 * Each position must be addressed directly with a simple way of computing coordinates.
 
+> :warning: **Warning**:
+> 
+> Following part using `dict` objects was replaced with a more efficient implementation relying on `sets`.
+> This part is kept as reference.
+
 The last arguments strongly makes the case of relying on a [`dict`][py-dict] object for storing an asteroid at a given location defined by a [`tuple`][py-tuple].
 
 ```python
@@ -184,7 +189,40 @@ def load_contents(filename: str) -> Iterator[map]:
             map_ = dict()
             x = 0
 ```
+
+> :memo: **Note**:
+> 
+> Following is a better implementation making use of [`sets`][py-set].
+
+```python
+def load_contents(filename: str) -> Iterator[set]:
+    lines = open(filename).read().strip().split(os.linesep)
+    positions = set()
+    x = 0
+    for line in lines:
+        if not len(line):
+            yield positions
+            positions = set()
+            x = 0
+            continue
+        positions.update({(x, y) for y, c in enumerate(line) if c == '#'})
+        x += 1
+```
+
 ## 💡🙋 Puzzle Solver
+
+First thing is:
+
+* iterate for each asteroid, 
+    * list remaining asteroids
+    * iterate for each remaining asteroid
+        * compute its positional offset with regard to the reference asteroid
+
+```python
+for asteroid in contents:
+    others = contents - {asteroid}
+    others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
+```
 
 Contents | Answer
 --- | ---

@@ -24,40 +24,39 @@ log = logging.getLogger(__name__)
 EXPECTED_CELL_CHARS = {'#', '.'}
 
 
-def load_contents(filename: str) -> Iterator[map]:
+def load_contents(filename: str) -> Iterator[set]:
     """Load and convert contents from file
 
     :param filename: input filename
     :return: iterator yielding maps of boolean per coordinates
     """
     lines = open(filename).read().strip().split(os.linesep)
-    map_ = dict()
-    x: int = 0
+    positions = set()
+    x = 0
     for line in lines:
-        if len(line):
-            for y, char in enumerate(line):
-                assert char in EXPECTED_CELL_CHARS
-                if char == '.':
-                    continue
-                position = (x, y)
-                map_[position] = char
-            x += 1
-        else:
-            log.debug(f'{filename=}, map of {len(map_)} items')
-            yield map_
-            map_ = dict()
+        if not len(line):
+            log.debug(f'{filename=}, map of {len(positions)} items')
+            yield positions
+            positions = set()
             x = 0
+            continue
+        positions.update({(x, y) for y, c in enumerate(line) if c == '#'})
+        x += 1
 
 
 # Solver Methods ---------------------------------------------------------------
 
 
-def solve(contents: map) -> int:
+def solve(contents: set) -> int:
     """Solve puzzle part one
 
     :param contents: puzzle input contents
     :return: puzzle answer
     """
+    for asteroid in contents:
+        others = contents - {asteroid}
+        others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
+        ...
     answer = -1
     return answer
 
