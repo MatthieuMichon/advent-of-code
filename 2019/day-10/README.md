@@ -224,6 +224,15 @@ for asteroid in contents:
     others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
 ```
 
+Next operation consists in computing an angle for all these asteroids with regard to the reference asteroid. Solving this puzzle requires filtering asteroids keeping only one per angle, we can already guess that rounding errors will be an issue.
+
+Thankfully the [`fractions`][py-fractions] module provides support for rational number arithmetic.
+
+```python
+>>> Fraction(4, -6)
+Fraction(-2, 3)
+```
+
 Contents | Answer
 --- | ---
 
@@ -249,8 +258,10 @@ Contents | Answer
 [py-argparse]: https://docs.python.org/3/library/argparse.html
 [py-copy]: https://docs.python.org/3/library/copy.html
 [py-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
+[py-decimal]: https://docs.python.org/3/library/decimal.html
 [py-dict]: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 [py-exit]: https://docs.python.org/3/library/sys.html?highlight=sys%20exit#sys.exit
+[py-fractions]: https://docs.python.org/3/library/fractions.html
 [py-generator]: https://docs.python.org/3/library/stdtypes.html#generator-types
 [py-json-load]: https://docs.python.org/3/library/json.html#json.load
 [py-iterator]: https://docs.python.org/3/reference/expressions.html#yield-expressions
