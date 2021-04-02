@@ -10,9 +10,8 @@ import argparse
 import logging
 import os
 import sys
+import fractions
 
-from enum import IntEnum
-from types import SimpleNamespace as sn
 from typing import Iterator
 
 log = logging.getLogger(__name__)
@@ -32,19 +31,51 @@ def load_contents(filename: str) -> Iterator[set]:
     """
     lines = open(filename).read().strip().split(os.linesep)
     positions = set()
-    x = 0
+    y = 0
     for line in lines:
         if not len(line):
             log.debug(f'{filename=}, map of {len(positions)} items')
             yield positions
             positions = set()
-            x = 0
+            y = 0
             continue
-        positions.update({(x, y) for y, c in enumerate(line) if c == '#'})
-        x += 1
+        positions.update({(x, y) for x, c in enumerate(line) if c == '#'})
+        y += 1
+    log.debug(f'{filename=}, map of {len(positions)} items')
+    yield positions
 
 
 # Solver Methods ---------------------------------------------------------------
+
+
+def count_asteroids(rel_positions: set) -> int:
+    """Count asteroids seen given their relative positions
+
+    :param rel_positions: set of relative positions
+    :return: quantity of asteroids detected
+    """
+    horizontal_asteroids = set()
+    upper_asteroids = set()
+    lower_asteroids = set()
+    for pos in rel_positions:
+        zero_denominator = pos[1] == 0
+        if zero_denominator:
+            horizontal_asteroids.add(
+                fractions.Fraction(pos[0], abs(pos[0])).as_integer_ratio())
+            continue
+        upper = pos[1] > 0
+        if upper:
+            upper_asteroids.add(
+                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
+            continue
+        lower = pos[1] < 0
+        if lower:
+            lower_asteroids.add(
+                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
+            continue
+    asteroids = len(horizontal_asteroids) \
+                + len(upper_asteroids) + len(lower_asteroids)
+    return asteroids
 
 
 def solve(contents: set) -> int:
@@ -53,11 +84,12 @@ def solve(contents: set) -> int:
     :param contents: puzzle input contents
     :return: puzzle answer
     """
+    detected_asteroids_map = dict()
     for asteroid in contents:
         others = contents - {asteroid}
         others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
-        ...
-    answer = -1
+        detected_asteroids_map[asteroid] = count_asteroids(rel_positions=others)
+    answer = max(detected_asteroids_map.values())
     return answer
 
 

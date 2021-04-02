@@ -198,15 +198,17 @@ def load_contents(filename: str) -> Iterator[map]:
 def load_contents(filename: str) -> Iterator[set]:
     lines = open(filename).read().strip().split(os.linesep)
     positions = set()
-    x = 0
+    y = 0
     for line in lines:
         if not len(line):
+            log.debug(f'{filename=}, map of {len(positions)} items')
             yield positions
             positions = set()
-            x = 0
+            y = 0
             continue
-        positions.update({(x, y) for y, c in enumerate(line) if c == '#'})
-        x += 1
+        positions.update({(x, y) for x, c in enumerate(line) if c == '#'})
+        y += 1
+    yield positions
 ```
 
 ## 💡🙋 Puzzle Solver
@@ -224,7 +226,7 @@ for asteroid in contents:
     others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
 ```
 
-Next operation consists in computing an angle for all these asteroids with regard to the reference asteroid. Solving this puzzle requires filtering asteroids keeping only one per angle, we can already guess that rounding errors will be an issue.
+At its core, this puzzle consists in computing an angle for all these asteroids with regard to the reference asteroid. Solving this puzzle requires filtering asteroids keeping only one per angle, we can already guess that rounding errors will be an issue.
 
 Thankfully the [`fractions`][py-fractions] module provides support for rational number arithmetic.
 
@@ -233,8 +235,60 @@ Thankfully the [`fractions`][py-fractions] module provides support for rational 
 Fraction(-2, 3)
 ```
 
+This operation coupled with a reduction implemented by keeping only unique fractions values is encapsulated in a `count_asteroids()` method.
+
+```python
+def count_asteroids(rel_positions: set) -> int:
+    ...
+```
+
+Obviously `Fraction` objects cannot take a denominator with a zero value, meaning that this case must be handled separately. Same thing with position symetrical with respect to the origin: we do not want to reduce positions `(2, 2)` and `(-2, -2)`. A simple way consists in separating upper and lower half with reference to the horizontal axis.
+
+This gives us the following method:
+
+```python
+def count_asteroids(rel_positions: set) -> int:
+    horizontal_asteroids = set()
+    upper_asteroids = set()
+    lower_asteroids = set()
+    for pos in rel_positions:
+        zero_denominator = pos[1] == 0
+        if zero_denominator:
+            horizontal_asteroids.add(
+                fractions.Fraction(pos[0], abs(pos[0])).as_integer_ratio())
+            continue
+        upper = pos[1] > 0
+        if upper:
+            upper_asteroids.add(
+                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
+            continue
+        lower = pos[1] < 0
+        if lower:
+            lower_asteroids.add(
+                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
+            continue
+    asteroids = len(horizontal_asteroids) \ 
+                + len(upper_asteroids) + len(lower_asteroids)
+    return asteroids
+```
+
+The complete `solve()` method for part one:
+
+```python
+def solve(contents: set) -> int:
+    detected_asteroids_map = dict()
+    for asteroid in contents:
+        others = contents - {asteroid}
+        others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
+        detected_asteroids_map[asteroid] = count_asteroids(rel_positions=others)
+    answer = max(detected_asteroids_map.values())
+    return answer
+```
+
 Contents | Answer
 --- | ---
+[`examples.txt`](./examples.txt) | `[8, 33, 35, 41, 210]`
+[`input.txt`](./input.txt) | `296`
 
 # 😰🙅 Part Two
 
