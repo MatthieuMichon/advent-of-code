@@ -305,9 +305,10 @@ Nice! Would've preferred a rail gun though.
 The term `always rotates clockwise` is filed under *oddly specific*. 
 
 > If multiple asteroids are exactly in line with the station, the laser only has enough power to vaporize one of them before continuing its rotation. In other words, the same asteroids that can be detected can be vaporized, but if vaporizing one asteroid makes another one detectable, the newly-detected asteroid won't be vaporized until the laser has returned to the same position by rotating a full 360 degrees.
-> 
-> Nice to be able of reusing all the implementation designed in part one. 
-> 
+
+
+Nice to be able of reusing all the implementation designed in part one. 
+
 > For example, consider the following map, where the asteroid with the new monitoring station (and laser) is marked X:
 > 
 > ```
@@ -382,6 +383,62 @@ Thankfully we have quite a lot of details which greatly help for QA.
 
 ## 🤔🤯 Puzzle Solver
 
+The puzzle instructions state that a clockwise scanning operation is performed, meaning that the angle is always increasing. Further it indicated that if multiple asteroids are on a given angle, only the closest one will be blasted. This leaves us with the following algorithm:
+
+* Map the number of detected asteroids from each asteroid position
+* Find the position of the station which yields the highest number of detected asteroids
+* Compute angles and distance of all the other asteroids
+* Remove N asteroids each time moving the angle clockwise
+* Compute the answer based on the position of the Nth removed asteroid  
+
+```python
+def solve_part_two(contents: map) -> int:
+    detected_asteroids_map = map_detected_asteroids(asteroids=contents)
+    max_asteroids = max(detected_asteroids_map.values())
+    index = list(detected_asteroids_map.values()).index(max_asteroids)
+    station = list(detected_asteroids_map.keys())[index]
+    asteroids = contents - {station}
+    polar_positions = compute_positions(reference=station, asteroids=asteroids)
+    polar_map = map_polar_positons(polar_positions=polar_positions)
+```
+
+Rather than duplicating the logic present in the part one `solve()` method, I went on factorizing it in a `map_detected_asteroids()` method.
+
+```python
+def map_detected_asteroids(asteroids: set) -> map:
+    detected_asteroids_map = dict()
+    for asteroid in asteroids:
+        others = asteroids - {asteroid}
+        polar_positions = compute_positions(reference=asteroid,
+                                            asteroids=others)
+        angles = set(p[1] for p in polar_positions)
+        detected_asteroids_map[asteroid] = len(angles)
+    return detected_asteroids_map
+```
+
+The mapping logic was improved using a [polar coordinates][w-polar] transform instead of relying on fractions and byzantine comparison logic. The [`cmath`][py-cmath] module provides all the required methods for this operation.
+
+```python
+def compute_positions(reference: tuple, asteroids: set[tuple]) -> set:
+    positions = set()
+    rel_positions = compute_offsets(reference=reference, asteroids=asteroids)
+    for pos in rel_positions:
+        distance, angle = cmath.polar(complex(*pos))
+        positions.add((distance, angle))
+    return positions
+```
+
+The runtime of part one is significantly lowered.
+
+```python
+cmath.polar(complex(1, 4))
+(4.123105625617661, 1.3258176636680326)
+cmath.polar(complex(2, 8))
+(8.246211251235321, 1.3258176636680326)
+```
+
+
+
 Contents | Answer
 --- | ---
 
@@ -396,6 +453,7 @@ Contents | Answer
 
 [py]: https://docs.python.org/3/
 [py-argparse]: https://docs.python.org/3/library/argparse.html
+[py-cmath]: https://docs.python.org/3/library/cmath.html
 [py-copy]: https://docs.python.org/3/library/copy.html
 [py-counter]: https://docs.python.org/3/library/collections.html#collections.Counter
 [py-decimal]: https://docs.python.org/3/library/decimal.html
@@ -426,4 +484,5 @@ Contents | Answer
 [py-tuple]: https://docs.python.org/3/library/stdtypes.html#tuple
 [py-zip]: https://docs.python.org/3/library/functions.html#zip
 
-[w-isa]: https://en.wikipedia.org/wiki/Instruction_set_architecture
+[w-cartesian]: https://en.wikipedia.org/wiki/Polar_coordinate_system
+[w-polar]: https://en.wikipedia.org/wiki/Polar_coordinate_system

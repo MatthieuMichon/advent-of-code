@@ -7,6 +7,7 @@ Puzzle Solution in Python
 """
 
 import argparse
+import cmath
 import logging
 import os
 import sys
@@ -43,6 +44,54 @@ def load_contents(filename: str) -> Iterator[set]:
         y += 1
     log.debug(f'{filename=}, map of {len(positions)} items')
     yield positions
+
+
+def compute_offsets(reference: tuple[int, int],
+                    asteroids: set[tuple[int, int]]
+                    ) -> set[tuple]:
+    """Computing offsets o asteroids with regard to a given reference
+
+    :param reference: reference coordinates
+    :param asteroids: list of asteroids
+    :return: list of asteroids with offset coordinates
+    """
+    offsets = set()
+    for asteroid in asteroids:
+        t = tuple(a - b for a, b in zip(reference, asteroid))
+        offsets.add(t)
+    return offsets
+
+
+def map_detected_asteroids(asteroids: set) -> map:
+    """Compute number of detected asteroids from each asteroid position
+
+    :param asteroids: list of asteroids
+    :return: map of detected asteroids per location
+    """
+    detected_asteroids_map = dict()
+    for asteroid in asteroids:
+        others = asteroids - {asteroid}
+        polar_positions = compute_positions(reference=asteroid,
+                                            asteroids=others)
+        angles = set(p[1] for p in polar_positions)
+        detected_asteroids_map[asteroid] = len(angles)
+    return detected_asteroids_map
+
+
+def compute_positions(reference: tuple, asteroids: set[tuple]) -> set:
+    """Compute polar positions relative to a reference
+
+    :param reference: reference position in Cartesian coordinates
+    :param asteroids: list of asteroids in absolute Cartesian coordinates
+    :return: list of asteroids in relative polar coordinates
+    """
+    positions = set()
+    assert reference not in asteroids
+    rel_positions = compute_offsets(reference=reference, asteroids=asteroids)
+    for pos in rel_positions:
+        distance, angle = cmath.polar(complex(*pos))
+        positions.add((distance, angle))
+    return positions
 
 
 # Solver Methods ---------------------------------------------------------------
@@ -84,11 +133,7 @@ def solve(contents: set) -> int:
     :param contents: puzzle input contents
     :return: puzzle answer
     """
-    detected_asteroids_map = dict()
-    for asteroid in contents:
-        others = contents - {asteroid}
-        others = {tuple(a - b for a, b in zip(asteroid, o)) for o in others}
-        detected_asteroids_map[asteroid] = count_asteroids(rel_positions=others)
+    detected_asteroids_map = map_detected_asteroids(asteroids=contents)
     answer = max(detected_asteroids_map.values())
     return answer
 
@@ -99,8 +144,19 @@ def solve_part_two(contents: map) -> int:
     :param contents: puzzle input contents
     :return: puzzle answer
     """
-    answer = -1
-    return answer
+    detected_asteroids_map = map_detected_asteroids(asteroids=contents)
+    max_asteroids = max(detected_asteroids_map.values())
+    index = list(detected_asteroids_map.values()).index(max_asteroids)
+    station = list(detected_asteroids_map.keys())[index]
+    asteroids = contents - {station}
+    polar_positions = compute_positions(reference=station, asteroids=asteroids)
+    polar_map = map_polar_positons(polar_positions=polar_positions)
+    scan_angle = 0
+    for _ in range(200):
+
+
+    breakpoint()
+    return station
 
 
 # Support Methods --------------------------------------------------------------
