@@ -11,7 +11,6 @@ import cmath
 import logging
 import os
 import sys
-import fractions
 
 from typing import Iterator
 
@@ -19,9 +18,6 @@ log = logging.getLogger(__name__)
 
 
 # Common Methods ---------------------------------------------------------------
-
-
-EXPECTED_CELL_CHARS = {'#', '.'}
 
 
 def load_contents(filename: str) -> Iterator[set]:
@@ -47,8 +43,7 @@ def load_contents(filename: str) -> Iterator[set]:
 
 
 def compute_offsets(reference: tuple[int, int],
-                    asteroids: set[tuple[int, int]]
-                    ) -> set[tuple]:
+                    asteroids: set[tuple[int, int]]) -> set[tuple]:
     """Computing offsets o asteroids with regard to a given reference
 
     :param reference: reference coordinates
@@ -73,7 +68,7 @@ def map_detected_asteroids(asteroids: set) -> map:
         others = asteroids - {asteroid}
         polar_positions = compute_positions(reference=asteroid,
                                             asteroids=others)
-        angles = set(p[1] for p in polar_positions)
+        angles = set(angle for distance, angle in polar_positions)
         detected_asteroids_map[asteroid] = len(angles)
     return detected_asteroids_map
 
@@ -94,37 +89,64 @@ def compute_positions(reference: tuple, asteroids: set[tuple]) -> set:
     return positions
 
 
-# Solver Methods ---------------------------------------------------------------
+def map_polar_pos(reference: tuple, asteroids: set[tuple]) -> dict[float, dict]:
+    """Map a list of polar positions by angle and distance
 
-
-def count_asteroids(rel_positions: set) -> int:
-    """Count asteroids seen given their relative positions
-
-    :param rel_positions: set of relative positions
-    :return: quantity of asteroids detected
+    :param reference: reference position in Cartesian coordinates
+    :param asteroids: list of asteroids in absolute Cartesian coordinates
+    :return: per-angle map of per-distance asteroids
     """
-    horizontal_asteroids = set()
-    upper_asteroids = set()
-    lower_asteroids = set()
-    for pos in rel_positions:
-        zero_denominator = pos[1] == 0
-        if zero_denominator:
-            horizontal_asteroids.add(
-                fractions.Fraction(pos[0], abs(pos[0])).as_integer_ratio())
-            continue
-        upper = pos[1] > 0
-        if upper:
-            upper_asteroids.add(
-                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
-            continue
-        lower = pos[1] < 0
-        if lower:
-            lower_asteroids.add(
-                fractions.Fraction(pos[0], pos[1]).as_integer_ratio())
-            continue
-    asteroids = len(horizontal_asteroids) \
-                + len(upper_asteroids) + len(lower_asteroids)
-    return asteroids
+    position_map = dict()
+    for asteroid in asteroids:
+        relative_x = asteroid[0] - reference[0]
+        relative_y = asteroid[1] - reference[1]
+        transformed_pos = (-relative_y, relative_x)
+        distance, angle = cmath.polar(complex(*transformed_pos))
+        if angle < 0:
+            angle += 2 * cmath.pi
+        angle *= 180.0 / cmath.pi
+        if angle not in position_map:
+            position_map[angle] = {distance: asteroid}
+        else:
+            position_map[angle].update({distance: asteroid})
+    log.debug(f'mapped {len(position_map)} angles')
+    position_map = dict(sorted(position_map.items(), key=lambda item: item[0]))
+    for angle, distance in position_map.items():
+        distance = dict(sorted(distance.items(), key=lambda item: item[0]))
+        position_map[angle] = distance
+    for deg in range(0, 360, 90):
+        log.debug(f'at {deg=} {len(position_map[deg])}')
+    return position_map
+
+
+def vaporize(station: tuple, asteroids: set[tuple], quantity: int) -> tuple:
+    """Vaporize a number of asteroids and return position of the last one
+
+    :param station: vaporization station position in Cartesian coordinates
+    :param asteroids: list of asteroids in absolute Cartesian coordinates
+    :param quantity: number of asteroid to vaporize
+    :return: position of the last vaporized asteroid
+    """
+    polar_map = map_polar_pos(reference=station, asteroids=asteroids)
+    scan_angle = next(iter(polar_map.keys()))
+    asteroid = (0, 0)
+    for _ in range(quantity):
+        log.debug(f'{scan_angle=}')
+        asteroids_by_distance = polar_map[scan_angle]
+        scan_index = list(polar_map.keys()).index(scan_angle)
+        next_scan_index = (1 + scan_index) % len(polar_map)
+        next_scan_angle = list(polar_map.keys())[next_scan_index]
+        closest_distance = next(iter(asteroids_by_distance.keys()))
+        asteroid = asteroids_by_distance.pop(closest_distance)
+        log.debug(f'{1 + _} asteroid to be vaporized is at {asteroid}')
+        angle_cleared = not len(asteroids_by_distance)
+        if angle_cleared:
+            polar_map.pop(scan_angle)
+        scan_angle = next_scan_angle
+    return asteroid
+
+
+# Solver Methods ---------------------------------------------------------------
 
 
 def solve(contents: set) -> int:
@@ -148,22 +170,17 @@ def solve_part_two(contents: map) -> int:
     max_asteroids = max(detected_asteroids_map.values())
     index = list(detected_asteroids_map.values()).index(max_asteroids)
     station = list(detected_asteroids_map.keys())[index]
+    log.info(f'located {station=}')
     asteroids = contents - {station}
-    polar_positions = compute_positions(reference=station, asteroids=asteroids)
-    polar_map = map_polar_positons(polar_positions=polar_positions)
-    scan_angle = 0
-    for _ in range(200):
-
-
-    breakpoint()
-    return station
-
+    x, y = vaporize(station=station, asteroids=asteroids, quantity=200)
+    answer = x * 100 + y
+    return answer
 
 # Support Methods --------------------------------------------------------------
 
 
 EXIT_SUCCESS = 0
-LOG_FORMAT = '# %(msecs)-3d - %(funcName)-12s - %(levelname)-8s - %(message)s'
+LOG_FORMAT = '# %(msecs)-3d - %(funcName)-16s - %(levelname)-8s - %(message)s'
 
 
 def configure_logger(verbose: bool):

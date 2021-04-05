@@ -302,7 +302,7 @@ Nice! Would've preferred a rail gun though.
 
 > Fortunately, in addition to an asteroid scanner, the new monitoring station also comes equipped with a giant rotating laser perfect for vaporizing asteroids. The laser starts by pointing up and always rotates clockwise, vaporizing any asteroid it hits.
 
-The term `always rotates clockwise` is filed under *oddly specific*. 
+The term `pointing up and always rotates clockwise` is filed under *oddly specific*.
 
 > If multiple asteroids are exactly in line with the station, the laser only has enough power to vaporize one of them before continuing its rotation. In other words, the same asteroids that can be detected can be vaporized, but if vaporizing one asteroid makes another one detectable, the newly-detected asteroid won't be vaporized until the laser has returned to the same position by rotating a full 360 degrees.
 
@@ -379,6 +379,10 @@ This example differs from those in part one.
 
 Thankfully we have quite a lot of details which greatly help for QA.
 
+> :warning: **Warning**:
+> 
+> Lost time trying to figure out a disagreement between the coordinates of the vaporized asteroid computed and the one listed above. It turned out there are several jumps in the table (i.e from 3rd to 10th) that I didn't notice. Going forward I should list such kind of data inside a table, which would have made noticed the discontinuity before hand.
+
 > The Elves are placing bets on which will be the 200th asteroid to be vaporized. Win the bet by determining which asteroid that will be; what do you get if you multiply its X coordinate by 100 and then add its Y coordinate? (For example, 8,2 becomes 802.)
 
 ## 🤔🤯 Puzzle Solver
@@ -387,7 +391,6 @@ The puzzle instructions state that a clockwise scanning operation is performed, 
 
 * Map the number of detected asteroids from each asteroid position
 * Find the position of the station which yields the highest number of detected asteroids
-* Compute angles and distance of all the other asteroids
 * Remove N asteroids each time moving the angle clockwise
 * Compute the answer based on the position of the Nth removed asteroid  
 
@@ -398,8 +401,9 @@ def solve_part_two(contents: map) -> int:
     index = list(detected_asteroids_map.values()).index(max_asteroids)
     station = list(detected_asteroids_map.keys())[index]
     asteroids = contents - {station}
-    polar_positions = compute_positions(reference=station, asteroids=asteroids)
-    polar_map = map_polar_positons(polar_positions=polar_positions)
+    x, y = vaporize(station=station, asteroids=asteroids, quantity=200)
+    answer = x * 100 + y
+    return answer
 ```
 
 Rather than duplicating the logic present in the part one `solve()` method, I went on factorizing it in a `map_detected_asteroids()` method.
@@ -411,7 +415,7 @@ def map_detected_asteroids(asteroids: set) -> map:
         others = asteroids - {asteroid}
         polar_positions = compute_positions(reference=asteroid,
                                             asteroids=others)
-        angles = set(p[1] for p in polar_positions)
+        angles = set(angle for distance, angle in polar_positions)
         detected_asteroids_map[asteroid] = len(angles)
     return detected_asteroids_map
 ```
@@ -428,21 +432,67 @@ def compute_positions(reference: tuple, asteroids: set[tuple]) -> set:
     return positions
 ```
 
-The runtime of part one is significantly lowered.
+Following this change, the runtime of part one was significantly lowered. With both angle and distance of all the other asteroids, the next step is storing these data into a convenient layout.
 
 ```python
-cmath.polar(complex(1, 4))
-(4.123105625617661, 1.3258176636680326)
-cmath.polar(complex(2, 8))
-(8.246211251235321, 1.3258176636680326)
+def vaporize(station: tuple, asteroids: set[tuple], quantity: int) -> tuple:
+    polar_map = map_polar_positions(reference=station, asteroids=asteroids)
+    scan_angle = next(iter(polar_map.keys()))
+    asteroid = (0, 0)
+    for _ in range(quantity):
+        asteroids_by_distance = polar_map[scan_angle]
+        scan_index = list(polar_map.keys()).index(scan_angle)
+        next_scan_index = (1 + scan_index) % len(polar_map)
+        next_scan_angle = list(polar_map.keys())[next_scan_index]
+        closest_distance = next(iter(asteroids_by_distance.keys()))
+        asteroid = asteroids_by_distance.pop(closest_distance)
+        angle_cleared = not len(asteroids_by_distance)
+        if angle_cleared:
+            polar_map.pop(scan_angle)
+        scan_angle = next_scan_angle
+    asteroid = tuple(a + b for a, b in zip(station, asteroid))
+    return asteroid
 ```
 
+The last operation consisting in scanning angles in a clockwise fashion, it makes sense using a map of angles with each entry being a map of distances and associated position. This task is delegated to a `map_polar_positons()` method.
 
+> :memo: **Note**:
+> 
+> The puzzle part two states `the laser starts by pointing up`, which does not match the usual polar coordinates convention. This requires fiddling with the axis and explains the usage of a `transformed_pos` variable in the snippet below.
+
+```python
+def map_polar_pos(reference: tuple, asteroids: set[tuple]) -> dict[float, dict]:
+    position_map = dict()
+    for asteroid in asteroids:
+        relative_x = asteroid[0] - reference[0]
+        relative_y = asteroid[1] - reference[1]
+        transformed_pos = (-relative_y, relative_x)
+        distance, angle = cmath.polar(complex(*transformed_pos))
+        if angle < 0:
+            angle += 2 * cmath.pi
+        angle *= 180.0 / cmath.pi
+        if angle not in position_map:
+            position_map[angle] = {distance: asteroid}
+        else:
+            position_map[angle].update({distance: asteroid})
+    position_map = dict(sorted(position_map.items(), key=lambda item: item[0]))
+    for angle, distance in position_map.items():
+        distance = dict(sorted(distance.items(), key=lambda item: item[0]))
+        position_map[angle] = distance
+    for deg in range(0, 360, 90):
+        log.debug(f'at {deg=} {len(position_map[deg])}')
+    return position_map
+```
 
 Contents | Answer
 --- | ---
+[`example_part_two.txt`](./example_part_two.txt) | `802`
+[`input.txt`](./input.txt) | `204`
 
 # 🚀✨ Further Improvements
+
+The handling of the axis swap (for handling the scan start on a vertical axis) and the grid coordinates having an origin at the top-left can be improved for better readability.
+
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
