@@ -164,7 +164,7 @@ Message huh?! Extracting one from an image may be a though part to script...
 
 ## 🤔🤯 Solver Implementation
 
-The whole process operates on a per-pixel basis, thus the first thing is to convert the list of layers into a list pixels. This constitutes a textbook usage of [`zip()`].
+The whole process operates on a per-pixel basis, thus the first thing is to convert the list of layers into a list pixels. This constitutes a textbook usage of [`zip()`][py-zip].
 
 ```python
 pixels = [''.join(l) for l in list(zip(*layers))]
