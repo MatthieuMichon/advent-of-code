@@ -55,7 +55,7 @@ Initial robot position is `(0, 0)` heading is North.
 > .....
 > ```
 
-Memory storage relying [`dict`][py-dict] are a good fit for situations where there may be an arbitrary number of items and quickly lookup and updates are required.
+Memory storage relying on [`dict`][py-dict] are a good fit for situations where there may be an arbitrary number of items and quickly lookup and updates are required.
 
 The robot's heading can be represented by the pointy side as follows:
 
@@ -124,7 +124,8 @@ Looking down from the top-level yields the following tree:
   * `main()`
     * `load_contents()`
     * `solve()`
-      * `control_robot()`
+      * `step()`
+      * `move_robot()`
 
 The main() method remains unchanged from the previous puzzles.
 
@@ -135,8 +136,8 @@ def main() -> int:
     compute_part_one = not args.part or 1 == args.part
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
-        intcode = next(load_contents(filename=args.filename))
-        answer = solve(contents=intcode)
+        contents = next(load_contents(filename=args.filename))
+        answer = solve(contents=contents)
         print(f'part one: {answer=}')
     if compute_part_two:
         answer = -1  # TODO
@@ -165,17 +166,16 @@ def solve(contents: map) -> int:
         'x': 0,
         'y': 0,
         'heading': Directions.NORTH,
-        'trail': ()
+        'trail': []
     }
     robot = control_robot(program=contents, initial_state=robot)
-    answer = len(robot['trail'])
+    answer = len(set(robot['trail']))
     return answer
 ```
 
-Contents | Answer
---- | ---
-[`examples.txt`](./examples.txt) | ``
-[`input.txt`](./input.txt) | ``
+Contents | Command | Answer
+--- | --- | ---
+[`input.txt`](./input.txt) | `./day-11.py input.txt` | ``
 
 # 😰🙅 Part Two
 
