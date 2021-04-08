@@ -22,7 +22,7 @@ class Colors(IntEnum):
     WHITE = 1
 
 
-class Turn(IntEnum):
+class Turns(IntEnum):
     LEFT = 0
     RIGHT = 1
 
@@ -76,10 +76,16 @@ def load_contents(filename: str) -> Iterator[map]:
         yield {i: int(token) for i, token in enumerate(line.split(','))}
 
 
-def move_robot(robot: map, turn: int) -> None:
-    """Update robot position by moving a single step
+# Solver Methods ---------------------------------------------------------------
 
+
+def paint_panel(panels: map, color: int, robot: map, turn: int) -> None:
+    """Paint panel and move the robot
+
+    :param panels: map of panels
+    :param color: direction to turn to after advancing
     :param robot: robot state
+    :param turn: direction to turn to after advancing
     :return: nothing
     """
     robot['trail'].append(robot['x'], robot['y'])
@@ -92,13 +98,15 @@ def move_robot(robot: map, turn: int) -> None:
         robot['y'] -= 1
     if heading == Directions.WEST:
         robot['x'] += 1
-    if turn == Turn.LEFT:
+    if turn == Turns.LEFT:
         robot['heading'] = (robot['heading'] - 1) % 4
-    if turn == Turn.RIGHT:
+    if turn == Turns.RIGHT:
         robot['heading'] = (robot['heading'] + 1) % 4
 
 
-# Solver Methods ---------------------------------------------------------------
+def step(ram: dict, pc: int, inputs: list[int]) -> tuple[int, tuple]:
+    ...
+    return pc, (Colors.WHITE, Turns.LEFT)
 
 
 def solve(contents: map) -> int:
@@ -108,20 +116,18 @@ def solve(contents: map) -> int:
     :return: puzzle answer
     """
     robot = {
-        'x': 0,
-        'y': 0,
+        'position': (0, 0),
         'heading': Directions.NORTH,
         'trail': []
     }
     pc = 0
-    panel = Colors.BLACK
+    panels = dict()
     try:
         while True:
-            inputs = [panel]
-            pc, outputs = step(ram=ram, pc=pc, inputs=inputs)
-            color, turn = outputs
-            move_robot(robot=robot, turn=turn)
-
+            color = panels.get(robot['position'], Colors.BLACK)
+            pc, outputs = step(ram=contents, pc=pc, inputs=[color])
+            new_color, turn = outputs
+            paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
     except HaltOpcode:
         ...
 

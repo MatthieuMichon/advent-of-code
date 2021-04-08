@@ -125,7 +125,7 @@ Looking down from the top-level yields the following tree:
     * `load_contents()`
     * `solve()`
       * `step()`
-      * `move_robot()`
+      * `paint_panel()`
 
 The main() method remains unchanged from the previous puzzles.
 
@@ -168,7 +168,16 @@ def solve(contents: map) -> int:
         'heading': Directions.NORTH,
         'trail': []
     }
-    robot = control_robot(program=contents, initial_state=robot)
+    pc = 0
+    panels = dict()
+    try:
+        while True:
+            color = panels.get(robot['position'], Colors.BLACK)
+            pc, outputs = step(ram=contents, pc=pc, inputs=[color])
+            new_color, turn = outputs
+            paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
+    except HaltOpcode:
+        ...
     answer = len(set(robot['trail']))
     return answer
 ```
