@@ -12,6 +12,7 @@ import os
 import sys
 
 from enum import Enum, IntEnum, auto
+from types import SimpleNamespace as sn
 from typing import Iterator
 
 log = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class Turns(IntEnum):
     RIGHT = 1
 
 
-class Directions(Enum):
+class Directions(IntEnum):
     NORTH = 0
     EAST = 1
     SOUTH = 2
@@ -50,18 +51,6 @@ class HaltOpcode(Error):
         super().__init__()
 
 
-class OpcodeError(Error):
-    """Exception raised for unsupported opcode.
-
-    Attributes:
-        opcode -- opcode value
-    """
-
-    def __init__(self, opcode: int):
-        message = f'Invalid opcode {opcode}'
-        super().__init__(message)
-
-
 # Common Methods ---------------------------------------------------------------
 
 
@@ -76,6 +65,216 @@ def load_contents(filename: str) -> Iterator[map]:
         yield {i: int(token) for i, token in enumerate(line.split(','))}
 
 
+# Intcode Methods --------------------------------------------------------------
+
+
+INTCODE_INSTR_MOD = 100
+DEFAULT_RAM_VALUE = 0
+ISA = {
+    1: sn(name='Add', input_args=0, load_args=2, store_args=1, output_args=0, jump=False),
+    2: sn(name='Mul', input_args=0, load_args=2, store_args=1, output_args=0, jump=False),
+    3: sn(name='In', input_args=1, load_args=0, store_args=1, output_args=0, jump=False),
+    4: sn(name='Out', input_args=0, load_args=1, store_args=0, output_args=1, jump=False),
+    5: sn(name='JNZ', input_args=0, load_args=2, store_args=0, output_args=0, jump=True),
+    6: sn(name='JZ', input_args=0, load_args=2, store_args=0, output_args=0, jump=True),
+    7: sn(name='LT', input_args=0, load_args=2, store_args=1, output_args=0, jump=False),
+    8: sn(name='Eq', input_args=0, load_args=2, store_args=1, output_args=0, jump=False),
+    9: sn(name='RBS', input_args=0, load_args=1, store_args=0, output_args=0, jump=False),
+    99: sn(name='Halt', input_args=0, load_args=0, store_args=0, output_args=0, jump=False),
+}
+
+
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+
+class Mode(IntEnum):
+    POSITION = 0
+    IMMEDIATE = 1
+    RELATIVE = 2
+
+
+class OpcodeError(Error):
+    """Exception raised for unsupported opcode.
+
+    Attributes:
+        opcode -- opcode value
+    """
+
+    def __init__(self, opcode: int):
+        message = f'Invalid opcode {opcode}'
+        super().__init__(message)
+
+
+def decode(instruction: int) -> [int, list[int]]:
+    """Decode instruction into opcode and load modes
+
+    :param instruction: instruction
+    :return: opcode and access mode per loaded arguments
+    """
+    opcode = instruction % INTCODE_INSTR_MOD
+    if opcode not in ISA:
+        raise OpcodeError(opcode=opcode)
+    args_qty = ISA[opcode].load_args + ISA[opcode].store_args
+    modes_int = instruction // INTCODE_INSTR_MOD
+    modes = [Mode(int(m)) for m in reversed(str(modes_int))]
+    leading_zero_modes = [Mode.POSITION] * (args_qty - len(modes))
+    padded_modes = modes + leading_zero_modes
+    log.debug(f'{instruction=}: {ISA[opcode].name}, {padded_modes}')
+    return opcode, padded_modes
+
+
+def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
+          relative_base: int, opcode:int, input_stack: list[int]) -> list[int]:
+    """Fetch operands from memory
+
+    :param instruction_pointer: instruction operation code
+    :param load_modes: access mode per loaded arguments
+    :param ram: memory contents mapping
+    :param relative_base: relative base address value
+    :param opcode: instruction opcode
+    :param input_stack: initial input value list
+    :return: operand values
+    """
+    operands = list()
+    if ISA[opcode].input_args > 0:
+        for _ in range(ISA[opcode].input_args):
+            value = input_stack.pop()
+            operands.append(value)
+    else:
+        for i, mode in enumerate(load_modes):
+            pointer = instruction_pointer + 1 + i
+            contents = ram[pointer]
+            if mode == Mode.IMMEDIATE:
+                operands.append(contents)
+            elif mode == Mode.POSITION:
+                operands.append(ram.get(contents, DEFAULT_RAM_VALUE))
+            elif mode == Mode.RELATIVE:
+                operands.append(ram[relative_base + contents])
+            else:
+                raise Exception
+    log.debug(f'{operands=}')
+    return operands
+
+
+def execute(opcode:int , operands: list[int]) -> int:
+    """Execute an instruction
+
+    :param opcode: instruction opcode
+    :param operands: operand values
+    :return:
+    """
+    result = None
+    if ISA[opcode].name == 'Add':
+        result = sum(operands)
+    if ISA[opcode].name == 'Mul':
+        result = operands[0] * operands[1]
+    if ISA[opcode].name == 'In':
+        result = operands[0]
+    if ISA[opcode].name == 'Out':
+        result = operands[0]
+    if ISA[opcode].name == 'LT':
+        result = 1 if operands[0] < operands[1] else 0
+    if ISA[opcode].name == 'Eq':
+        result = 1 if operands[0] == operands[1] else 0
+    if ISA[opcode].name == 'JNZ':
+        result = operands[1]
+    if ISA[opcode].name == 'JZ':
+        result = operands[1]
+    if ISA[opcode].name == 'RBS':
+        result = operands[0]
+    assert result is not None
+    log.debug(f'executed {opcode=}, {operands=}, {result=}')
+    return result
+
+
+def store(
+        opcode: int,
+        store_mode: int,
+        output: int,
+        instruction_pointer: int,
+        ram: dict[int, int],
+        relative_base: int) -> None:
+    """Store output value back into memory
+
+    :param opcode: instruction opcode
+    :param store_mode: stored operand mode
+    :param output: output after execution of the instruction
+    :param instruction_pointer: pointer to the current instruction
+    :param ram: memory contents mapping
+    :param relative_base: relative base address value
+    :return: nothing
+    """
+    no_store = ISA[opcode].store_args == 0
+    if no_store:
+        return
+    if store_mode == Mode.RELATIVE:
+        store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
+        store_pointer = relative_base + ram.get(store_pointer_address, DEFAULT_RAM_VALUE)
+    elif store_mode == Mode.POSITION:
+        store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
+        store_pointer = ram[store_pointer_address]
+    else:
+        raise Exception
+    ram[store_pointer] = output
+    log.debug(f'stored {output} @{store_pointer}')
+    return
+
+
+def push_output(opcode: int, output: int) -> list[int]:
+    """Push value in the output stack
+
+    :param opcode: instruction opcode
+    :param output: output after execution of the instruction
+    :return: new value to push to the output stack
+    """
+    output_ = list()
+    if ISA[opcode].name == 'Out':
+        output_.append(output)
+    return output_
+
+
+def shift_base(opcode: int, output: int) -> int:
+    """Compute relative base shift
+
+    :param opcode: instruction opcode
+    :param output: output after execution of the instruction
+    :return: relative base shift value
+    """
+    shift = 0
+    if ISA[opcode].name == 'RBS':
+        shift = output
+    return shift
+
+
+def jump_next_instruction(
+        opcode: int,
+        instruction_pointer: int,
+        operands: list[int]) -> int:
+    """Compute pointer to following instruction
+
+    :param opcode: instruction opcode
+    :param instruction_pointer: pointer to the current instruction
+    :param operands: operand values
+    :return: pointer to following instruction
+    """
+    next_instruction = instruction_pointer + 1 + \
+                       ISA[opcode].load_args + ISA[opcode].store_args
+    if ISA[opcode].name in ['Add', 'Mul', 'RBS', 'LT', 'Eq', 'In', 'Out']:
+        pass
+    elif ISA[opcode].name == 'JNZ':
+        non_zero = operands[0] != 0
+        next_instruction = operands[1] if non_zero else next_instruction
+    elif ISA[opcode].name == 'JZ':
+        non_zero = operands[0] == 0
+        next_instruction = operands[1] if non_zero else next_instruction
+    else:
+        raise Exception
+    log.debug(f'{opcode=}, {next_instruction=}')
+    return next_instruction
+
+
 # Solver Methods ---------------------------------------------------------------
 
 
@@ -88,25 +287,58 @@ def paint_panel(panels: map, color: int, robot: map, turn: int) -> None:
     :param turn: direction to turn to after advancing
     :return: nothing
     """
-    robot['trail'].append(robot['x'], robot['y'])
+    panels[robot['position']] = color
+    robot['trail'].append(robot['position'])
     heading = robot['heading']
     if heading == Directions.NORTH:
-        robot['y'] += 1
+        robot['position'] = (robot['position'][0], robot['position'][1] + 1)
     if heading == Directions.EAST:
-        robot['x'] += 1
+        robot['position'] = (robot['position'][0] + 1, robot['position'][1])
     if heading == Directions.SOUTH:
-        robot['y'] -= 1
+        robot['position'] = (robot['position'][0], robot['position'][1] - 1)
     if heading == Directions.WEST:
-        robot['x'] += 1
+        robot['position'] = (robot['position'][0] - 1, robot['position'][1])
     if turn == Turns.LEFT:
         robot['heading'] = (robot['heading'] - 1) % 4
     if turn == Turns.RIGHT:
         robot['heading'] = (robot['heading'] + 1) % 4
 
 
-def step(ram: dict, pc: int, inputs: list[int]) -> tuple[int, tuple]:
-    ...
-    return pc, (Colors.WHITE, Turns.LEFT)
+def step(ram: dict, regs: dict, inputs: list[int]) -> tuple[int, tuple]:
+    """
+
+    :param ram: memory contents
+    :param regs: register map
+    :param inputs: input queue
+    :return: updated pc; new color and turn direction
+    """
+    pc = regs['pc']
+    relative_base = regs['rb']
+    output_values = list()
+    while True:
+        instruction = ram[pc]
+        opcode, operand_modes = decode(instruction=instruction)
+        halt = ISA[opcode].name == 'Halt'
+        if halt:
+            raise HaltOpcode
+        load_modes = operand_modes[:ISA[opcode].load_args]
+        operands = fetch(instruction_pointer=pc,
+                         load_modes=load_modes, ram=ram,
+                         relative_base=relative_base,
+                         opcode=opcode, input_stack=inputs)
+        output = execute(opcode=opcode, operands=operands)
+        store_mode = operand_modes[-ISA[opcode].store_args:][0]
+        store(opcode=opcode, store_mode=store_mode, output=output,
+              instruction_pointer=pc, ram=ram,
+              relative_base=relative_base)
+        output_values.extend(push_output(opcode=opcode, output=output))
+        relative_base += shift_base(opcode=opcode, output=output)
+        next_instruction_pointer = jump_next_instruction(
+            opcode=opcode, instruction_pointer=pc, operands=operands)
+        pc = next_instruction_pointer
+        if len(output_values) == 2:
+            break
+    return pc, tuple(output_values)
 
 
 def solve(contents: map) -> int:
@@ -120,17 +352,17 @@ def solve(contents: map) -> int:
         'heading': Directions.NORTH,
         'trail': []
     }
-    pc = 0
     panels = dict()
+    regs = {'pc': 0, 'rb': 0}
     try:
         while True:
             color = panels.get(robot['position'], Colors.BLACK)
-            pc, outputs = step(ram=contents, pc=pc, inputs=[color])
-            new_color, turn = outputs
+            _, outputs = step(ram=contents, regs=regs, inputs=[color])
+            new_color = Colors(outputs[0])
+            turn = Turns(outputs[1])
             paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
     except HaltOpcode:
         ...
-
     answer = len(set(robot['trail']))
     return answer
 
