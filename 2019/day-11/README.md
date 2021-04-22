@@ -163,18 +163,18 @@ The `solve()` method is responsible for setting the initial parameters and compu
 ```python
 def solve(contents: map) -> int:
     robot = {
-        'x': 0,
-        'y': 0,
+        'position': (0, 0),
         'heading': Directions.NORTH,
-        'trail': []
+        'trail': [],
     }
-    pc = 0
     panels = dict()
+    regs = {'pc': 0, 'rb': 0}
     try:
         while True:
             color = panels.get(robot['position'], Colors.BLACK)
-            pc, outputs = step(ram=contents, pc=pc, inputs=[color])
-            new_color, turn = outputs
+            outputs = step(ram=contents, regs=regs, inputs=[color])
+            new_color = Colors(outputs[0])
+            turn = Turns(outputs[1])
             paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
     except HaltOpcode:
         ...
@@ -184,7 +184,7 @@ def solve(contents: map) -> int:
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-11.py input.txt` | ``
+[`input.txt`](./input.txt) | `./day-11.py input.txt` | `2172`
 
 # 😰🙅 Part Two
 

@@ -248,10 +248,8 @@ def shift_base(opcode: int, output: int) -> int:
     return shift
 
 
-def jump_next_instruction(
-        opcode: int,
-        instruction_pointer: int,
-        operands: list[int]) -> int:
+def jump_next_instruction(opcode: int, instruction_pointer: int,
+                          operands: list[int]) -> int:
     """Compute pointer to following instruction
 
     :param opcode: instruction opcode
@@ -288,7 +286,13 @@ def paint_panel(panels: map, color: int, robot: map, turn: int) -> None:
     :return: nothing
     """
     panels[robot['position']] = color
-    robot['trail'].append(robot['position'])
+    painted = color == Colors.WHITE
+    if painted:
+        robot['trail'].append(robot['position'])
+    if turn == Turns.LEFT:
+        robot['heading'] = Directions((robot['heading'] - 1) % 4)
+    if turn == Turns.RIGHT:
+        robot['heading'] = Directions((robot['heading'] + 1) % 4)
     heading = robot['heading']
     if heading == Directions.NORTH:
         robot['position'] = (robot['position'][0], robot['position'][1] + 1)
@@ -298,14 +302,10 @@ def paint_panel(panels: map, color: int, robot: map, turn: int) -> None:
         robot['position'] = (robot['position'][0], robot['position'][1] - 1)
     if heading == Directions.WEST:
         robot['position'] = (robot['position'][0] - 1, robot['position'][1])
-    if turn == Turns.LEFT:
-        robot['heading'] = (robot['heading'] - 1) % 4
-    if turn == Turns.RIGHT:
-        robot['heading'] = (robot['heading'] + 1) % 4
 
 
-def step(ram: dict, regs: dict, inputs: list[int]) -> tuple[int, tuple]:
-    """
+def step(ram: dict, regs: dict, inputs: list[int]) -> tuple:
+    """Advance robot by a single step
 
     :param ram: memory contents
     :param regs: register map
@@ -338,7 +338,9 @@ def step(ram: dict, regs: dict, inputs: list[int]) -> tuple[int, tuple]:
         pc = next_instruction_pointer
         if len(output_values) == 2:
             break
-    return pc, tuple(output_values)
+    regs['pc'] = pc
+    regs['rb'] = relative_base
+    return tuple(output_values)
 
 
 def solve(contents: map) -> int:
@@ -350,19 +352,19 @@ def solve(contents: map) -> int:
     robot = {
         'position': (0, 0),
         'heading': Directions.NORTH,
-        'trail': []
+        'trail': [],
     }
     panels = dict()
     regs = {'pc': 0, 'rb': 0}
     try:
         while True:
             color = panels.get(robot['position'], Colors.BLACK)
-            _, outputs = step(ram=contents, regs=regs, inputs=[color])
+            outputs = step(ram=contents, regs=regs, inputs=[color])
             new_color = Colors(outputs[0])
             turn = Turns(outputs[1])
             paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
     except HaltOpcode:
-        ...
+        log.debug(f'Got halt, {robot=}')
     answer = len(set(robot['trail']))
     return answer
 
