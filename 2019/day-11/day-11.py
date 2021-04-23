@@ -343,10 +343,11 @@ def step(ram: dict, regs: dict, inputs: list[int]) -> tuple:
     return tuple(output_values)
 
 
-def solve(contents: map) -> int:
+def solve(contents: map, start_panel_color: int = Colors.BLACK) -> tuple:
     """Solve puzzle part one
 
     :param contents: puzzle input contents
+    :param start_panel_color: color of the start panel
     :return: puzzle answer
     """
     robot = {
@@ -354,7 +355,7 @@ def solve(contents: map) -> int:
         'heading': Directions.NORTH,
         'trail': [],
     }
-    panels = dict()
+    panels = {(0, 0): start_panel_color}
     regs = {'pc': 0, 'rb': 0}
     try:
         while True:
@@ -365,19 +366,23 @@ def solve(contents: map) -> int:
             paint_panel(panels=panels, color=new_color, robot=robot, turn=turn)
     except HaltOpcode:
         log.debug(f'Got halt, {robot=}')
-    answer = len(set(robot['trail']))
-    return answer
+    panel_len = len(set(robot['trail']))
+    return panel_len, panels
 
 
-def solve_part_two(contents: map) -> int:
-    """Solve puzzle part two
+def print_panels(panels: dict) -> None:
+    """Print panels
 
-    :param contents: puzzle input contents
-    :return: puzzle answer
+    :param panels:
+    :return:
     """
-    answer = -1
-    return answer
-
+    min_x = min(x for x, _ in panels.keys())
+    max_x = max(x for x, _ in panels.keys()) + 1
+    min_y = min(y for _, y in panels.keys())
+    max_y = max(y for _, y in panels.keys()) + 1
+    panel_list = [['I' if (x, y) in panels.keys() else ' ' for x in range(min_x, max_x)] for y in range(min_y, max_y)]
+    for l in reversed(panel_list):
+        print(''.join(l))
 
 # Support Methods --------------------------------------------------------------
 
@@ -429,13 +434,15 @@ def main() -> int:
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = next(load_contents(filename=args.filename))
-        answer = solve(contents=contents)
+        answer, _ = solve(contents=contents)
         print(f'part one: {answer=}')
     if compute_part_two:
-        answer = -1  # TODO
-        print(f'part two: {answer=}')
+        contents = next(load_contents(filename=args.filename))
+        _, panels = solve(contents=contents, start_panel_color=Colors.WHITE)
+        panels = {k: v for k, v in panels.items() if v == Colors.WHITE}
+        print_panels(panels=panels)
     return EXIT_SUCCESS
-
+# JELEFGHP
 
 if __name__ == "__main__":
     sys.exit(main())

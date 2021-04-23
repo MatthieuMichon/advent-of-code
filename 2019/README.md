@@ -29,7 +29,8 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [8](/2019/day-8) | Space Image Format | [AoC][aoc-2019-8] - [Reddit][reddit-2019-8]| [Bitmap][w-bitmap] | ⭐ | ⭐
 [9](/2019/day-9) | Sensor Boost | [AoC][aoc-2019-9] - [Reddit][reddit-2019-9]| [Virtual machine][w-vn] | ⭐ | ⭐
 [10](/2019/day-10) | Monitoring Station | [AoC][aoc-2019-10] - [Reddit][reddit-2019-10]| [Arithmetic geometry][w-ari-geom] | ⭐ | ⭐⭐
-[11](/2019/day-11) | Space Police | [AoC][aoc-2019-11] - [Reddit][reddit-2019-11]| [Virtual machine][w-vn] | ⭐ | ⏱
+[11](/2019/day-11) | Space Police | [AoC][aoc-2019-11] - [Reddit][reddit-2019-11]| [Virtual machine][w-vn] | ⭐ | ⭐
+
 
 # Resources
 

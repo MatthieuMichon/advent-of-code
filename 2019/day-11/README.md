@@ -184,7 +184,7 @@ def solve(contents: map) -> int:
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-11.py input.txt` | `2172`
+[`input.txt`](./input.txt) | `./day-11.py input.txt -p 1` | `2172`
 
 # 😰🙅 Part Two
 
@@ -202,12 +202,43 @@ Will have to visualize the panels.
 
 ## 🤔🤯 Puzzle Solver
 
+The different initial configuration change requires adding an extra parameter: `start_panel_color`.
 
-Contents | Answer
---- | ---
-[`input.txt`](./input.txt) | ``
+```python
+def solve(contents: map, start_panel_color: int = Colors.BLACK) -> int:
+    """Solve puzzle part one
+
+    :param contents: puzzle input contents
+    :param start_panel_color: color of the start panel
+    :return: puzzle answer
+    """
+```
+
+Printing the contents is managed by a new `print_panels` method.
+
+```python
+def print_panels(panels: dict) -> None:
+    """Print panels
+
+    :param panels:
+    :return:
+    """
+    min_x = min(x for x, _ in panels.keys())
+    max_x = max(x for x, _ in panels.keys()) + 1
+    min_y = min(y for _, y in panels.keys())
+    max_y = max(y for _, y in panels.keys()) + 1
+    panel_list = [['I' if (x, y) in panels.keys() else ' ' for x in range(min_x, max_x)] for y in range(min_y, max_y)]
+    for l in reversed(panel_list):
+        print(''.join(l))
+```
+
+Contents | Command | Answer
+--- | --- | ---
+[`input.txt`](./input.txt) | `./day-11.py input.txt -p 2` | `JELEFGHP`
 
 # 🚀✨ Further Improvements
+
+The `print_panels()` could be improved.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
