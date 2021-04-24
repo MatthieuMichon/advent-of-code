@@ -154,11 +154,15 @@ There are several ways to decode contents:
 * As a [`list`][py-list]: `[7, 10, 17]`
 * As a [`dict`][py-dict]: `{'x': 7, 'y': 10, 'z': 17}`
 
-As we never know what part two has in store, we will use a map. Thus the following `load_contents()` method signature.
+As we never know what part two has in store, we will use a map.
 
 ```python
 def load_contents(filename: str) -> Iterator[map]:
-    ...
+    lines = open(filename).read().strip().strip('<>').split(os.linesep)
+    for line in lines:
+        axis = [token.split('=') for token in line.strip('<>').split(',')]
+        axis = {name: int(value) for name, value in axis}
+        yield axis
 ```
 
 ## 💡 Solver
