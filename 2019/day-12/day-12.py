@@ -11,8 +11,7 @@ import logging
 import os
 import sys
 
-from enum import Enum, IntEnum, auto
-from types import SimpleNamespace as sn
+from itertools import permutations
 from typing import Iterator
 
 log = logging.getLogger(__name__)
@@ -32,6 +31,77 @@ def load_contents(filename: str) -> Iterator[map]:
         axis = [token.split('=') for token in line.strip('<>').split(',')]
         axis = {name: int(value) for name, value in axis}
         yield axis
+
+
+def trace(step: int, positions: list[map], velocities: list[map]) -> None:
+    """Trace values
+
+    :param step: step index
+    :param positions: bodies positions
+    :param velocities: bodies velocity
+    :return: nothing
+    """
+    log.info(f'{step=}')
+    for i, pos in enumerate(positions):
+        vel = velocities[i]
+        log.info(f'{pos=}, {vel=}')
+
+
+def compute_time_step(positions: list[map], velocities: list[map]) -> None:
+    """Update positions and velocities
+
+    :param positions: bodies positions
+    :param velocities: bodies velocity
+    :return: nothing
+    """
+    bodies = range(len(positions))
+    for ref, opp in permutations(bodies, 2):
+        ref_pos = positions[ref]
+        opp_pos = positions[opp]
+        for axis, ref_val in ref_pos.items():
+            if ref_val < opp_pos[axis]:
+                velocities[ref][axis] += 1
+            elif ref_val > opp_pos[axis]:
+                velocities[ref][axis] -= 1
+    for body, pos in enumerate(positions):
+        for axis in pos.keys():
+            pos[axis] += velocities[body][axis]
+
+
+def compute_total_energy(positions: list[map], velocities: list[map]) -> int:
+    """Compute total energy
+
+    :param positions: bodies positions
+    :param velocities: bodies velocity
+    :return: total energy
+    """
+    total_energy = 0
+    for body, pos in enumerate(positions):
+        body_energy = sum(map(abs, pos.values()))
+        kin = velocities[body]
+        body_energy *= sum(map(abs, kin.values()))
+        total_energy += body_energy
+    return total_energy
+
+
+# Solver Methods ---------------------------------------------------------------
+
+
+def solve(contents: list[map], steps: int) -> int:
+    """Part one solving method
+
+    :param contents: decoded contents
+    :param steps: number of steps to compute
+    :return: answer
+    """
+    positions = contents
+    velocities = [{axis: 0 for axis in body.keys()} for body in positions]
+    for step in range(steps):
+        if not step % 10:
+            trace(step, positions, velocities)
+        compute_time_step(positions, velocities)
+    total_energy = compute_total_energy(positions, velocities)
+    return total_energy
 
 
 # Support Methods --------------------------------------------------------------
@@ -87,7 +157,7 @@ def main() -> int:
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = list(load_contents(filename=args.filename))
-        answer = -1
+        answer = solve(contents=contents, steps=1000)
         print(f'part one: {answer=}')
     if compute_part_two:
         answer = -1

@@ -167,9 +167,66 @@ def load_contents(filename: str) -> Iterator[map]:
 
 ## 💡 Solver
 
+The algorithm for part one is quite simple:
+
+* initialize velocity vectors
+* for each time step
+    * for each moon pair permutation
+        * for each axis
+            * compare position values and update the velocity value
+    * for each body
+        * for each axis
+            * update position using the velocity of relevant body and axis
+* compute the total energy    
+
+With the corresponding source code:
+
+```python
+def solve(contents: list[map], steps: int) -> int:
+    positions = contents
+    velocities = [{axis: 0 for axis in body.keys()} for body in positions]
+    for step in range(steps):
+        if not step % 10:
+            trace(step, positions, velocities)
+        compute_time_step(positions, velocities)
+    total_energy = compute_total_energy(positions, velocities)
+    return total_energy
+```
+
+The `compute_time_step()` uses reference passing for updating the values without having to return anything. Permutations are computed using [`itertools.permutations`][py-itertools-permutations].
+
+```python
+def compute_time_step(positions: list[map], velocities: list[map]) -> None:
+    bodies = range(len(positions))
+    for ref, opp in permutations(bodies, 2):
+        ref_pos = positions[ref]
+        opp_pos = positions[opp]
+        for axis, ref_val in ref_pos.items():
+            if ref_val < opp_pos[axis]:
+                velocities[ref][axis] += 1
+            elif ref_val > opp_pos[axis]:
+                velocities[ref][axis] -= 1
+    for body, pos in enumerate(positions):
+        for axis in pos.keys():
+            pos[axis] += velocities[body][axis]
+```
+
+The `compute_total_energy()` is also quite trivial:
+
+```python
+def compute_total_energy(positions: list[map], velocities: list[map]) -> int:
+    total_energy = 0
+    for body, pos in enumerate(positions):
+        body_energy = sum(map(abs, pos.values()))
+        kin = velocities[body]
+        body_energy *= sum(map(abs, kin.values()))
+        total_energy += body_energy
+    return total_energy
+```
+
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-11.py input.txt -p 1` | `2172`
+[`input.txt`](./input.txt) | `./day-12.py input.txt -p 1` | `9958`
 
 # 😰🙅 Part Two
 
@@ -179,7 +236,7 @@ Contents | Command | Answer
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-11.py input.txt -p 2` | `JELEFGHP`
+[`input.txt`](./input.txt) | `./day-12.py input.txt -p 2` | ``
 
 # 🚀✨ Further Improvements
 
