@@ -285,6 +285,27 @@ Corresponding velocities are also zero. Coincidence? 🤔 I think not!
 
 ## 🤔🤯 Puzzle Solver
 
+Instead of looping on each body, a more efficient way is to loop on each axis.
+
+```python
+pos_per_axis = [[body[axis] for body in contents] for axis in contents[0].keys()]
+vel_per_axis = [[0 for _ in contents] for axis in contents[0].keys()]
+```
+
+```python
+def step_by_axis(
+        positions: list[list[int]], velocities: list[list[int]]) -> None:
+    for axis, bodies in enumerate(positions):
+        for bindex, body in enumerate(bodies):
+            velocities[axis][bindex] += \
+                sum(opp > body for opp in bodies) - \
+                sum(body > opp for opp in bodies)
+        for bindex, body in enumerate(bodies):
+            bodies[bindex] += velocities[axis][bindex]
+```
+
+Performance is much better, however still too slow for computing the value in less than a few dozen seconds.
+
 Contents | Command | Answer
 --- | --- | ---
 [`input.txt`](./input.txt) | `./day-12.py input.txt -p 2` | ``
