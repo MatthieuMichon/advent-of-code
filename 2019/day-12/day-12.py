@@ -86,8 +86,7 @@ def step_by_axis(
     """
     for index, body in enumerate(positions):
         velocities[index] += \
-            sum(opp > body for opp in positions) - \
-            sum(body > opp for opp in positions)
+            sum(1 if opp > body else -1 for opp in positions if opp != body)
     for index, body in enumerate(positions):
         positions[index] += velocities[index]
 
@@ -138,18 +137,17 @@ def solve_part_two(contents: list[map]) -> int:
         return int((a * b) / math.gcd(a, b))
 
     pos_per_axis = [[body[axis] for body in contents] for axis in contents[0].keys()]
-    vel_per_axis = [0 for _ in range(4)]
     cycles_per_axis = list()
     for axis, positions in enumerate(pos_per_axis):
+        start_positions = positions.copy()
+        vel_per_axis = [0 for _ in range(4)]
         step = 0
-        while True:
+        while not step or not all(body == 0 for body in vel_per_axis) \
+                or (positions != start_positions):
             step += 1
             step_by_axis(positions=positions, velocities=vel_per_axis)
-            if all(axis == 0 for axis in vel_per_axis):
-                print(f'{step=}')
-                cycles_per_axis.append(step)
-                break
-    answer = 2 * lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
+        cycles_per_axis.append(step)
+    answer = lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
     return answer
 
 

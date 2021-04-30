@@ -353,13 +353,30 @@ def solve_part_two(contents: list[map]) -> int:
 
 Comparing with the example values, it appears that the answer must be multiplied by two for some reason.
 
+> :memo: Note
+> 
+> Turned out that position wasn't compared against start position for cycles with zero velocity.
+
+```diff
+-        while True:
++        while not step or not all(body == 0 for body in vel_per_axis) \
++                or (positions != start_positions):
+             step += 1
+             step_by_axis(positions=positions, velocities=vel_per_axis)
+-            if all(axis == 0 for axis in vel_per_axis):
+-                print(f'{step=}')
+-                cycles_per_axis.append(step)
+-                break
+-    answer = 2 * lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
++        cycles_per_axis.append(step)
++    answer = lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
+```
+
 Contents | Command | Answer
 --- | --- | ---
 [`input.txt`](./input.txt) | `./day-12.py input.txt -p 2` | `318382803780324`
 
 # 🚀✨ Further Improvements
-
-Find out why the correct answer is the double of the one computed.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
