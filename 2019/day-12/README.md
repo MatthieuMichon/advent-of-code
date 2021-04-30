@@ -306,13 +306,60 @@ def step_by_axis(
 
 Performance is much better, however still too slow for computing the value in less than a few dozen seconds.
 
+Next step was finding a way to reduce the design space. Interestingly the three axis do not have an dependencies. This implies that the problem could be split in three.
+
+Running the `step_by_axis()` on each axis yields a different loop value. Computing the lesser common denominator yields the correct value for the example.
+
+```python
+def step_by_axis(
+        positions: list[int], velocities: list[int]) -> None:
+    """Update positions and velocities
+
+    :param positions: bodies positions
+    :param velocities: bodies velocity
+    :return: nothing
+    """
+    for index, body in enumerate(positions):
+        velocities[index] += \
+            sum(opp > body for opp in positions) - \
+            sum(body > opp for opp in positions)
+    for index, body in enumerate(positions):
+        positions[index] += velocities[index]
+```
+
+> :memo: Note
+> 
+> Cycle count for the axis are `9`, `14` and `22`. The product is `2772`, however the lesse common multiplier is half: `1386`. Surprisingly this value is not mentioned in the part two statement.
+
+```python
+def solve_part_two(contents: list[map]) -> int:
+    def lcm(a: int, b: int) -> int:
+        return int((a * b) / math.gcd(a, b))
+
+    pos_per_axis = [[body[axis] for body in contents] for axis in contents[0].keys()]
+    vel_per_axis = [0 for _ in range(4)]
+    cycles_per_axis = list()
+    for axis, positions in enumerate(pos_per_axis):
+        step = 0
+        while True:
+            step += 1
+            step_by_axis(positions=positions, velocities=vel_per_axis)
+            if all(axis == 0 for axis in vel_per_axis):
+                cycles_per_axis.append(step)
+                break
+    answer = 2 * lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
+    return answer
+```
+
+Comparing with the example values, it appears that the answer must be multiplied by two for some reason.
+
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-12.py input.txt -p 2` | ``
+[`input.txt`](./input.txt) | `./day-12.py input.txt -p 2` | `318382803780324`
 
 # 🚀✨ Further Improvements
 
-The `print_panels()` could be improved.
+Find out why the correct answer is the double of the one computed.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/

@@ -8,6 +8,7 @@ Puzzle Solution in Python
 
 import argparse
 import logging
+import math
 import os
 import sys
 
@@ -76,22 +77,19 @@ def compute_time_step(positions: list[map], velocities: list[map]) -> None:
 
 
 def step_by_axis(
-        positions: list[list[int]], velocities: list[list[int]]) -> None:
+        positions: list[int], velocities: list[int]) -> None:
     """Update positions and velocities
 
     :param positions: bodies positions
     :param velocities: bodies velocity
     :return: nothing
     """
-    # bodies = range(len(positions))
-    # for ref, opp in permutations(bodies, 2):
-    for axis, bodies in enumerate(positions):
-        for bindex, body in enumerate(bodies):
-            velocities[axis][bindex] += \
-                sum(opp > body for opp in bodies) - \
-                sum(body > opp for opp in bodies)
-        for bindex, body in enumerate(bodies):
-            bodies[bindex] += velocities[axis][bindex]
+    for index, body in enumerate(positions):
+        velocities[index] += \
+            sum(opp > body for opp in positions) - \
+            sum(body > opp for opp in positions)
+    for index, body in enumerate(positions):
+        positions[index] += velocities[index]
 
 
 def compute_total_energy(positions: list[map], velocities: list[map]) -> int:
@@ -136,15 +134,23 @@ def solve_part_two(contents: list[map]) -> int:
     :param contents: decoded contents
     :return: answer
     """
+    def lcm(a: int, b: int) -> int:
+        return int((a * b) / math.gcd(a, b))
+
     pos_per_axis = [[body[axis] for body in contents] for axis in contents[0].keys()]
-    vel_per_axis = [[0 for _ in contents] for axis in contents[0].keys()]
-    step = 0
-    while True:
-        step += 1
-        step_by_axis(positions=pos_per_axis, velocities=vel_per_axis)
-        if all(all(body == 0 for body in axis) for axis in vel_per_axis):
-            print(f'{step=}')
-    return step
+    vel_per_axis = [0 for _ in range(4)]
+    cycles_per_axis = list()
+    for axis, positions in enumerate(pos_per_axis):
+        step = 0
+        while True:
+            step += 1
+            step_by_axis(positions=positions, velocities=vel_per_axis)
+            if all(axis == 0 for axis in vel_per_axis):
+                print(f'{step=}')
+                cycles_per_axis.append(step)
+                break
+    answer = 2 * lcm(lcm(cycles_per_axis[0], cycles_per_axis[1]), cycles_per_axis[2])
+    return answer
 
 
 # Support Methods --------------------------------------------------------------

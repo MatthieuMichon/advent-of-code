@@ -19,7 +19,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [9](/2019/day-9) | Sensor Boost | [AoC][aoc-2019-9] - [Reddit][reddit-2019-9]| [Virtual machine][w-vn] | ⭐ | ⭐
 [10](/2019/day-10) | Monitoring Station | [AoC][aoc-2019-10] - [Reddit][reddit-2019-10]| [Arithmetic geometry][w-ari-geom] | ⭐ | ⭐⭐
 [11](/2019/day-11) | Space Police | [AoC][aoc-2019-11] - [Reddit][reddit-2019-11]| [Virtual machine][w-vn] | ⭐ | ⭐
-[12](/2019/day-12) | The N-Body Problem | [AoC][aoc-2019-12] - [Reddit][reddit-2019-12]| [Orbital mechanics][w-orbital-mech] | ⭐ | ⏱
+[12](/2019/day-12) | The N-Body Problem | [AoC][aoc-2019-12] - [Reddit][reddit-2019-12]| [Number theory][w-number] | ⭐ | ⭐⭐
 
 Tag | Description
 --- | ---
@@ -94,6 +94,7 @@ Tag | Description
 [w-graph]: https://en.wikipedia.org/wiki/Graph_traversal
 [w-logic]: https://en.wikipedia.org/wiki/Logic
 [w-memoization]: https://en.wikipedia.org/wiki/Memoization
+[w-number]: https://en.wikipedia.org/wiki/Number_theory
 [w-orbital-mech]: https://en.wikipedia.org/wiki/Orbital_mechanics
 [w-single-recursion]: https://en.wikipedia.org/wiki/Recursion_(computer_science)#single_recursion
 [w-vn]: https://en.wikipedia.org/wiki/Virtual_machine
