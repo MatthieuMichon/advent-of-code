@@ -11,11 +11,20 @@ import logging
 import os
 import sys
 
-from enum import Enum, IntEnum, auto
+from collections import Counter
+from enum import IntEnum
 from types import SimpleNamespace as sn
 from typing import Iterator
 
 log = logging.getLogger(__name__)
+
+
+class TilesTypes(IntEnum):
+    EMPTY = 0
+    WALL = 1
+    BLOCK = 2
+    HORIZONTAL_PADDLE = 3
+    BALL = 4
 
 
 # Common Methods ---------------------------------------------------------------
@@ -109,7 +118,7 @@ def decode(instruction: int) -> [int, list[int]]:
 
 
 def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
-          relative_base: int, opcode:int, input_stack: list[int]) -> list[int]:
+          relative_base: int, opcode: int, input_stack: list[int]) -> list[int]:
     """Fetch operands from memory
 
     :param instruction_pointer: instruction operation code
@@ -141,7 +150,7 @@ def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
     return operands
 
 
-def execute(opcode:int , operands: list[int]) -> int:
+def execute(opcode: int, operands: list[int]) -> int:
     """Execute an instruction
 
     :param opcode: instruction opcode
@@ -241,7 +250,7 @@ def jump_next_instruction(opcode: int, instruction_pointer: int,
     :return: pointer to following instruction
     """
     next_instruction = instruction_pointer + 1 + \
-                       ISA[opcode].load_args + ISA[opcode].store_args
+        ISA[opcode].load_args + ISA[opcode].store_args
     if ISA[opcode].name in ['Add', 'Mul', 'RBS', 'LT', 'Eq', 'In', 'Out']:
         pass
     elif ISA[opcode].name == 'JNZ':
@@ -275,7 +284,7 @@ def step(ram: dict, regs: dict, inputs: list[int]) -> tuple:
         opcode, operand_modes = decode(instruction=instruction)
         halt = ISA[opcode].name == 'Halt'
         if halt:
-            raise HaltOpcode
+            break
         load_modes = operand_modes[:ISA[opcode].load_args]
         operands = fetch(instruction_pointer=pc,
                          load_modes=load_modes, ram=ram,
@@ -291,27 +300,25 @@ def step(ram: dict, regs: dict, inputs: list[int]) -> tuple:
         next_instruction_pointer = jump_next_instruction(
             opcode=opcode, instruction_pointer=pc, operands=operands)
         pc = next_instruction_pointer
-        if len(output_values) == 2:
-            break
     regs['pc'] = pc
     regs['rb'] = relative_base
     return tuple(output_values)
 
 
-def solve(contents: map) -> tuple:
+def solve(contents: map) -> int:
     """Solve puzzle part one
 
     :param contents: puzzle input contents
-    :param start_panel_color: color of the start panel
     :return: puzzle answer
     """
     regs = {'pc': 0, 'rb': 0}
-    try:
-        while True:
-            outputs = step(ram=contents, regs=regs, inputs=[])
-    except HaltOpcode:
-        ...
-    return (-1, -1)
+    output_values = step(ram=contents, regs=regs, inputs=[])
+    assert len(output_values) % 3 == 0
+    tiles_count: int = len(output_values) // 3
+    tiles = [output_values[3 * i:3 * i + 3] for i in range(tiles_count)]
+    tile_ids = [tile[2] for tile in tiles]
+    block_tiles = Counter(tile_ids)[TilesTypes.BLOCK]
+    return block_tiles
 
 
 # Support Methods --------------------------------------------------------------
@@ -364,13 +371,13 @@ def main() -> int:
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = next(load_contents(filename=args.filename))
-        answer, _ = solve(contents=contents)
+        answer = solve(contents=contents)
         print(f'part one: {answer=}')
-    if compute_part_two:
-        contents = next(load_contents(filename=args.filename))
-        _, panels = solve(contents=contents, start_panel_color=Colors.WHITE)
-        panels = {k: v for k, v in panels.items() if v == Colors.WHITE}
-        print_panels(panels=panels)
+    # if compute_part_two:
+    #     contents = next(load_contents(filename=args.filename))
+    #     _, panels = solve(contents=contents, start_panel_color=Colors.WHITE)
+    #     panels = {k: v for k, v in panels.items() if v == Colors.WHITE}
+    #     print_panels(panels=panels)
     return EXIT_SUCCESS
 
 

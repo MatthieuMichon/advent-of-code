@@ -42,14 +42,39 @@ Ok so no real computing yet!
 
 ## 💡🙋 Implementation
 
-Since this puzzle relies on Intcode, we can rip off methods from day 
+Since this puzzle relies on Intcode, we can rip off methods from [day 11](/2019/day-11) which has the latest *Intcode* implementation.
+
+The different types of tiles are mapped into an enum:
+
+```python
+class TilesTypes(IntEnum):
+    EMPTY = 0
+    WALL = 1
+    BLOCK = 2
+    HORIZONTAL_PADDLE = 3
+    BALL = 4
+```
+
 
 ## 💡 Solver
 
+The `solve()` method is slightly modified to accommodate the different expected results. The `output_values` is converted into a list of three-item tuples before being mapped using the `Counter` class.
+
+```python
+def solve(contents: map) -> int:
+    regs = {'pc': 0, 'rb': 0}
+    output_values = step(ram=contents, regs=regs, inputs=[])
+    assert len(output_values) % 3 == 0
+    tiles_count: int = len(output_values) // 3
+    tiles = [output_values[3 * i:3 * i + 3] for i in range(tiles_count)]
+    tile_ids = [tile[2] for tile in tiles]
+    block_tiles = Counter(tile_ids)[TilesTypes.BLOCK]
+    return block_tiles
+```
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-13.py input.txt -p 1` | `---`
+[`input.txt`](./input.txt) | `./day-13.py input.txt -p 1` | `335`
 
 # 😰🙅 Part Two
 
