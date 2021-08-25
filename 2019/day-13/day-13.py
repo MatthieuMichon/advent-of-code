@@ -305,6 +305,16 @@ def step(ram: dict, regs: dict, inputs: list[int]) -> tuple:
     return tuple(output_values)
 
 
+def map_tiles(tiles: [int, int, int]) -> dict:
+    """Map a list in of tiles
+
+    :param tiles: list of tiles
+    :return: dict representation
+    """
+    d = {(x, y): id_ for (x, y, id_) in tiles}
+    return d
+
+
 def solve(contents: map) -> int:
     """Solve puzzle part one
 
@@ -316,6 +326,23 @@ def solve(contents: map) -> int:
     assert len(output_values) % 3 == 0
     tiles_count: int = len(output_values) // 3
     tiles = [output_values[3 * i:3 * i + 3] for i in range(tiles_count)]
+    map_ = map_tiles(tiles=tiles)
+    pic = []
+    for y in range(min(map_.keys())[1], max(map_.keys())[1]+1):
+        line = []
+        for x in range(min(map_.keys())[0], max(map_.keys())[0]+1):
+            if map_[(x, y)] == TilesTypes.BLOCK:
+                line.append('x')
+            elif map_[(x, y)] == TilesTypes.WALL:
+                line.append('#')
+            elif map_[(x, y)] == TilesTypes.EMPTY:
+                line.append(' ')
+            elif map_[(x, y)] == TilesTypes.HORIZONTAL_PADDLE:
+                line.append('=')
+            elif map_[(x, y)] == TilesTypes.BALL:
+                line.append('o')
+        print(''.join(line))
+        pic.append(line)
     tile_ids = [tile[2] for tile in tiles]
     block_tiles = Counter(tile_ids)[TilesTypes.BLOCK]
     return block_tiles

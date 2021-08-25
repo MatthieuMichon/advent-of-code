@@ -55,7 +55,6 @@ class TilesTypes(IntEnum):
     BALL = 4
 ```
 
-
 ## 💡 Solver
 
 The `solve()` method is slightly modified to accommodate the different expected results. The `output_values` is converted into a list of three-item tuples before being mapped using the `Counter` class.
@@ -81,6 +80,63 @@ Contents | Command | Answer
 
 ## 🥺👉👈 Annotated Statement
 
+> The game didn't run because you didn't put in any quarters. Unfortunately, you did not bring any quarters. Memory address 0 represents the number of quarters that have been inserted; set it to 2 to play for free.
+
+The express `memory address 0` likely refers to the following feature detailled in [day 9][aoc-2019-9]:
+
+> Memory beyond the initial program starts with the value `0` and can be read or written like any other memory.
+
+This means that software must be altered prior to running *part two*. The operation would consist in appending the value `0`.
+
+```python
+contents.append(0)
+```
+
+> The arcade cabinet has a joystick that can move left and right. The software reads the position of the joystick with input instructions:
+> ```
+> If the joystick is in the neutral position, provide 0.
+> If the joystick is tilted to the left, provide -1.
+> If the joystick is tilted to the right, provide 1.
+> ```
+
+With three choices exploring each round increases by three-fold the number of moves which must be explored.
+
+> The arcade cabinet also has a segment display capable of showing a single number that represents the player's current score. When three output instructions specify `X=-1, Y=0`, the third output instruction is not a tile; the value instead specifies the new score to show in the segment display. For example, a sequence of output values like `-1,0,12345` would show `12345` as the player's current score.
+
+A *simple* change to the `solve` method from part one should do the trick. 
+
+> Beat the game by breaking all the blocks. What is your score after the last block is broken?
+
+Thinking that having a picture representation of the scene may help, something transforming the output list into a dict of x, y tiles.
+
+```
+########################################
+#                                      #
+#   x  xxxx x  x  xxxx     x x xxx x   #
+# xxx xx  x xxxxxx  xx   xx  xx xxxx x #
+#  xx xxxx xxxx x xx  xxx xxxxxx  xx   #
+# xxxx xxxx xxxx xx   x     x  xx x  x #
+# xxxxx x x x xxxx x xxx xxxxxx xxx x  #
+#  x xxxx x  x xx     xxx  x xx xx     #
+#  x  xxxxxxxxxxx x  xxxxx xxx  x   x  #
+#  xx x xxx     xxxxxxx  x  x xxxxx xx #
+#  xxxx x   xxx x x      xx xx  xxxxxx #
+#   x x  x x x  x xx  x       xx xxxx  #
+#  xxx x x xxxxxxxxxx x   x x x xxxxxx #
+# x x xx  xxxxxxx xx   xx xx  x xxxx   #
+#  x  xx       x     x xxx  x xx xxxxx #
+# x  x  xxx   xxxxxxx xxxxxx  xx x  xx #
+# xx  xxxx xxxx    x xxx x   x x    x  #
+# xx xxx xxxxxxxxxxxxx        x xxxx x #
+#                                      #
+#                 o                    #
+#                                      #
+#                                      #
+#                   =                  #
+#                                      #
+```
+
+Turns out that the arcade wasn't a flipper but a pong! This explains a lot of things and greatly simplifies the logic for governing the joystick as we only want to track the vertical position of the ball!
 
 ## 🤔🤯 Puzzle Solver
 
@@ -95,6 +151,7 @@ Contents | Command | Answer
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about
+[aoc-2019-9]: https://adventofcode.com/2019/day/9
 [aoc-2019-13]: https://adventofcode.com/2019/day/13
 
 [json]: https://www.json.org/json-en.html
