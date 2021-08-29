@@ -27,6 +27,12 @@ class TilesTypes(IntEnum):
     BALL = 4
 
 
+class Joystick(IntEnum):
+    NEUTRAL = 0
+    LEFT = -1
+    RIGHT = 1
+
+
 # Common Methods ---------------------------------------------------------------
 
 
@@ -42,22 +48,6 @@ def load_contents(filename: str) -> Iterator[map]:
 
 
 # Intcode Methods --------------------------------------------------------------
-
-
-class Error(Exception):
-    """Base class for exceptions in this module."""
-    pass
-
-
-class HaltOpcode(Error):
-    """Exception when an HALT opcode is encountered.
-
-    Attributes:
-        opcode -- opcode value
-    """
-
-    def __init__(self):
-        super().__init__()
 
 
 INTCODE_INSTR_MOD = 100
@@ -96,6 +86,17 @@ class OpcodeError(Error):
 
     def __init__(self, opcode: int):
         message = f'Invalid opcode {opcode}'
+        super().__init__(message)
+
+
+class HaltOpcode(Error):
+    """Exception when an HALT opcode is encountered.
+
+    Attributes:
+        opcode -- opcode value
+    """
+
+    def __init__(self, message=""):
         super().__init__(message)
 
 
@@ -139,10 +140,14 @@ def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
             pointer = instruction_pointer + 1 + i
             contents = ram[pointer]
             if mode == Mode.IMMEDIATE:
+                log.debug(f'argument {i}: mode {str(mode)}, value {contents}')
                 operands.append(contents)
             elif mode == Mode.POSITION:
-                operands.append(ram.get(contents, DEFAULT_RAM_VALUE))
+                log.debug(f'argument {i}: mode {str(mode)}, position {contents}, value {ram[contents]}')
+                #operands.append(ram.get(contents, DEFAULT_RAM_VALUE))
+                operands.append(ram[contents])
             elif mode == Mode.RELATIVE:
+                log.debug(f'argument {i}: mode {str(mode)}, position {relative_base + contents}, value {ram[relative_base + contents]}')
                 operands.append(ram[relative_base + contents])
             else:
                 raise Exception
@@ -203,7 +208,8 @@ def store(
         return
     if store_mode == Mode.RELATIVE:
         store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
-        store_pointer = relative_base + ram.get(store_pointer_address, DEFAULT_RAM_VALUE)
+        #store_pointer = relative_base + ram.get(store_pointer_address, DEFAULT_RAM_VALUE)
+        store_pointer = relative_base + ram[store_pointer_address]
     elif store_mode == Mode.POSITION:
         store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
         store_pointer = ram[store_pointer_address]
@@ -348,6 +354,129 @@ def solve(contents: map) -> int:
     return block_tiles
 
 
+def print_map(map_):
+    for y in set(k[1] for k in map_.keys()):
+        line = []
+        for x in set(k[0] for k in map_.keys()):
+            if x == -1:
+                continue
+            if (x, y) not in map_:
+                continue
+            if map_[(x, y)] == TilesTypes.BLOCK:
+                line.append('x')
+            elif map_[(x, y)] == TilesTypes.WALL:
+                line.append('#')
+            elif map_[(x, y)] == TilesTypes.EMPTY:
+                line.append(' ')
+            elif map_[(x, y)] == TilesTypes.HORIZONTAL_PADDLE:
+                line.append('=')
+            elif map_[(x, y)] == TilesTypes.BALL:
+                line.append('o')
+        print(''.join(line))
+
+
+def step_part_two(
+        ram: dict, regs: dict, inputs: list[int],
+        tiles: list[list[int]]) -> int:
+    """Advance robot by a single step
+
+    :param ram: memory contents
+    :param regs: register map
+    :param inputs: input queue
+    :param tiles: list of tiles
+    :return: ball position on the horizontal axis
+    """
+    pc = regs['pc']
+    relative_base = regs['rb']
+    tile = []
+    while True:
+        instruction = ram[pc]
+        opcode, operand_modes = decode(instruction=instruction)
+        halt = ISA[opcode].name == 'Halt'
+        if halt:
+            break
+        load_modes = operand_modes[:ISA[opcode].load_args]
+        operands = fetch(instruction_pointer=pc,
+                         load_modes=load_modes, ram=ram,
+                         relative_base=relative_base,
+                         opcode=opcode, input_stack=inputs)
+        output = execute(opcode=opcode, operands=operands)
+        store_mode = operand_modes[-ISA[opcode].store_args:][0]
+        store(opcode=opcode, store_mode=store_mode, output=output,
+              instruction_pointer=pc, ram=ram,
+              relative_base=relative_base)
+        tile.extend(push_output(opcode=opcode, output=output))
+        relative_base += shift_base(opcode=opcode, output=output)
+        next_instruction_pointer = jump_next_instruction(
+            opcode=opcode, instruction_pointer=pc, operands=operands)
+        pc = next_instruction_pointer
+        if len(tile) == 3:
+            tiles.append([*tile[0:2], tile[2]])
+            if tile[0] != -1 and tile[2] == TilesTypes.BALL:
+                break
+            tile = []
+    regs['pc'] = pc
+    regs['rb'] = relative_base
+
+
+def print_score(tiles: map):
+    assert (-1, 0) in tiles
+    print(f'Score: {tiles[(-1, 0)]}')
+
+
+def get_position(tiles: list, tile_type: TilesTypes) -> any:
+    """Get object position
+
+    :param tiles: map of tiles per coordinates
+    :param tile_type: target tile type
+    :return: position
+    """
+    filtered_tiles = [t[0:2] for t in tiles if t[2] == tile_type]
+    if not len(filtered_tiles):
+        return None
+    return filtered_tiles[-1][0]
+
+
+def solve_part_two(contents: map) -> int:
+    """Solve puzzle part one
+
+    :param contents: puzzle input contents
+    :return: puzzle answer
+    """
+    contents[0] = 2
+
+    regs = {'pc': 0, 'rb': 0}
+    inputs = []
+    tiles = []
+    last_ball_position = None
+    while True:
+        step_part_two(ram=contents, regs=regs, inputs=inputs, tiles=tiles)
+        map_ = map_tiles(tiles=tiles)
+        tile_ids = list(map_.values())
+        block_tiles = Counter(tile_ids)[TilesTypes.BLOCK]
+        if block_tiles == 0:
+            print_map(map_)
+            print('done')
+            return map_[(-1, 0)]
+        paddle_position = get_position(
+            tiles=tiles, tile_type=TilesTypes.HORIZONTAL_PADDLE)
+        if paddle_position is None:
+            inputs.append(Joystick.NEUTRAL)
+            continue
+        ball_position = get_position(
+            tiles=tiles, tile_type=TilesTypes.BALL)
+        if last_ball_position is None:
+            last_ball_position = ball_position
+        next_ball_position = ball_position + (ball_position - last_ball_position)
+        if next_ball_position < paddle_position:
+            inputs.append(Joystick.LEFT)
+        elif next_ball_position == paddle_position:
+            inputs.append(Joystick.NEUTRAL)
+        elif next_ball_position > paddle_position:
+            inputs.append(Joystick.RIGHT)
+        last_ball_position = ball_position
+
+
 # Support Methods --------------------------------------------------------------
 
 
@@ -400,12 +529,11 @@ def main() -> int:
         contents = next(load_contents(filename=args.filename))
         answer = solve(contents=contents)
         print(f'part one: {answer=}')
-    # if compute_part_two:
-    #     contents = next(load_contents(filename=args.filename))
-    #     _, panels = solve(contents=contents, start_panel_color=Colors.WHITE)
-    #     panels = {k: v for k, v in panels.items() if v == Colors.WHITE}
-    #     print_panels(panels=panels)
-    return EXIT_SUCCESS
+    if compute_part_two:
+        contents = next(load_contents(filename=args.filename))
+        answer = solve_part_two(contents=contents)
+        print(f'part two: {answer=}')
+        return EXIT_SUCCESS
 
 
 if __name__ == "__main__":

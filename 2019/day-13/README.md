@@ -86,7 +86,7 @@ The express `memory address 0` likely refers to the following feature detailled 
 
 > Memory beyond the initial program starts with the value `0` and can be read or written like any other memory.
 
-This means that software must be altered prior to running *part two*. The operation would consist in appending the value `0`.
+This means that software must be altered prior to running *part two*. The operation would consist in appending the value `0` to the first integer ~~beyond the intial program~~ (turns out that `memory address 0` should be taken literally).
 
 ```python
 contents.append(0)
@@ -140,10 +140,64 @@ Turns out that the arcade wasn't a flipper but a pong! This explains a lot of th
 
 ## 🤔🤯 Puzzle Solver
 
+First thing is to get the game running by applying the indicated change.
+
+```python
+contents[0] = 2
+```
+
+Next thing is to provide joystick inputs. Providing a single joystick input triggers an internal error:
+
+```
+IndexError: pop from empty list
+```
+
+This error provides insights on how the program behaves:
+
+* a `halt` instruction is triggered when the game is over
+* joystick commands are popped during game execution
+
+Rather than breaking on `halt` instructions, breaking on outputs which update the ball position may be much better as we could deduce the correct joystick input.
+
+
+For the game to continue, the paddle must track the ball hence the need for a method returning the position of the ball or the paddle on the horizontal axis.
+
+```python
+def get_position(tiles: list, tile_type: TilesTypes) -> any:
+    filtered_tiles = [t[0:2] for t in tiles if t[2] == tile_type]
+    if not len(filtered_tiles):
+        return None
+    return filtered_tiles[-1][0]
+```
+
+For each ball position update, its next position must get computed:
+
+```python
+next_ball_position = ball_position + (ball_position - last_ball_position)
+```
+
+This value is then compared with the position of the paddle for determining the next action:
+
+```python
+if next_ball_position < paddle_position:
+    inputs.append(Joystick.LEFT)
+elif next_ball_position == paddle_position:
+    inputs.append(Joystick.NEUTRAL)
+elif next_ball_position > paddle_position:
+    inputs.append(Joystick.RIGHT)
+```
+
+The exit condition being an `halt` instruction, after which the expected solution value is computed:
+
+```python
+    block_tiles = Counter(tile_ids)[TilesTypes.BLOCK]
+    if block_tiles == 0:
+        return map_[(-1, 0)]
+```
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-13.py input.txt -p 2` | `---`
+[`input.txt`](./input.txt) | `./day-13.py input.txt -p 2` | `15706`
 
 # 🚀✨ Further Improvements
 
