@@ -201,7 +201,6 @@ Contents | Command | Answer
 
 # 🚀✨ Further Improvements
 
-
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-intro]: https://adventofcode.com/2019/about

@@ -21,6 +21,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [11](/2019/day-11) | Space Police | [AoC][aoc-2019-11] - [Reddit][reddit-2019-11]| [Virtual machine][w-vn] | ⭐ | ⭐
 [12](/2019/day-12) | The N-Body Problem | [AoC][aoc-2019-12] - [Reddit][reddit-2019-12]| [Number theory][w-number] | ⭐ | ⭐⭐
 [13](/2019/day-13) | Care Package | [AoC][aoc-2019-13] - [Reddit][reddit-2019-13]| [Virtual machine][w-vn] | ⭐ | ⭐
+[14](/2019/day-14) | Space Stoichiometry | [AoC][aoc-2019-14] - [Reddit][reddit-2019-14]| [Graph Traversal][w-graph] | ⏱ | ⏱
 
 Tag | Description
 --- | ---
