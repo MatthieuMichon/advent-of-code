@@ -6,30 +6,33 @@ Solution in [Python][py] for the [day 14 puzzle][aoc-2019-14] of the [2019 editi
 
 > As you approach the rings of Saturn, your ship's low fuel indicator turns on. There isn't any fuel here, but the rings have plenty of raw material. Perhaps your ship's Inter-Stellar Refinery Union brand nanofactory can turn these raw materials into fuel.
 > 
-> You ask the nanofactory to produce a list of the reactions it can perform that are relevant to this process (your puzzle input). Every reaction turns some quantities of specific input chemicals into some quantity of an output chemical.
+> You ask the nanofactory to produce a list of the reactions it can perform that are relevant to this process (your puzzle input).
 
-The **puzzle input** is a **list** of *reactions*, with a **reaction** being a pair of a list of chemicals and single chemical.
+The *puzzle input* is a **list** of *reactions*.
 
-```
-chemical: string
-reaction: tuple(tuple(chemical), chemical)
-puzzle_input: tuple(reactions)
-```
+> Every reaction turns some quantities of specific input chemicals into some quantity of an output chemical.
+
+A *reaction* associates a *number* of **quantified input chemicals** with a **quantity of output chemical**.
 
 > Almost every chemical is produced by exactly one reaction; the only exception, `ORE`, is the raw material input to the entire process and is not produced by a reaction.
-> 
+
+We should never have an equation where the `ORE` chemical is on the right-hand side (RHS) of the equation.
+
 > You just need to know how much `ORE` you'll need to collect before you can produce one unit of `FUEL`.
 
-> Each reaction gives specific quantities for its inputs and output; reactions cannot be partially run, so only whole integer multiples of these quantities can be used. **(It's okay to have leftover chemicals when you're done, though.)**
+The implied algorithm starts with a unitary amount of the final chemical `FUEL`, and makes it way back to elementary `ORE` chemicals.
+
+> Each reaction gives specific quantities for its inputs and output; reactions cannot be partially run, so only whole integer multiples of these quantities can be used. (It's okay to have leftover chemicals when you're done, though.)
+
+Rather then computing decimal quantities, arithmetics results should be rounded up to the nearest larger integer value.
+
 > 
 > For example, the reaction:
 > ```
 > 1 A, 2 B, 3 C => 2 D
 > ```
 > means that exactly `2` units of chemical `D` can be produced by consuming exactly `1 A`, `2 B` and `3 C`. You can run the full reaction as many times as necessary; for example, you could produce `10 D` by consuming `5 A`, `10 B`, and `15 C`.
-
-This explanation is well done.
-
+> 
 > Suppose your nanofactory produces the following list of reactions:
 > ```
 > 10 ORE => 10 A
@@ -133,27 +136,86 @@ Step | Items
 > ```
 > Given the list of reactions in your puzzle input, what is the minimum amount of ORE required to produce exactly 1 FUEL?
 
+## 💾🔍 Content Decoding
+
+The puzzle input was described as a list of objects, meaning that the decoder method body will start by breaking down the input file into lines.
+
+```python
+lines = open(file).read().strip().split(os.linesep)
+assert all(_EQ_OPERATOR in l for l in lines)
+log.info(f'Loaded {len(lines)} lines from {file=}')
+```
+
+Thankfully the `assert` check passes.
+
+```shell
+# 303 - load_contents    - INFO     - Loaded 59 lines from file=PosixPath('input.txt')
+```
+
+Next thing is to iterate over each line and process both sides.
+
+```python
+for l in lines:
+    lhs, rhs = l.split(_EQ_OPERATOR)
+    lhs = tuple(split_lhs(lhs))
+    rhs_qty, rhs_name = tuple(split_chem(rhs))
+```
+
+Two nested methods `split_lhs()` and `split_chem()` are used for low-level string manipulation.
+
+```python
+def split_lhs(lhs: str) -> Iterator:
+    chems = lhs.split(_LHS_SEPARATOR)
+    for chem in chems:
+        yield split_chem(chem)
+
+def split_chem(chem: str) -> (int, str):
+    qty, name = chem.split(_CHEM_SEPARATOR)
+    qty = int(qty)
+    return qty, name
+```
+
+The complete `load_contents()` method in all its glory:
+
+```python
+def load_contents(file: Path) -> Iterator:
+    """Load and convert contents from a filename
+
+    :param file: input file handle
+    :return: iterator yielding a dict entry for each chemical reaction
+    """
+    _EQ_OPERATOR = ' => '
+    _LHS_SEPARATOR = ', '
+    _CHEM_SEPARATOR = ' '
+
+    def split_lhs(lhs: str) -> Iterator:
+        chems = lhs.split(_LHS_SEPARATOR)
+        for chem in chems:
+            yield split_chem(chem)
+
+    def split_chem(chem: str) -> (int, str):
+        qty, name = chem.split(_CHEM_SEPARATOR)
+        qty = int(qty)
+        return qty, name
+
+    lines = open(file).read().strip().split(os.linesep)
+    assert all(_EQ_OPERATOR in l for l in lines)
+    log.info(f'Loaded {len(lines)} lines from {file=}')
+    for l in lines:
+        lhs, rhs = l.split(_EQ_OPERATOR)
+        lhs = tuple(split_lhs(lhs))
+        rhs_qty, rhs_name = tuple(split_chem(rhs))
+        yield rhs_name, {'qty': rhs_qty, 'lhs': lhs}
+```
+
+```shell
+# 642 - main             - DEBUG    - Arguments: Namespace(filename='input.txt', part=1, verbose=True)
+# 642 - load_contents    - INFO     - Loaded 59 lines from file=PosixPath('input.txt')
+{'DQFL': {'qty': 9, 'lhs': ((180, 'ORE'),)}, 'ZBLC': {'qty': 8, 'lhs': ((3, 'HGCR'), (9, 'TKRT'))}, ...
+```
+
 ## 💡🙋 Implementation
 
-`dict` is nearly always the answer for dealing with non-trivial data storage. Input contents for this puzzle are provided by means of multi-line text contents which are retrieved as a text file. Each line is independent parsing-wise, meaning that the content loading function could return an iterator object yielding one result for each processed line.
-
-Hence, the signature of the method tasked with loading structured contents:
-
-```python
-def load_contents(filename: str) -> Iterator[map]:
-    lines = open(filename).read().strip().split(os.linesep)
-    for line in lines:
-        ...
-```
-
-As explained earlier tokenizind a line is a matter of splitting several times using the appropriate separator.
-
-```python
-lhs, rhs = line.split(' => ')
-lhs = lhs.split(', ')
-rhs = rhs.split(', ')
-lhs = tuple((int(qty), chem,) for qty, chem in [g.split(' ') for g in lhs])
-```
 
 
 
