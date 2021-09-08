@@ -216,8 +216,77 @@ def load_contents(file: Path) -> Iterator:
 
 ## 💡🙋 Implementation
 
+Struggled a bit on this puzzle. First intuition was to use a depth-first search with a recursive function. This however didn't work out due to the need of handling lots and left-overs.
 
+The computation method required to be replaced by a [breath-first search][w-bfs] which yielded the correct results.
 
+```python
+def do_bfs(chem_map: dict) -> int:
+    """Execute a breadth-first search
+
+    :param chem_map: chemical reactions map
+    :return: answer
+    """
+    reactions = list()
+    reactions.append({'chem': 'FUEL', 'qty': 1})
+    req_qty = defaultdict(int)
+    ore_qty = 0
+    while len(reactions):
+        reaction = reactions.pop()
+        chem_name = reaction['chem']
+        if chem_name == 'ORE':
+            ore_qty += reaction['qty']
+        elif reaction['qty'] <= req_qty[chem_name]:
+            req_qty[chem_name] -= reaction['qty']
+        else:
+            qty_required = reaction['qty'] - req_qty[chem_name]
+            new_reaction = chem_map[chem_name]
+            lots = math.ceil(qty_required / new_reaction['lot'])
+            for lhs_chem in new_reaction['chems']:
+                reactions.append({'chem': lhs_chem[1], 'qty': lots * lhs_chem[0]})
+            qty_extra = lots * new_reaction['lot'] - qty_required
+            req_qty[chem_name] = qty_extra
+    return ore_qty
+```
+
+Contents | Command | Answer
+--- | --- | ---
+[`input.txt`](./input.txt) | `./day-13.py input.txt -p 1` | `399063`
+
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Statement
+
+> After collecting `ORE` for a while, you check your cargo hold: **1 trillion** (1000000000000) units of `ORE`.
+
+Thankfully Python is not limited to mere 32-bit integers.
+
+> With that much ore, given the examples above:
+> ```
+> The 13312 ORE-per-FUEL example could produce 82892753 FUEL.
+> The 180697 ORE-per-FUEL example could produce 5586022 FUEL.
+> The 2210736 ORE-per-FUEL example could produce 460664 FUEL.
+> ```
+> 
+> Given 1 trillion ORE, what is the maximum amount of FUEL you can produce?
+
+Intuitively we could get away by just using a bissect on the results and closing in on the final value.
+
+## 🤔🤯 Puzzle Solver
+
+First thing is to pass the target `FUEL` quantity value:
+
+```python
+def do_bfs(chem_map: dict, fuel_qty: int = 1) -> int:
+    """Execute a breadth-first search
+
+    :param chem_map: chemical reactions map
+    :param fuel_qty: number of FUEL units to produce
+    :return: answer
+    """
+    reactions = list()
+    reactions.append({'chem': 'FUEL', 'qty': fuel_qty})
+```
 
 
 [aoc]: https://adventofcode.com/
@@ -263,4 +332,4 @@ def load_contents(file: Path) -> Iterator:
 
 [w-cartesian]: https://en.wikipedia.org/wiki/Polar_coordinate_system
 [w-polar]: https://en.wikipedia.org/wiki/Polar_coordinate_system
-
+[w-bfs]: https://en.wikipedia.org/wiki/Breadth-first_search
