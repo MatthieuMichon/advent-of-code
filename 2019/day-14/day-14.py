@@ -120,6 +120,36 @@ def solve_part_one(reactions: dict) -> int:
     return answer
 
 
+def solve_part_two(reactions: dict) -> int:
+    """Provide answer for part one of the puzzle
+
+    :param reactions: mapping of chemical reactions
+    :return: answer of part one
+    """
+
+    target_ore_quantity = 1000000000000
+    fuel_qty = 1
+    required_ore = do_bfs(chem_map=reactions, fuel_qty=fuel_qty)
+    lower_fuel_qty = target_ore_quantity // required_ore
+    log.info(f'Computed {lower_fuel_qty=}')
+    upper_fuel_qty = int(1.1 * lower_fuel_qty)
+    while target_ore_quantity > do_bfs(chem_map=reactions, fuel_qty=upper_fuel_qty):
+        upper_fuel_qty = int(1.1 * upper_fuel_qty)
+    log.info(f'Computed {upper_fuel_qty=}')
+
+    while upper_fuel_qty - lower_fuel_qty > 1:
+        bissect_fuel_qty = (lower_fuel_qty + upper_fuel_qty) // 2
+        log.debug(f'Computed {bissect_fuel_qty=}')
+        required_ore = do_bfs(chem_map=reactions, fuel_qty=bissect_fuel_qty)
+        more_fuel = required_ore < target_ore_quantity
+        if more_fuel:
+            lower_fuel_qty = bissect_fuel_qty
+        else:
+            upper_fuel_qty = bissect_fuel_qty
+    answer = lower_fuel_qty
+    return answer
+
+
 # Support Methods --------------------------------------------------------------
 
 
@@ -128,10 +158,11 @@ EXIT_ERROR = 1
 LOG_FORMAT = '# %(msecs)-3d - %(funcName)-16s - %(levelname)-8s - %(message)s'
 
 
-def configure_logger(verbose: bool) -> None:
+def configure_logger(verbose: bool, debug: bool) -> None:
     """Configure logging
 
-    :param verbose: display debug and info messages
+    :param verbose: display info messages
+    :param debug: display debug and info messages
     :return: nothing
     """
     logger = logging.getLogger()
@@ -141,6 +172,9 @@ def configure_logger(verbose: bool) -> None:
     stdout.setFormatter(logging.Formatter(LOG_FORMAT))
     logger.addHandler(stdout)
     if verbose:
+        stdout.setLevel(level=logging.INFO)
+        logger.setLevel(level=logging.INFO)
+    if debug:
         stdout.setLevel(level=logging.DEBUG)
         logger.setLevel(level=logging.DEBUG)
 
@@ -155,6 +189,7 @@ def parse_arguments() -> argparse.Namespace:
     pa('filename', type=str, help='input contents filename')
     pa('-p', '--part', type=int, help='solve only the given part')
     pa('-v', '--verbose', action='store_true', help='print extra messages')
+    pa('-d', '--debug', action='store_true', help='print debug messages')
     arguments = parser.parse_args()
     return arguments
 
@@ -165,7 +200,7 @@ def main() -> int:
     :return: shell exit code
     """
     args = parse_arguments()
-    configure_logger(verbose=args.verbose)
+    configure_logger(verbose=args.verbose, debug=args.debug)
     log.debug(f'Arguments: {args}')
     compute_part_one = not args.part or 1 == args.part
     compute_part_two = not args.part or 2 == args.part
@@ -181,8 +216,9 @@ def main() -> int:
             else:
                 print(f'part one: answer: {answer}')
     if compute_part_two:
-        return EXIT_ERROR
-        print(f'part two: answer: {answer}')
+        for reactions in load_contents(file=Path(args.filename)):
+            answer = solve_part_two(reactions=reactions)
+            print(f'part two: answer: {answer}')
     return EXIT_SUCCESS
 
 

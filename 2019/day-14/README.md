@@ -251,7 +251,7 @@ def do_bfs(chem_map: dict) -> int:
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-13.py input.txt -p 1` | `399063`
+[`input.txt`](./input.txt) | `./day-14.py input.txt -p 1` | `399063`
 
 # 😰🙅 Part Two
 
@@ -270,7 +270,7 @@ Thankfully Python is not limited to mere 32-bit integers.
 > 
 > Given 1 trillion ORE, what is the maximum amount of FUEL you can produce?
 
-Intuitively we could get away by just using a bissect on the results and closing in on the final value.
+Intuitively we could get away by just using a [binary search][w-binary-search] on the results and closing in on the final value.
 
 ## 🤔🤯 Puzzle Solver
 
@@ -288,6 +288,77 @@ def do_bfs(chem_map: dict, fuel_qty: int = 1) -> int:
     reactions.append({'chem': 'FUEL', 'qty': fuel_qty})
 ```
 
+Next was implementing the binary search, with the start point computed by using a cross-multiplication. Knowing the ratio of `ORE` requird for producing a single unit of `FUEL`, we can compute the lower boundary of the quantity `FUEL` produced by one trillion amount of `ORE`. Again the final value will be higher due to left-overs being used for other chemical reactions.
+
+```python
+target_ore_quantity = 1000000000000
+fuel_qty = 1
+required_ore = do_bfs(chem_map=reactions, fuel_qty=fuel_qty)
+lower_fuel_qty = target_ore_quantity // required_ore
+```
+
+Next step is computing the upper boundary, here nothing fancy we simply multiply by 10 %:
+
+```python
+upper_fuel_qty = int(1.1 * lower_fuel_qty)
+while target_ore_quantity > do_bfs(chem_map=reactions, fuel_qty=upper_fuel_qty):
+    upper_fuel_qty = int(1.1 * upper_fuel_qty)
+```
+
+Finally the binary search is performed by computing the half point, and depending if it yields below or above the target ore quantity either the lower or upper bound is updated. The exit condition being when both bounds are separated by a single unit.
+
+```python
+while upper_fuel_qty - lower_fuel_qty > 1:
+    bissect_fuel_qty = (lower_fuel_qty + upper_fuel_qty) // 2
+    log.debug(f'Computed {bissect_fuel_qty=}')
+    required_ore = do_bfs(chem_map=reactions, fuel_qty=bissect_fuel_qty)
+    more_fuel = required_ore < target_ore_quantity
+    if more_fuel:
+        lower_fuel_qty = bissect_fuel_qty
+    else:
+        upper_fuel_qty = bissect_fuel_qty
+```
+
+The complete method:
+
+```python
+def solve_part_two(reactions: dict) -> int:
+    """Provide answer for part one of the puzzle
+
+    :param reactions: mapping of chemical reactions
+    :return: answer of part one
+    """
+
+    target_ore_quantity = 1000000000000
+    fuel_qty = 1
+    required_ore = do_bfs(chem_map=reactions, fuel_qty=fuel_qty)
+    lower_fuel_qty = target_ore_quantity // required_ore
+    log.info(f'Computed {lower_fuel_qty=}')
+    upper_fuel_qty = int(1.1 * lower_fuel_qty)
+    while target_ore_quantity > do_bfs(chem_map=reactions, fuel_qty=upper_fuel_qty):
+        upper_fuel_qty = int(1.1 * upper_fuel_qty)
+    log.info(f'Computed {upper_fuel_qty=}')
+
+    while upper_fuel_qty - lower_fuel_qty > 1:
+        bissect_fuel_qty = (lower_fuel_qty + upper_fuel_qty) // 2
+        log.debug(f'Computed {bissect_fuel_qty=}')
+        required_ore = do_bfs(chem_map=reactions, fuel_qty=bissect_fuel_qty)
+        more_fuel = required_ore < target_ore_quantity
+        if more_fuel:
+            lower_fuel_qty = bissect_fuel_qty
+        else:
+            upper_fuel_qty = bissect_fuel_qty
+    answer = lower_fuel_qty
+    return answer
+```
+
+Contents | Command | Answer
+--- | --- | ---
+[`input.txt`](./input.txt) | `./day-14.py input.txt -p 2` | `4215654`
+
+# 🙄😔 Closing Thoughts
+
+Part one contained a technicality requiring a breadth-first_search, which wasn't caught upon first reading and required some  additional logic for tracking required vs produced chemical quantities. On the other hand part two was straightforward.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
@@ -330,6 +401,7 @@ def do_bfs(chem_map: dict, fuel_qty: int = 1) -> int:
 [py-tuple]: https://docs.python.org/3/library/stdtypes.html#tuple
 [py-zip]: https://docs.python.org/3/library/functions.html#zip
 
+[w-binary-search]: https://en.wikipedia.org/wiki/Binary_search_algorithm
 [w-cartesian]: https://en.wikipedia.org/wiki/Polar_coordinate_system
 [w-polar]: https://en.wikipedia.org/wiki/Polar_coordinate_system
 [w-bfs]: https://en.wikipedia.org/wiki/Breadth-first_search
