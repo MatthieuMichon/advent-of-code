@@ -22,7 +22,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 [12](/2019/day-12) | The N-Body Problem | [AoC][aoc-2019-12] - [Reddit][reddit-2019-12]| [Number theory][w-number] | ⭐ | ⭐⭐
 [13](/2019/day-13) | Care Package | [AoC][aoc-2019-13] - [Reddit][reddit-2019-13]| [Virtual machine][w-vn] | ⭐ | ⭐
 [14](/2019/day-14) | Space Stoichiometry | [AoC][aoc-2019-14] - [Reddit][reddit-2019-14]| [Graph Traversal][w-graph] | ⭐⭐ | ⭐
-[15](/2019/day-15) | Oxygen System | [AoC][aoc-2019-15] - [Reddit][reddit-2019-15]| ⏱ | ⏱ | ⏱
+[15](/2019/day-15) | Oxygen System | [AoC][aoc-2019-15] - [Reddit][reddit-2019-15]| [Virtual machine][w-vn] | ⏱ | ⏱
 
 Tag | Description
 --- | ---
