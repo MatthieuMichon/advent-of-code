@@ -155,6 +155,10 @@ def load_contents(filename: Path) -> Iterator[map]:
 
 A small improvement is the use of an iterator with the `iter()` keyword, which avoids having to reconstruct the complete list before iterating over it.
 
+## 💡🙋 Implementation
+
+Looking at the Intcode program, the first instruction is `3` which reads an input value and stores it on the pointer located in the following integer `1033`. This means that an input must be provided from the start.
+
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-2019-15]: https://adventofcode.com/2019/day/15

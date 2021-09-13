@@ -293,6 +293,35 @@ def jump_next_instruction(opcode: int, instruction_pointer: int,
 
 # Solver Methods ---------------------------------------------------------------
 
+def solve_part_one(program: dict[int, int]) -> int:
+    droid_position = (0, 0)
+    area = {droid_position: 'D'}
+    pc = 0
+    rb = 0
+    inputs = [Movement.NORTH]
+    while True:
+        instruction = program[pc]
+        opcode, operand_modes = decode(instruction=instruction)
+        load_modes = operand_modes[:ISA[opcode].load_args]
+        log.debug(f'{pc=} {instruction=} {ISA[opcode]} {operand_modes=} {load_modes=}')
+        halt = ISA[opcode].name == 'Halt'
+        operands = fetch(
+            instruction_pointer=pc, load_modes=load_modes, ram=program,
+            relative_base=rb, opcode=opcode, input_stack=inputs)
+        output = execute(opcode=opcode, operands=operands)
+        store_mode = operand_modes[-ISA[opcode].store_args:][0]
+        store(opcode=opcode, store_mode=store_mode, output=output,
+              instruction_pointer=pc, ram=program, relative_base=rb)
+        outputs = push_output(opcode=opcode, output=output)
+        if len(outputs):
+            log.info(f'{outputs=}')
+        rb += shift_base(opcode=opcode, output=output)
+        next_instruction_pointer = jump_next_instruction(
+            opcode=opcode, instruction_pointer=pc, operands=operands)
+        pc = next_instruction_pointer
+    answer = 0
+    return answer
+
 
 # Support Methods --------------------------------------------------------------
 
@@ -339,7 +368,7 @@ def main() -> int:
     compute_part_two = not args.part or 2 == args.part
     if compute_part_one:
         contents = next(load_contents(filename=args.filename))
-        answer = 0
+        answer = solve_part_one(program=contents)
         print(f'part one: {answer=}')
     if compute_part_two:
         contents = next(load_contents(filename=args.filename))
