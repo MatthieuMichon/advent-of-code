@@ -157,9 +157,78 @@ A small improvement is the use of an iterator with the `iter()` keyword, which a
 
 ## 💡🙋 Implementation
 
-Looking at the Intcode program, the first instruction is `3` which reads an input value and stores it on the pointer located in the following integer `1033`. This means that an input must be provided from the start.
+Looking at the Intcode program, the first instruction is `3` which reads an input value and stores it on the pointer located in the following integer `1033`. This means that an input must be provided from the start. Following the example lets set the droid heading to north:
+
+```python
+inputs = [Movement.NORTH]
+```
+
+Next is the implementation of the scanning algorithm. The goal is to perform a sort of flood fill. Knowing nothing about this topic, the best thing is to have a look at Wikipedia's [*Flood fill* article][w-fill].
+
+Sadly the algorithms described in the article are not relevant to this puzzle since the droid is able only to move one location at the time.
+
+The alternative is to fellow a concentric pattern.
+
+```
+9abc
+812d
+703e
+654f
+```
+
+The algorithm starts simple, if both the location on the right is not visited then turn right and visit-it.
+
+```python
+def compute_next_move(current_position, area_map, last_move) -> tuple:
+    next_move = None
+    positions = {
+        'north': (current_position[0], current_position[1] + 1),
+        'east': (current_position[0] + 1, current_position[1]),
+        'south': (current_position[0], current_position[1] - 1),
+        'west': (current_position[0] - 1, current_position[1]),
+    }
+    visited = {
+        'north': positions['north'] in area_map,
+        'east': positions['east'] in area_map,
+        'south': positions['south'] in area_map,
+        'west': positions['west'] in area_map,
+    }
+    if last_move == Movement.NORTH:
+        if not visited['east']:
+            next_move = Movement.EAST
+        elif not visited['north']:
+            next_move = Movement.NORTH
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.EAST:
+        if not visited['south']:
+            next_move = Movement.SOUTH
+        elif not visited['east']:
+            next_move = Movement.EAST
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.SOUTH:
+        if not visited['west']:
+            next_move = Movement.WEST
+        elif not visited['south']:
+            next_move = Movement.SOUTH
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.WEST:
+        if not visited['north']:
+            next_move = Movement.NORTH
+        elif not visited['west']:
+            next_move = Movement.WEST
+        else:
+            raise Exception('stuck')
+    return next_move
+```
+
+Checking the trail, it appears that the droid moves as intended however no walls were encountered which suggests that the program isn't behaving properly.
 
 [aoc]: https://adventofcode.com/
 [aoc-2019]: https://adventofcode.com/2019/
 [aoc-2019-15]: https://adventofcode.com/2019/day/15
 [py]: https://docs.python.org/3/
+
+[w-fill]: https://en.wikipedia.org/wiki/Flood_fill

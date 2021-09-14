@@ -116,7 +116,7 @@ class HaltOpcode(Error):
         opcode -- opcode value
     """
 
-    def __init__(self, message=""):
+    def __init__(self, message=''):
         super().__init__(message)
 
 
@@ -164,7 +164,6 @@ def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
                 operands.append(contents)
             elif mode == Mode.POSITION:
                 log.debug(f'argument {i}: mode {str(mode)}, position {contents}, value {ram[contents]}')
-                #operands.append(ram.get(contents, DEFAULT_RAM_VALUE))
                 operands.append(ram[contents])
             elif mode == Mode.RELATIVE:
                 log.debug(f'argument {i}: mode {str(mode)}, position {relative_base + contents}, value {ram[relative_base + contents]}')
@@ -228,7 +227,6 @@ def store(
         return
     if store_mode == Mode.RELATIVE:
         store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
-        #store_pointer = relative_base + ram.get(store_pointer_address, DEFAULT_RAM_VALUE)
         store_pointer = relative_base + ram[store_pointer_address]
     elif store_mode == Mode.POSITION:
         store_pointer_address = instruction_pointer + 1 + ISA[opcode].load_args
@@ -293,32 +291,110 @@ def jump_next_instruction(opcode: int, instruction_pointer: int,
 
 # Solver Methods ---------------------------------------------------------------
 
+def compute_next_move(current_position, area_map, last_move) -> tuple:
+    """Compute following movement depending on area map and last movement
+
+    :param current_position:
+    :param area_map:
+    :param last_move:
+    :return:
+    """
+    next_move = None
+    positions = {
+        'north': (current_position[0], current_position[1] + 1),
+        'east': (current_position[0] + 1, current_position[1]),
+        'south': (current_position[0], current_position[1] - 1),
+        'west': (current_position[0] - 1, current_position[1]),
+    }
+    visited = {
+        'north': positions['north'] in area_map,
+        'east': positions['east'] in area_map,
+        'south': positions['south'] in area_map,
+        'west': positions['west'] in area_map,
+    }
+    if last_move == Movement.NORTH:
+        if not visited['east']:
+            next_move = Movement.EAST
+        elif not visited['north']:
+            next_move = Movement.NORTH
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.EAST:
+        if not visited['south']:
+            next_move = Movement.SOUTH
+        elif not visited['east']:
+            next_move = Movement.EAST
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.SOUTH:
+        if not visited['west']:
+            next_move = Movement.WEST
+        elif not visited['south']:
+            next_move = Movement.SOUTH
+        else:
+            raise Exception('stuck')
+    elif last_move == Movement.WEST:
+        if not visited['north']:
+            next_move = Movement.NORTH
+        elif not visited['west']:
+            next_move = Movement.WEST
+        else:
+            raise Exception('stuck')
+    return next_move
+
+
 def solve_part_one(program: dict[int, int]) -> int:
     droid_position = (0, 0)
     area = {droid_position: 'D'}
     pc = 0
     rb = 0
     inputs = [Movement.NORTH]
-    while True:
-        instruction = program[pc]
-        opcode, operand_modes = decode(instruction=instruction)
-        load_modes = operand_modes[:ISA[opcode].load_args]
-        log.debug(f'{pc=} {instruction=} {ISA[opcode]} {operand_modes=} {load_modes=}')
-        halt = ISA[opcode].name == 'Halt'
-        operands = fetch(
-            instruction_pointer=pc, load_modes=load_modes, ram=program,
-            relative_base=rb, opcode=opcode, input_stack=inputs)
-        output = execute(opcode=opcode, operands=operands)
-        store_mode = operand_modes[-ISA[opcode].store_args:][0]
-        store(opcode=opcode, store_mode=store_mode, output=output,
-              instruction_pointer=pc, ram=program, relative_base=rb)
-        outputs = push_output(opcode=opcode, output=output)
-        if len(outputs):
-            log.info(f'{outputs=}')
-        rb += shift_base(opcode=opcode, output=output)
-        next_instruction_pointer = jump_next_instruction(
-            opcode=opcode, instruction_pointer=pc, operands=operands)
-        pc = next_instruction_pointer
+    trail = [Movement.NORTH]
+    outputs = []
+    while len(outputs) == 0 or outputs[0] != StatusCodes.MOVED_GOT_OXYGEN:
+        while len(outputs) == 0:
+            instruction = program[pc]
+            opcode, operand_modes = decode(instruction=instruction)
+            load_modes = operand_modes[:ISA[opcode].load_args]
+            log.debug(f'{pc=} {instruction=} {ISA[opcode]} {operand_modes=} {load_modes=}')
+            halt = ISA[opcode].name == 'Halt'
+            input_required = ISA[opcode].name == 'In' and len(inputs) == 0
+            operands = fetch(
+                instruction_pointer=pc, load_modes=load_modes, ram=program,
+                relative_base=rb, opcode=opcode, input_stack=inputs)
+            output = execute(opcode=opcode, operands=operands)
+            store_mode = operand_modes[-ISA[opcode].store_args:][0]
+            store(opcode=opcode, store_mode=store_mode, output=output,
+                  instruction_pointer=pc, ram=program, relative_base=rb)
+            outputs = push_output(opcode=opcode, output=output)
+            rb += shift_base(opcode=opcode, output=output)
+            next_instruction_pointer = jump_next_instruction(
+                opcode=opcode, instruction_pointer=pc, operands=operands)
+            pc = next_instruction_pointer
+        last_move = trail[-1]
+        if last_move == Movement.NORTH:
+            target_position = (droid_position[0], droid_position[1] + 1)
+        elif last_move == Movement.EAST:
+            target_position = (droid_position[0] + 1, droid_position[1])
+        elif last_move == Movement.SOUTH:
+            target_position = (droid_position[0], droid_position[1] - 1)
+        else:
+            target_position = (droid_position[0] - 1, droid_position[1])
+        state = StatusCodes(outputs[0])
+        moved = state != StatusCodes.BLOCKED
+        if moved:
+            droid_position = target_position
+            found_oxygen = state == StatusCodes.MOVED_GOT_OXYGEN
+            if found_oxygen:
+                area[target_position] = 'O'
+            else:
+                area[target_position] = '.'
+        else:
+            area[target_position] = '#'
+        next_move = compute_next_move(current_position=droid_position, area_map=area, last_move=last_move)
+        inputs = [next_move]
+        trail.append(next_move)
+        print('stop')
     answer = 0
     return answer
 
