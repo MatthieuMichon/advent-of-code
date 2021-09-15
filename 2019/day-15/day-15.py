@@ -352,7 +352,7 @@ def solve_part_one(program: dict[int, int]) -> int:
     trail = [Movement.NORTH]
     outputs = []
     while len(outputs) == 0 or outputs[0] != StatusCodes.MOVED_GOT_OXYGEN:
-        while len(outputs) == 0:
+        while len(inputs) > 0 or len(outputs) == 0:
             instruction = program[pc]
             opcode, operand_modes = decode(instruction=instruction)
             load_modes = operand_modes[:ISA[opcode].load_args]
@@ -371,6 +371,7 @@ def solve_part_one(program: dict[int, int]) -> int:
             next_instruction_pointer = jump_next_instruction(
                 opcode=opcode, instruction_pointer=pc, operands=operands)
             pc = next_instruction_pointer
+        assert len(inputs) == 0
         last_move = trail[-1]
         if last_move == Movement.NORTH:
             target_position = (droid_position[0], droid_position[1] + 1)
