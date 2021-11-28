@@ -11,7 +11,6 @@ import logging
 import os
 import sys
 
-from collections import Counter
 from enum import IntEnum
 from types import SimpleNamespace as sn
 from typing import Iterator
@@ -163,10 +162,13 @@ def fetch(instruction_pointer: int, load_modes: list[int], ram: dict[int, int],
                 log.debug(f'argument {i}: mode {str(mode)}, value {contents}')
                 operands.append(contents)
             elif mode == Mode.POSITION:
-                log.debug(f'argument {i}: mode {str(mode)}, position {contents}, value {ram[contents]}')
+                log.debug(f'argument {i}: mode {str(mode)}, '
+                          f'position {contents}, value {ram[contents]}')
                 operands.append(ram[contents])
             elif mode == Mode.RELATIVE:
-                log.debug(f'argument {i}: mode {str(mode)}, position {relative_base + contents}, value {ram[relative_base + contents]}')
+                log.debug(f'argument {i}: mode {str(mode)}, '
+                          f'position {relative_base + contents}, '
+                          f'value {ram[relative_base + contents]}')
                 operands.append(ram[relative_base + contents])
             else:
                 raise Exception
@@ -291,13 +293,13 @@ def jump_next_instruction(opcode: int, instruction_pointer: int,
 
 # Solver Methods ---------------------------------------------------------------
 
-def compute_next_move(current_position, area_map, last_move) -> tuple:
+def compute_next_move(current_position, area_map, last_move) -> int:
     """Compute following movement depending on area map and last movement
 
-    :param current_position:
-    :param area_map:
-    :param last_move:
-    :return:
+    :param current_position: current position coordinates
+    :param area_map: map of known items
+    :param last_move: previous move direction
+    :return: direction of next move
     """
     next_move = None
     positions = {
@@ -344,6 +346,11 @@ def compute_next_move(current_position, area_map, last_move) -> tuple:
 
 
 def solve_part_one(program: dict[int, int]) -> int:
+    """Solve the first part of the challenge
+
+    :param program: program input in `IntCode` format
+    :return: expected challenge answer
+    """
     droid_position = (0, 0)
     area = {droid_position: 'D'}
     pc = 0
@@ -356,9 +363,10 @@ def solve_part_one(program: dict[int, int]) -> int:
             instruction = program[pc]
             opcode, operand_modes = decode(instruction=instruction)
             load_modes = operand_modes[:ISA[opcode].load_args]
-            log.debug(f'{pc=} {instruction=} {ISA[opcode]} {operand_modes=} {load_modes=}')
-            halt = ISA[opcode].name == 'Halt'
-            input_required = ISA[opcode].name == 'In' and len(inputs) == 0
+            log.debug(f'{pc=} {instruction=} {ISA[opcode]} {operand_modes=} '
+                      f'{load_modes=}')
+            # halt = ISA[opcode].name == 'Halt'
+            # input_required = ISA[opcode].name == 'In' and len(inputs) == 0
             operands = fetch(
                 instruction_pointer=pc, load_modes=load_modes, ram=program,
                 relative_base=rb, opcode=opcode, input_stack=inputs)
@@ -447,11 +455,11 @@ def main() -> int:
         contents = next(load_contents(filename=args.filename))
         answer = solve_part_one(program=contents)
         print(f'part one: {answer=}')
-    if compute_part_two:
-        contents = next(load_contents(filename=args.filename))
-        answer = 0
-        print(f'part two: {answer=}')
-        return EXIT_SUCCESS
+    # if compute_part_two:
+    #     contents = next(load_contents(filename=args.filename))
+    #     answer = 0
+    #     print(f'part two: {answer=}')
+    #     return EXIT_SUCCESS
 
 
 if __name__ == "__main__":
