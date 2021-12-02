@@ -10,9 +10,17 @@ Solutions in [Python][py] for the [Advent of Code][aoc] annual programming chall
 
 **Advent of Code** is an annual [Advent calendar][advent-calendar] of small programming puzzles that can be solved in any programming language, in this repository [Python 3][py] is used.
 
-Annual editions: [2020](#-2020-tropical-island-), [2019](#-2019-solar-system-), 2018, 2017, 2016, 2015.
+Annual editions: [2021](#-2021), [2020](#-2020-tropical-island-), [2019](#-2019-solar-system-), 2018, 2017, 2016, 2015.
 
-# 🎄🌟 [2020: Tropical Island](./2020/) 🎄🌟
+# 🎄🌟 [2021](./2020/) 🎄🌟
+
+> You're minding your own business on a ship at sea when the overboard alarm goes off! You rush to see if you can help. Apparently, one of the Elves tripped and accidentally sent the sleigh keys flying into the ocean!
+
+| 日 | 月 | 火 | 水 | 木 | 金 | 土
+|---|---|---|---|---|---|---
+| - | - | - | [1](./2021/day-1) | - | - | - |
+
+# 🎄🌟 [2020: Tropical Island](./2021/) 🎄🌟
 
 [![AoC 2020 Banner](./docs/aoc-2020-menu.png)](./2020)
 
