@@ -44,11 +44,8 @@ def solve_part_one(depths: [int]) -> int:
     :param depths: list of depth values
     :return: expected challenge answer
     """
-    answer = 0
-    for i, depth in enumerate(depths):
-        first_depth = i == 0
-        prev_depth = depths[0] if first_depth else depths[i-1]
-        answer += 1 if depth > prev_depth else 0
+    pairs = zip(depths[:-1], depths[1:])
+    answer = sum(a < b for a, b in pairs)
     return answer
 
 # Support Methods --------------------------------------------------------------
