@@ -99,6 +99,75 @@ Contents | Command | Answer
 --- | --- | ---
 [`input.txt`](./input.txt) | `./day-1.py input.txt -p 1` | `1292`
 
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Statement
+
+> Instead, consider sums of a three-measurement sliding window. Again considering the above example:
+> 
+> ```
+> 199  A      
+> 200  A B    
+> 208  A B C  
+> 210    B C D
+> 200  E   C D
+> 207  E F   D
+> 240  E F G  
+> 269    F G H
+> 260      G H
+> 263        H
+> ```
+> 
+> Start by comparing the first and second three-measurement windows. The measurements in the first window are marked A (199, 200, 208); their sum is 199 + 200 + 208 = 607. The second window is marked B (200, 208, 210); its sum is 618. The sum of measurements in the second window is larger than the sum of the first, so this first comparison increased.
+
+Idea is, instead of processing and slicing the list into a pair of integers, to compute two sets of three integers; do their sum and finally compare them. 
+
+> In the above example, the sum of each three-measurement window is as follows:
+> 
+> ```
+> A: 607 (N/A - no previous sum)
+> B: 618 (increased)
+> C: 618 (no change)
+> D: 617 (decreased)
+> E: 647 (increased)
+> F: 716 (increased)
+> G: 769 (increased)
+> H: 792 (increased)
+> ```
+> 
+> Consider sums of a three-measurement sliding window. How many sums are larger than the previous sum?
+
+This second part is not that different from the first one.
+
+## 🤔🤯 Puzzle Solver
+
+The following processing steps are required:
+
+- Convert the list of integers into a list of tuples by producing slices using `zip()` of three integers each one with an offset shifted by one, changing the range boundaries.
+- Convert a second time the list with all the range boundaries shifted by one: `depths[1:-2], depths[2:-1], depths[3:]` instead of `depths[:-3], depths[1:-2], depths[2:-1]`.
+- For both lists compute the sum for each tuple
+- Compare these sums like was done in part one.
+
+```python
+def solve_part_two(depths: [int]) -> int:
+    """Solve the second part of the challenge
+
+    :param depths: list of depth values
+    :return: expected challenge answer
+    """
+    baseline = zip(depths[:-3], depths[1:-2], depths[2:-1])
+    baseline_sums = (sum(i) for i in baseline)
+    sample = zip(depths[1:-2], depths[2:-1], depths[3:])
+    sample_sums = (sum(i) for i in sample)
+    pairs = zip(baseline_sums, sample_sums)
+    answer = sum(a < b for a, b in pairs)
+    return answer
+```
+
+Contents | Command | Answer
+--- | --- | ---
+[`input.txt`](./input.txt) | `./day-1.py input.txt -p 2` | `1262`
+
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
 [aoc-2021-1]: https://adventofcode.com/2021/day/1

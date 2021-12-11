@@ -12,7 +12,7 @@ Solutions in [Python][py] for the [Advent of Code][aoc] annual programming chall
 
 Annual editions: [2021](#-2021), [2020](#-2020-tropical-island-), [2019](#-2019-solar-system-), 2018, 2017, 2016, 2015.
 
-# 🎄🌟 [2021](./2020/) 🎄🌟
+# 🎄🌟 [2021](./2021/) 🎄🌟
 
 > You're minding your own business on a ship at sea when the overboard alarm goes off! You rush to see if you can help. Apparently, one of the Elves tripped and accidentally sent the sleigh keys flying into the ocean!
 

@@ -10,11 +10,8 @@ import argparse
 import logging
 import os
 import sys
-
-from enum import IntEnum
-from types import SimpleNamespace as sn
-from typing import Iterator
 from pathlib import Path
+from typing import Iterator
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +42,21 @@ def solve_part_one(depths: [int]) -> int:
     :return: expected challenge answer
     """
     pairs = zip(depths[:-1], depths[1:])
+    answer = sum(a < b for a, b in pairs)
+    return answer
+
+
+def solve_part_two(depths: [int]) -> int:
+    """Solve the second part of the challenge
+
+    :param depths: list of depth values
+    :return: expected challenge answer
+    """
+    baseline = zip(depths[:-3], depths[1:-2], depths[2:-1])
+    baseline_sums = (sum(i) for i in baseline)
+    sample = zip(depths[1:-2], depths[2:-1], depths[3:])
+    sample_sums = (sum(i) for i in sample)
+    pairs = zip(baseline_sums, sample_sums)
     answer = sum(a < b for a, b in pairs)
     return answer
 
@@ -90,18 +102,17 @@ def main() -> int:
     args = parse_arguments()
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
-    compute_part_one = not args.part or 1 == args.part
-    # compute_part_two = not args.part or 2 == args.part
+    contents = list(load_contents(filename=args.filename))
+    compute_part_one = not args.part or args.part == 1
     if compute_part_one:
-        contents = list(load_contents(filename=args.filename))
         answer = solve_part_one(depths=contents)
         print(f'part one: {answer=}')
-    # if compute_part_two:
-    #     contents = next(load_contents(filename=args.filename))
-    #     answer = 0
-    #     print(f'part two: {answer=}')
+    compute_part_two = not args.part or 2 == args.part
+    if compute_part_two:
+        answer = solve_part_two(depths=contents)
+        print(f'part two: {answer=}')
     return EXIT_SUCCESS
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())
