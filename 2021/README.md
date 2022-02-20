@@ -8,14 +8,14 @@ Annual editions in Python: **2021**, [2020](/2020), [2019](/2019).
 
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
-[1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - | - | ⭐ | ⭐
+[1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]| List manipulation | ⭐ | ⭐
 
 # Resources
 
 * [Advent of Code subreddit][reddit]
 
 [aoc]: https://adventofcode.com/
-[aoc-2019]: https://adventofcode.com/2021/
+[aoc-2021]: https://adventofcode.com/2021/
 [aoc-2021-1]: https://adventofcode.com/2021/day/1
 [aoc-2021-1]: https://adventofcode.com/2021/day/1
 [aoc-2021-2]: https://adventofcode.com/2021/day/2
@@ -45,8 +45,11 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two
 
 [py]: https://docs.python.org/3/
 
-[reddit]: https://www.reddit.com/r/adventofcode/
-
+[reddit-aoc]: https://www.reddit.com/r/adventofcode/
+[reddit-aoc-2021-1]: https://www.reddit.com/r66vow
+[reddit-aoc-2021-2]: https://www.reddit.com/r6zd93
+[reddit-aoc-2021-3]: https://www.reddit.com/r7r0ff
+[reddit-aoc-2021-4]: https://www.reddit.com/r8i1lq
 
 [w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
 [w-bitmap]: https://en.wikipedia.org/wiki/Bitmap

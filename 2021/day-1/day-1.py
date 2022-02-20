@@ -10,6 +10,7 @@ import argparse
 import logging
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Iterator
 
@@ -102,6 +103,7 @@ def main() -> int:
     args = parse_arguments()
     configure_logger(verbose=args.verbose)
     log.debug(f'Arguments: {args}')
+    start_time = time.perf_counter()
     contents = list(load_contents(filename=args.filename))
     compute_part_one = not args.part or args.part == 1
     if compute_part_one:
@@ -111,8 +113,11 @@ def main() -> int:
     if compute_part_two:
         answer = solve_part_two(depths=contents)
         print(f'part two: {answer=}')
+    elapsed_time = time.perf_counter() - start_time
+    print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
 
 
 if __name__ == '__main__':
     sys.exit(main())
+
