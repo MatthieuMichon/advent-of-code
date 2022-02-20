@@ -38,14 +38,22 @@ def load_contents(filename: Path) -> Iterator[tuple]:
 # Solver Methods ---------------------------------------------------------------
 
 
-def solve_part_one(depths: [int]) -> int:
+def solve_part_one(commands: tuple[str, int]) -> int:
     """Solve the first part of the challenge
 
-    :param depths: list of depth values
+    :param commands: list of commands
     :return: expected challenge answer
     """
-    pairs = zip(depths[:-1], depths[1:])
-    answer = sum(a < b for a, b in pairs)
+    forward_pos = 0
+    depth = 0
+    for command in commands:
+        if command[0] == 'forward':
+            forward_pos += command[1]
+        elif command[0] == 'down':
+            depth += command[1]
+        elif command[0] == 'up':
+            depth -= command[1]
+    answer = forward_pos * depth
     return answer
 
 
@@ -107,11 +115,11 @@ def main() -> int:
     configure_logger(verbose=args.verbose)
     log.debug(f'called with {args=}')
     start_time = time.perf_counter()
-    contents = list(load_contents(filename=args.filename))
+    contents = load_contents(filename=args.filename)
     compute_part_one = not args.part or args.part == 1
-    # if compute_part_one:
-    #     answer = solve_part_one(depths=contents)
-    #     print(f'part one: {answer=}')
+    if compute_part_one:
+        answer = solve_part_one(commands=contents)
+        print(f'part one: {answer=}')
     # compute_part_two = not args.part or 2 == args.part
     # if compute_part_two:
     #     answer = solve_part_two(depths=contents)

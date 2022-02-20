@@ -50,9 +50,9 @@ def load_contents(filename: Path) -> Iterator[tuple]:
 
 
 
-Contents | Command | Answer
---- | --- | ---
-[`input.txt`](./input.txt) | `./day-2.py input.txt -p 1` | ⏱
+Contents | Command | Answer | Time
+--- | --- | --- | ---
+[`input.txt`](./input.txt) | `./day-2.py input.txt -p 1` | `1480518` | 11.2 ms
 
 # 😰🙅 Part Two
 
