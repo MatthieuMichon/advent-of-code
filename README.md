@@ -18,7 +18,7 @@ Annual editions: [2021](#-2021), [2020](#-2020-tropical-island-), [2019](#-2019-
 
 | 日 | 月 | 火 | 水 | 木 | 金 | 土
 |---|---|---|---|---|---|---
-| - | - | - | [1](./2021/day-1) | - | - | - |
+| - | - | - | [1](./2021/day-1) | [2](./2021/day-2) | - | - |
 
 # 🎄🌟 [2020: Tropical Island](./2021/) 🎄🌟
 
@@ -51,6 +51,8 @@ Done solving all the puzzles of [Advent of Code 2020][aoc-2020]!
 * [Advent of Code subreddit](https://www.reddit.com/r/adventofcode/)
 * [Red Blob Games](https://www.redblobgames.com/): interactive visual explanations of math and algorithms
 * [Comprehensive walk-through](https://github.com/mebeim/aoc/blob/master/2020/README.md) by [Marco Bonelli](https://github.com/mebeim)
+* [Godbolt Compiler Explorer](https://godbolt.org/)
+
 
 [aoc]: https://adventofcode.com/
 [aoc-2020]: https://adventofcode.com/2020/

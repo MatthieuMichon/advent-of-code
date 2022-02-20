@@ -2,7 +2,7 @@
 
 """Advent of Code Programming Puzzles
 
-2021 Edition - Day 1
+2021 Edition - Day 2
 Puzzle Solution in Python
 """
 
@@ -23,15 +23,15 @@ LOG_FORMAT = '# %(msecs)-3d - %(funcName)-16s - %(levelname)-8s - %(message)s'
 # Common Methods ---------------------------------------------------------------
 
 
-def load_contents(filename: Path) -> Iterator[int]:
+def load_contents(filename: Path) -> Iterator[tuple]:
     """Load and convert contents from file
 
     :param filename: input filename
-    :return: iterator yielding integers
+    :return: iterator
     """
-    lines = iter(open(filename).read().strip().split(os.linesep))
-    for line in lines:
-        yield int(line)
+    for line in open(filename).readlines():
+        items = line.split()
+        yield items[0], int(items[1])
     log.debug(f'Reached end of {filename=}')
 
 
@@ -105,17 +105,17 @@ def main() -> int:
     """
     args = parse_arguments()
     configure_logger(verbose=args.verbose)
-    log.debug(f'Arguments: {args}')
+    log.debug(f'called with {args=}')
     start_time = time.perf_counter()
     contents = list(load_contents(filename=args.filename))
     compute_part_one = not args.part or args.part == 1
-    if compute_part_one:
-        answer = solve_part_one(depths=contents)
-        print(f'part one: {answer=}')
-    compute_part_two = not args.part or 2 == args.part
-    if compute_part_two:
-        answer = solve_part_two(depths=contents)
-        print(f'part two: {answer=}')
+    # if compute_part_one:
+    #     answer = solve_part_one(depths=contents)
+    #     print(f'part one: {answer=}')
+    # compute_part_two = not args.part or 2 == args.part
+    # if compute_part_two:
+    #     answer = solve_part_two(depths=contents)
+    #     print(f'part two: {answer=}')
     elapsed_time = time.perf_counter() - start_time
     print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
