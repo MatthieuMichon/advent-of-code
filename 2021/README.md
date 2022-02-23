@@ -9,7 +9,7 @@ Annual editions in Python: **2021**, [2020](/2020), [2019](/2019).
 Day | Puzzle Title | Links | Topics | Part One | Part Two
 --- | --- | --- | --- | --- | --- |
 [1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]| List manipulation | ⭐ | ⭐
-[2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| ⏱ | ⏱ | ⏱
+[2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| List iteration | ⭐ | ⭐
 
 # Resources
 

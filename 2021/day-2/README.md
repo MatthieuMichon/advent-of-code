@@ -14,6 +14,8 @@ Solution in [Python][py] for the [day 2 puzzle][aoc-2021-2] of the [2021 edition
 > 
 > Calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?
 
+According to this statement, this first part is quite straightforward.
+
 ## 💾🔍 Content Decoding
 
 Opening the input contents file, we notice that each line starts with command followed by a quantity.
@@ -48,7 +50,25 @@ def load_contents(filename: Path) -> Iterator[tuple]:
 
 ## 💡🙋 Implementation
 
+```python
+def solve_part_one(commands: Iterator[tuple]) -> int:
+    """Solve the first part of the challenge
 
+    :param commands: list of commands
+    :return: expected challenge answer
+    """
+    forward_pos = 0
+    depth = 0
+    for command in commands:
+        if command[0] == 'forward':
+            forward_pos += command[1]
+        elif command[0] == 'down':
+            depth += command[1]
+        elif command[0] == 'up':
+            depth -= command[1]
+    answer = forward_pos * depth
+    return answer
+```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
@@ -58,14 +78,51 @@ Contents | Command | Answer | Time
 
 ## 🥺👉👈 Annotated Statement
 
+> In addition to horizontal position and depth, you'll also need to track a third value, aim, which also starts at 0. The commands also mean something entirely different from you first thought:
+>
+> ```
+>    down X increases your aim by X units.
+>    up X decreases your aim by X units.
+>    forward X does two things:
+>        It increases your horizontal position by X units.
+>        It increases your depth by your aim multiplied by X.
+> ```
 
+Suspiciously easy for a part two!
+
+> Again note that since you're on a submarine, down and up do the opposite of what you might expect: "down" means aiming in the positive direction.
+
+> Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?
+
+Same method for computing the answer as in part one.
 
 ## 🤔🤯 Puzzle Solver
 
+```python
+def solve_part_two(commands: Iterator[tuple]) -> int:
+    """Solve the second part of the challenge
 
-Contents | Command | Answer
---- | --- | ---
-[`input.txt`](./input.txt) | `./day-2.py input.txt -p 2` | ⏱
+    :param commands: list of commands
+    :return: expected challenge answer
+    """
+    forward_pos = 0
+    depth = 0
+    aim = 0
+    for command in commands:
+        if command[0] == 'forward':
+            forward_pos += command[1]
+            depth += aim * command[1]
+        elif command[0] == 'down':
+            aim += command[1]
+        elif command[0] == 'up':
+            aim -= command[1]
+    answer = forward_pos * depth
+    return answer
+```
+
+Contents | Command | Answer | Time
+--- | --- | --- | ---
+[`input.txt`](./input.txt) | `./day-2.py input.txt -p 2` | `1282809906` | 22.5 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
