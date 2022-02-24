@@ -6,10 +6,11 @@ Annual editions in Python: **2021**, [2020](/2020), [2019](/2019).
 
 > Santa has become stranded at the edge of the Solar System while delivering presents to other planets! To accurately calculate his position in space, safely align his warp drive, and return to Earth in time to save Christmas, he needs you to bring him *measurements* from fifty stars.
 
-Day | Puzzle Title | Links | Topics | Part One | Part Two
---- | --- | --- | --- | --- | --- |
-[1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]| List manipulation | ⭐ | ⭐
-[2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| List iteration | ⭐ | ⭐
+Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
+--- | --- | --- | --- | --- | --- | ---
+[1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]| List manipulation | ⭐ | ⭐ | 20.8 ms
+[2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| List iteration | ⭐ | ⭐ | 23.2 ms
+[3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| ⏱ | ⭐ | ⏱ | ⏱
 
 # Resources
 
