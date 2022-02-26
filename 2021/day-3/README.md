@@ -127,12 +127,65 @@ Contents | Command | Answer | Time
 
 ## 🥺👉👈 Annotated Statement
 
+> Next, you should verify the life support rating, which can be determined by multiplying the oxygen generator rating by the CO2 scrubber rating.
+
+Two new variables are added to the mix.
+
+```python
+def solve_part_two(diagnostic_report: Iterator[tuple]) -> int:
+    ...
+    answer = oxygen_generator_rating * co2_scrubber_rating
+    return answer
+```
+
+> Before searching for either rating value, start with the full list of binary numbers from your diagnostic report and consider just the first bit of those numbers. Then:
+> 
+> - Keep only numbers selected by the bit criteria for the type of rating value for which you are searching. Discard numbers which do not match the bit criteria.
+> - If you only have one number left, stop; this is the rating value for which you are searching.
+> - Otherwise, repeat the process, considering the next bit to the right.
+
+Compared to part one, the main difference is that the most and least common bit must be re-computed with the remaining numbers.
+
 ## 🤔🤯 Puzzle Solver
 
+An easy solution is to narrow down on the number matching most bits and least bits in separate loops. 
+
+```python
+def solve_part_two(diagnostic_report: Iterator[tuple]) -> int:
+    """Solve the first part of the challenge
+
+    :param diagnostic_report: binary numbers
+    :return: expected challenge answer
+    """
+    numbers = set(diagnostic_report)
+    for bit_index, _ in enumerate(zip(*numbers)):
+        bits = list(zip(*numbers))[bit_index]
+        values = Counter(bits).most_common()
+        if len(values) == 1:
+            break
+        most_common =\
+            values[0][0] if values[0][1] > values[1][1] else '1'
+        numbers = set(number for number in numbers if number[bit_index] == most_common)
+    oxygen_generator_rating = int(''.join(numbers.pop()), 2)
+    numbers = set(diagnostic_report)
+    for bit_index, _ in enumerate(zip(*numbers)):
+        bits = list(zip(*numbers))[bit_index]
+        values = Counter(bits).most_common()
+        if len(values) == 1:
+            break
+        least_common =\
+            values[1][0] if values[0][1] > values[1][1] else '0'
+        numbers = set(number for number in numbers if number[bit_index] == least_common)
+    co2_scrubber_rating = int(''.join(numbers.pop()), 2)
+    answer = oxygen_generator_rating * co2_scrubber_rating
+    return answer
+```
+
+There is room for improvement has this method could be nearly completely factorized.
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-3.py input.txt -p 2` | `TBD` | TBD
+[`input.txt`](./input.txt) | `./day-3.py input.txt -p 2` | `1007985` | 36.9 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/

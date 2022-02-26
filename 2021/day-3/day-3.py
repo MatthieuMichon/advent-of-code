@@ -56,13 +56,33 @@ def solve_part_one(diagnostic_report: Iterator[tuple]) -> int:
     return answer
 
 
-def solve_part_two(commands: Iterator[tuple]) -> int:
-    """Solve the second part of the challenge
+def solve_part_two(diagnostic_report: Iterator[tuple]) -> int:
+    """Solve the first part of the challenge
 
-    :param commands: list of commands
+    :param diagnostic_report: binary numbers
     :return: expected challenge answer
     """
-    answer = 0
+    numbers = set(diagnostic_report)
+    for bit_index, _ in enumerate(zip(*numbers)):
+        bits = list(zip(*numbers))[bit_index]
+        values = Counter(bits).most_common()
+        if len(values) == 1:
+            break
+        most_common =\
+            values[0][0] if values[0][1] > values[1][1] else '1'
+        numbers = set(number for number in numbers if number[bit_index] == most_common)
+    oxygen_generator_rating = int(''.join(numbers.pop()), 2)
+    numbers = set(diagnostic_report)
+    for bit_index, _ in enumerate(zip(*numbers)):
+        bits = list(zip(*numbers))[bit_index]
+        values = Counter(bits).most_common()
+        if len(values) == 1:
+            break
+        least_common =\
+            values[1][0] if values[0][1] > values[1][1] else '0'
+        numbers = set(number for number in numbers if number[bit_index] == least_common)
+    co2_scrubber_rating = int(''.join(numbers.pop()), 2)
+    answer = oxygen_generator_rating * co2_scrubber_rating
     return answer
 
 
@@ -114,10 +134,10 @@ def main() -> int:
     if compute_part_one:
         answer = solve_part_one(diagnostic_report=contents)
         print(f'part one: {answer=}')
-    # compute_part_two = not args.part or 2 == args.part
-    # if compute_part_two:
-    #     answer = solve_part_two(commands=contents)
-    #     print(f'part two: {answer=}')
+    compute_part_two = not args.part or 2 == args.part
+    if compute_part_two:
+        answer = solve_part_two(diagnostic_report=contents)
+        print(f'part two: {answer=}')
     elapsed_time = time.perf_counter() - start_time
     print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
