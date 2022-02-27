@@ -189,7 +189,7 @@ Contents | Command | Answer | Time
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
-[aoc-2021-1]: https://adventofcode.com/2021/day/1
+[aoc-2021-3]: https://adventofcode.com/2021/day/3
 [py]: https://docs.python.org/3/
 
 [py-argparse]: https://docs.python.org/3/library/argparse.html
