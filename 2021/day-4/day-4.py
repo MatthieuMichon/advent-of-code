@@ -55,14 +55,34 @@ def load_contents(filename: Path) -> tuple[Iterator, list]:
 def solve_part_one(contents: tuple[Iterator, list]) -> int:
     """Solve the first part of the challenge
 
-    :param diagnostic_report: called numbers and bingo grids
+    :param contents: called numbers and bingo grids
     :return: expected challenge answer
     """
     called_numbers, grids = contents
-    unmarked_numbers = {0}
+    processed_grids = []
+    for grid in grids:
+        rows = [set(row) for row in grid]
+        rows.extend((set(row) for row in list(zip(*grid))))
+        processed_grids.append(rows)
+    unmarked_numbers:set[int] = {0}
     for called_number in called_numbers:
-        ...
-    answer = called_number * sum(unmarked_numbers)
+        for i, grid in enumerate(processed_grids):
+            bingo = False
+            for j, row in enumerate(grid):
+                if called_number not in row:
+                    continue
+                processed_grids[i][j] = row - {called_number}
+                if not processed_grids[i][j]:
+                    processed_grids[i].pop(j)
+                    bingo = True
+            if bingo:
+                unmarked_numbers = {n for row in processed_grids[i] for n in row}
+                break
+        else:
+            continue
+        break
+    sum_unmarked_numbers = sum(unmarked_numbers)
+    answer = called_number * sum_unmarked_numbers
     return answer
 
 
@@ -142,13 +162,13 @@ def main() -> int:
     contents = load_contents(filename=args.filename)
     compute_part_one = not args.part or args.part == 1
     if compute_part_one:
-        answer = solve_part_one(contents=contents)
-        print(f'part one: {answer=}')
-    compute_part_two = not args.part or 2 == args.part
-    if compute_part_two:
-        answer = solve_part_two(diagnostic_report=contents)
-        print(f'part two: {answer=}')
+        answer_part_one = solve_part_one(contents=contents)
+    # compute_part_two = not args.part or 2 == args.part
+    # if compute_part_two:
+    #     answer = solve_part_two(diagnostic_report=contents)
+    #     print(f'part two: {answer=}')
     elapsed_time = time.perf_counter() - start_time
+    print(f'{answer_part_one=}')
     print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
 

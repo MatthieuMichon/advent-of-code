@@ -105,16 +105,40 @@ def solve_part_one(contents: tuple[Iterator, list]) -> int:
     :return: expected challenge answer
     """
     called_numbers, grids = contents
+    called_numbers = 0
     unmarked_numbers = {0}
     for called_number in called_numbers:
         ...
-    answer = called_number * sum(unmarked_numbers)
+    sum_unmarked_numbers = sum(unmarked_numbers)
+    answer = called_number * sum_unmarked_numbers
     return answer
 ```
 
+The inner loop must iterate over all grids. These grids must contain columns and rows which are updated by removing called numbers.
+
+```python
+    for called_number in called_numbers:
+        for i, grid in enumerate(processed_grids):
+            bingo = False
+            for j, row in enumerate(grid):
+                if called_number not in row:
+                    continue
+                processed_grids[i][j] = row - {called_number}
+                if not processed_grids[i][j]:
+                    processed_grids[i].pop(j)
+                    bingo = True
+            if bingo:
+                unmarked_numbers = {n for row in processed_grids[i] for n in row}
+                break
+        else:
+            continue
+        break
+```
+
+
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-4.py input.txt -p 1` | `-` | -
+[`input.txt`](./input.txt) | `./day-4.py input.txt -p 1` | `35711` | 62.5 ms
 
 # 😰🙅 Part Two
 
