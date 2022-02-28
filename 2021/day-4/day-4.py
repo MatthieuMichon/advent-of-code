@@ -22,37 +22,47 @@ LOG_FORMAT = '# %(msecs)-3d - %(funcName)-16s - %(levelname)-8s - %(message)s'
 
 # Common Methods ---------------------------------------------------------------
 
+BINGO_GRID_SIZE = 5
 
-def load_contents(filename: Path) -> object:
+
+def load_contents(filename: Path) -> tuple[Iterator, list]:
     """Load and convert contents from file
 
     :param filename: input filename
-    :return: TBD
+    :return: called numbers and bingo grids
     """
     lines = iter(open(filename).readlines())
-    numbers:list[int] = [int(token) for token in next(lines).split(',')]
+    called_numbers:Iterator[int] = (int(token) for token in next(lines).split(','))
+    bingo_grids = []
+    bingo_grid = []
+    for line in lines:
+        short_line = len(line) < BINGO_GRID_SIZE
+        if short_line:
+            continue
+        row_numbers = {int(token) for token in line.strip().split()}
+        bingo_grid.append(row_numbers)
+        grid_complete = len(bingo_grid) == BINGO_GRID_SIZE
+        if grid_complete:
+            bingo_grids.append(bingo_grid)
+            bingo_grid = []
     log.debug(f'Reached end of {filename=}')
+    return called_numbers, bingo_grids
 
 
 # Solver Methods ---------------------------------------------------------------
 
 
-def solve_part_one(diagnostic_report: Iterator[tuple]) -> int:
+def solve_part_one(contents: tuple[Iterator, list]) -> int:
     """Solve the first part of the challenge
 
-    :param diagnostic_report: binary numbers
+    :param diagnostic_report: called numbers and bingo grids
     :return: expected challenge answer
     """
-    diagnostic_report = tuple(zip(*diagnostic_report))
-    gamma_rate = ''
-    epsilon_rate = ''
-    for bits in diagnostic_report:
-        values = Counter(bits)
-        gamma_rate += str(values.most_common()[0][0])
-        epsilon_rate += str(values.most_common()[1][0])
-    gamma_rate = int(gamma_rate, 2)
-    epsilon_rate = int(epsilon_rate, 2)
-    answer = gamma_rate * epsilon_rate
+    called_numbers, grids = contents
+    unmarked_numbers = {0}
+    for called_number in called_numbers:
+        ...
+    answer = called_number * sum(unmarked_numbers)
     return answer
 
 
@@ -129,10 +139,10 @@ def main() -> int:
     configure_logger(verbose=args.verbose)
     log.debug(f'called with {args=}')
     start_time = time.perf_counter()
-    contents = list(load_contents(filename=args.filename))
+    contents = load_contents(filename=args.filename)
     compute_part_one = not args.part or args.part == 1
     if compute_part_one:
-        answer = solve_part_one(diagnostic_report=contents)
+        answer = solve_part_one(contents=contents)
         print(f'part one: {answer=}')
     compute_part_two = not args.part or 2 == args.part
     if compute_part_two:

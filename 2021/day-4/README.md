@@ -47,9 +47,70 @@ The first part of the contents is a list of integers separated by a comma. Build
 
 ```python
 lines = iter(open(filename).readlines())
-numbers:list[int] = [int(token) for token in next(lines).split(',')]
+called_numbers:Iterator[int] = (int(token) for token in next(lines).split(','))
 ```
 
+The following part consists in iterating over the remaining lines building a list of bingo grids.
+
+```python
+for line in lines:
+    short_line = len(line) < BINGO_GRID_SIZE
+    if short_line:
+        continue
+    row_numbers = {int(token) for token in line.strip().split()}
+    bingo_grid.append(row_numbers)
+    grid_complete = len(bingo_grid) == BINGO_GRID_SIZE
+    if grid_complete:
+        bingo_grids.append(bingo_grid)
+        bingo_grid = []
+```
+
+The complete `load_contents()` method being:
+
+```python
+def load_contents(filename: Path) -> tuple[Iterator, list]:
+    """Load and convert contents from file
+
+    :param filename: input filename
+    :return: called numbers and bingo grids
+    """
+    lines = iter(open(filename).readlines())
+    called_numbers:Iterator[int] = (
+        int(token) for token in next(lines).split(','))
+    bingo_grids = []
+    bingo_grid = []
+    for line in lines:
+        short_line = len(line) < BINGO_GRID_SIZE
+        if short_line:
+            continue
+        row_numbers = {int(token) for token in line.strip().split()}
+        bingo_grid.append(row_numbers)
+        grid_complete = len(bingo_grid) == BINGO_GRID_SIZE
+        if grid_complete:
+            bingo_grids.append(bingo_grid)
+            bingo_grid = []
+    log.debug(f'Reached end of {filename=}')
+    return called_numbers, bingo_grids
+```
+
+## 💡🙋 Implementation
+
+Working from the end, the answer is the product of the called numbered by the sum of all the unmarked numbers.
+
+```python
+def solve_part_one(contents: tuple[Iterator, list]) -> int:
+    """Solve the first part of the challenge
+
+    :param diagnostic_report: called numbers and bingo grids
+    :return: expected challenge answer
+    """
+    called_numbers, grids = contents
+    unmarked_numbers = {0}
+    for called_number in called_numbers:
+        ...
+    answer = called_number * sum(unmarked_numbers)
+    return answer
+```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
