@@ -10,8 +10,8 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 --- | --- | --- | --- | --- | --- | ---
 [1](/2021/day-1) | Sonar Sweep | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]| List manipulation | ⭐ | ⭐ | 20.8 ms
 [2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| List iteration | ⭐ | ⭐ | 23.2 ms
-[3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| List iteration | ⭐ | ⭐⭐ | 46.4 ms
-[4](/2021/day-4) | Giant Squid | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]| ⭐ | - | - | -
+[3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| List iteration | ⭐ | ⭐ | 46.4 ms
+[4](/2021/day-4) | Giant Squid | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]| Data structure iteration | ⭐ | ⭐⭐ | 137.7 ms
 
 
 # Resources

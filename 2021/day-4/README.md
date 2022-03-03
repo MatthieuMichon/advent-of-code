@@ -135,7 +135,6 @@ The inner loop must iterate over all grids. These grids must contain columns and
         break
 ```
 
-
 Contents | Command | Answer | Time
 --- | --- | --- | ---
 [`input.txt`](./input.txt) | `./day-4.py input.txt -p 1` | `35711` | 62.5 ms
@@ -144,8 +143,99 @@ Contents | Command | Answer | Time
 
 ## 🥺👉👈 Annotated Statement
 
+> You aren't sure how many bingo boards a giant squid could play at once, so rather than waste time counting its arms, the safe thing to do is to figure out which board will win last and choose that one. That way, no matter which boards it picks, it will win for sure.
+
+Goal is to find the last board to win.
 
 ## 🤔🤯 Puzzle Solver
+
+Instead of stopping on the first bingo call, the goal is to keep continuing and keeping track of the last card that did bingo, and the corresponding called number.
+
+```python
+def solve_part_two(contents: Iterator[tuple]) -> int:
+    """Solve the first part of the challenge
+
+    :param diagnostic_report: binary numbers
+    :return: expected challenge answer
+    """
+    """Solve the first part of the challenge
+
+    :param contents: called numbers and bingo grids
+    :return: expected challenge answer
+    """
+    called_numbers, grids = contents
+    processed_grids = []
+    for grid in grids:
+        rows = [set(row) for row in grid]
+        rows.extend((set(row) for row in list(zip(*grid))))
+        processed_grids.append(rows)
+    unmarked_numbers:set[int] = {0}
+    for called_number in called_numbers:
+        for i, grid in enumerate(processed_grids):
+            bingo = False
+            for j, row in enumerate(grid):
+                if called_number not in row:
+                    continue
+                processed_grids[i][j] = row - {called_number}
+                if not processed_grids[i][j]:
+                    processed_grids[i].pop(j)
+                    bingo = True
+                    break
+            if bingo:
+                unmarked_numbers = {n for row in processed_grids[i] for n in row}
+                processed_grids.pop(i)
+                last_called_number = called_number
+    sum_unmarked_numbers = sum(unmarked_numbers)
+    answer = last_called_number * sum_unmarked_numbers
+    return answer
+```
+
+This implementation turned out to be flawed. Two issues were present:
+
+- Using a set [for](py-set) the rows is correct in the sense that no duplicates are expected, however this storage type does not preserve the order. As a result the rotatation of the array using `list(zip(*grid)))` no longer produces correct results.
+- The iteration of the `processed_grids` contains an operation which affect its contents by deleting an entry after a bingo event.
+
+The correct implementation ending up being:
+
+```python
+def solve_part_two(contents: tuple[list, list]) -> int:
+    """Solve the second part of the challenge
+
+    :param contents: called numbers and bingo grids
+    :return: expected challenge answer
+    """
+    called_numbers, grids = contents
+    processed_grids = {}
+    for i, grid in enumerate(grids):
+        rows = [set(row) for row in grid]
+        rows.extend((set(row) for row in list(zip(*grid))))
+        processed_grids[i] = rows
+    unmarked_numbers:set[int] = {0}
+    for called_number in called_numbers:
+        for i, egrid in enumerate(grids):
+            if i not in processed_grids:
+                continue
+            bingo = False
+            for j, row in enumerate(processed_grids[i]):
+                if called_number not in row:
+                    continue
+                processed_grids[i][j] = row - {called_number}
+                if not len(processed_grids[i][j]):
+                    processed_grids[i].pop(j)
+                    bingo = True
+                    break
+            if bingo:
+                unmarked_numbers = {n for row in processed_grids[i] for n in row}
+                processed_grids.pop(i)
+                last_called_number = called_number
+    sum_unmarked_numbers = sum(unmarked_numbers)
+    answer = last_called_number * sum_unmarked_numbers
+    return answer
+```
+
+Contents | Command | Answer | Time
+--- | --- | --- | ---
+[`input.txt`](./input.txt) | `./day-4.py input.txt -p 2` | `5586` | 101.0 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
