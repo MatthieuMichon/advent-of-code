@@ -73,9 +73,50 @@ Position | Type | Regex
 
 Parsing these tokens can be done a number of ways:
 
-- regex matching following by a string to int conversion
-- splitting using whitespace; discarding the token `->` at position #2; then the string to int conversion
+* regex matching:
+  * match the complete line against a regex
+  * apply a string to int conversion on all four integers
 
+```python
+import re
+...
+REGEX = r'(\d+),(\d+) -> (\d+),(\d+)'
+...
+    for line in iter(open(filename).readlines()):
+        m = re.search(pattern=REGEX, string=line)
+        integers = [int(t) for t in m.groups()]
+        yield tuple(integers[0:2]), tuple(integers[2:4])
+```
+
+* tokenization:
+  * substitute comas by whitespaces
+  * split the string between whitespaces
+  * discarding the token `->` at position #2 
+  * apply a string to int conversion on all four integers
+
+```python
+    for line in iter(open(filename).readlines()):
+        tokens = line.strip().replace(',', ' ').split(' ')
+        tokens.pop(2)
+        integers = [int(t) for t in tokens]
+        yield tuple(integers[0:2]), tuple(integers[2:4])
+```
+
+Comparing the runtime of both implementations, the solution relying on [`split()`][py-split] takes around 30 % less time. The complete method being:
+
+```python
+def load_contents_token(filename: Path) -> tuple[tuple, tuple]:
+    """Load and convert contents from file
+
+    :param filename: input filename
+    :return: coordinates
+    """
+    for line in iter(open(filename).readlines()):
+        tokens = line.strip().replace(',', ' ').split(' ')
+        tokens.pop(2)
+        integers = [int(t) for t in tokens]
+        yield tuple(integers[0:2]), tuple(integers[2:4])
+```
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
