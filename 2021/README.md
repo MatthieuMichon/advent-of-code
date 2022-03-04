@@ -12,7 +12,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [2](/2021/day-2) | Dive! | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]| List iteration | ⭐ | ⭐ | 23.2 ms
 [3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| List iteration | ⭐ | ⭐ | 46.4 ms
 [4](/2021/day-4) | Giant Squid | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]| Data structure iteration | ⭐ | ⭐⭐ | 137.7 ms
-
+[5](/2021/day-5) | Hydrothermal Venture | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]| - | - | - | -
 
 # Resources
 
@@ -54,6 +54,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [reddit-aoc-2021-2]: https://www.reddit.com/r6zd93
 [reddit-aoc-2021-3]: https://www.reddit.com/r7r0ff
 [reddit-aoc-2021-4]: https://www.reddit.com/r8i1lq
+[reddit-aoc-2021-5]: https://www.reddit.com/r9824c
 
 [w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
 [w-bitmap]: https://en.wikipedia.org/wiki/Bitmap
