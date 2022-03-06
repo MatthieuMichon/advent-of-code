@@ -269,7 +269,7 @@ JUMP_ABSOLUTE            6 (to 12)
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_5.py input.txt -p 1` | `6841` | 745.3 ms
+[`input.txt`](./input.txt) | `./day_5.py input.txt -p 1` | `6841` | ~745.3~ 686.9 ms
 
 # 😰🙅 Part Two
 
