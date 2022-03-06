@@ -55,7 +55,25 @@ Such a diagram will also be handy for debug purposes.
 
 ## 💾🔍 Content Decoding
 
-The input contents are composed of number of independent lines, which was also the case for the prior puzzles of 2021. Also like for prior puzzles, the contents is handled on a per-line basis using [`readlines()`][py-readlines].
+The input contents are composed of number of independent lines, which was also the case for the prior puzzles of 2021.
+
+```
+217,490 -> 217,764
+44,270 -> 373,599
+440,139 -> 440,303
+161,663 -> 345,663
+```
+
+The goal is to obtain an efficient structure for storing these data, such as:
+
+```python
+((217, 490), (217, 764))
+((44, 270), (373, 599))
+((440, 139), (440, 303))
+((161, 663), (345, 663))
+```
+
+Also like for prior puzzles, the contents is handled on a per-line basis using [`readlines()`][py-readlines].
 
 ```python
 lines = iter(open(filename).readlines())
@@ -117,6 +135,13 @@ def load_contents_token(filename: Path) -> tuple[tuple, tuple]:
         integers = [int(t) for t in tokens]
         yield tuple(integers[0:2]), tuple(integers[2:4])
 ```
+
+## 💡🙋 Implementation
+
+The puzzle states that each set of coordinate represents a vertical or horizontal line. Implementing this processing requires locating the common axis and walking the points between the line ends. 
+
+
+
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
