@@ -138,10 +138,68 @@ def load_contents_token(filename: Path) -> tuple[tuple, tuple]:
 
 ## 💡🙋 Implementation
 
+One of the most important aspects of software design is selecting an appropriate structure for storing data. For instance the problem deals with a number of points which can be crossed by a number of segments. This requires a direct access to arbitrary points, thus calling for a map-like structure which is the [`dict`][py-dict] in Python with the key being the coordinates and the value being the number of crossed segments.
+
+Before going any further we can already write a debug method drawing the diagram as shown in the puzzle statement.
+
+```python
+def draw_diagram(coordinates: dict) -> None:
+    """Draw diagram of each coordinates
+
+    :param coordinates: map of points
+    :return: nothing
+    """
+    points = coordinates.keys()
+    start_col = min(col for col, row in points)
+    end_col = max(col for col, row in points)
+    start_row = min(row for col, row in points)
+    end_row = max(row for col, row in points)
+    for row in range(start_row, 1 + end_row):
+        line = ''
+        for col in range(start_col, 1 + end_col):
+            if (col, row) not in points:
+                line += '.'
+            else:
+                line += str(coordinates[(col, row)])
+        print(line)
+```
+
 The puzzle states that each set of coordinate represents a vertical or horizontal line. Implementing this processing requires locating the common axis and walking the points between the line ends. 
 
+```python
+def solve_part_one(contents: any) -> int:
+    """Solve the first part of the challenge
 
+    :param contents: input puzzle contents
+    :return: expected challenge answer
+    """
+    coordinates = defaultdict(int)
+    for segment in contents:
+        horizontal_segment = segment[0][0] == segment[1][0]
+        vertical_segment = segment[0][1] == segment[1][1]
+        if horizontal_segment:
+            start_col = min(segment[0][1], segment[1][1])
+            end_col = max(segment[0][1], segment[1][1])
+            for col in range(start_col, 1 + end_col):
+                point = (segment[0][0], col)
+                coordinates[point] += 1
+        elif vertical_segment:
+            start_row = min(segment[0][0], segment[1][0])
+            end_row = max(segment[0][0], segment[1][0])
+            for row in range(start_row, 1 + end_row):
+                point = (row, segment[0][1])
+                coordinates[point] += 1
+        else:
+            continue
+    #draw_diagram(coordinates=coordinates)
+    overlaps = Counter(coordinates)
+    answer = sum(1 for i in list(overlaps.values()) if i >= 2)
+    return answer
+```
 
+Contents | Command | Answer | Time
+--- | --- | --- | ---
+[`input.txt`](./input.txt) | `./day_5.py input.txt -p 1` | `6841` | 745.3 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
