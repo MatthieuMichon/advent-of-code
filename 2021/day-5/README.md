@@ -248,22 +248,23 @@ def solve_part_one(contents: any) -> int:
 Checking the byte-code we clearly see that performing the `x = segment[0][0]` and `y = segment[0][1]` yields differences in the byte-code. For the latter operation:
 
 ```diff
- 23         264 LOAD_FAST                1 (coordinates)
-            266 LOAD_FAST               12 (row)
-            268 LOAD_FAST                2 (segment)
- -           270 LOAD_CONST               1 (0)
- -           272 BINARY_SUBSCR
- -           274 LOAD_CONST               2 (1)
- -           276 BINARY_SUBSCR
-            278 BUILD_TUPLE              2
-            280 DUP_TOP_TWO
-            282 BINARY_SUBSCR
-            284 LOAD_CONST               2 (1)
-            286 INPLACE_ADD
-            288 ROT_THREE
-            290 STORE_SUBSCR
-            292 JUMP_ABSOLUTE          130 (to 260)
-        >>  294 JUMP_ABSOLUTE            6 (to 12)
+LOAD_FAST                1 (coordinates)
+LOAD_FAST               12 (row)
+-LOAD_FAST                2 (segment)
+-LOAD_CONST               1 (0)
+-BINARY_SUBSCR
+-LOAD_CONST               2 (1)
++LOAD_FAST               11 (y)
+BINARY_SUBSCR
+BUILD_TUPLE              2
+DUP_TOP_TWO
+BINARY_SUBSCR
+LOAD_CONST               2 (1)
+INPLACE_ADD
+ROT_THREE
+STORE_SUBSCR
+JUMP_ABSOLUTE          130 (to 260)
+JUMP_ABSOLUTE            6 (to 12)
 ```
 
 Contents | Command | Answer | Time
