@@ -69,21 +69,19 @@ def solve_part_one(contents: any) -> int:
     coordinates = defaultdict(int)
     for segment in contents:
         horizontal_segment = segment[0][0] == segment[1][0]
-        vertical_segment = segment[0][1] == segment[1][1]
+        vertical_segment = not horizontal_segment and segment[0][1] == segment[1][1]
         if horizontal_segment:
             start_col = min(segment[0][1], segment[1][1])
             end_col = max(segment[0][1], segment[1][1])
+            x = segment[0][0]
             for col in range(start_col, 1 + end_col):
-                point = (segment[0][0], col)
-                coordinates[point] += 1
+                coordinates[(x, col)] += 1
         elif vertical_segment:
             start_row = min(segment[0][0], segment[1][0])
             end_row = max(segment[0][0], segment[1][0])
+            y = segment[0][1]
             for row in range(start_row, 1 + end_row):
-                point = (row, segment[0][1])
-                coordinates[point] += 1
-        else:
-            continue
+                coordinates[(row, y)] += 1
     #draw_diagram(coordinates=coordinates)
     overlaps = Counter(coordinates)
     answer = sum(1 for i in list(overlaps.values()) if i >= 2)

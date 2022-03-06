@@ -136,6 +136,23 @@ def load_contents_token(filename: Path) -> tuple[tuple, tuple]:
         yield tuple(integers[0:2]), tuple(integers[2:4])
 ```
 
+Running `pylint` on the script yielded a number of issues, some of which required changing the  `load_contents()` method:
+
+```python
+def load_contents(filename: Path) -> tuple[tuple, tuple]:
+    """Load and convert contents from file
+
+    :param filename: input filename
+    :return: coordinates
+    """
+    with open(filename, encoding='UTF-8') as buffer:
+        for line in iter(buffer.readlines()):
+            tokens = line.strip().replace(',', ' ').split(' ')
+            tokens.pop(2)
+            integers = [int(t) for t in tokens]
+            yield tuple(integers[0:2]), tuple(integers[2:4])
+```
+
 ## 💡🙋 Implementation
 
 One of the most important aspects of software design is selecting an appropriate structure for storing data. For instance the problem deals with a number of points which can be crossed by a number of segments. This requires a direct access to arbitrary points, thus calling for a map-like structure which is the [`dict`][py-dict] in Python with the key being the coordinates and the value being the number of crossed segments.
@@ -197,9 +214,92 @@ def solve_part_one(contents: any) -> int:
     return answer
 ```
 
+Wasn't happy with the execution time. Replacing lookups to the `segment` variable in the hot paths (i.e inner nested `for` loop) shaved nearly 15 % of the runtime.
+
+```python
+def solve_part_one(contents: any) -> int:
+    """Solve the first part of the challenge
+
+    :param contents: input puzzle contents
+    :return: expected challenge answer
+    """
+    coordinates = defaultdict(int)
+    for segment in contents:
+        horizontal_segment = segment[0][0] == segment[1][0]
+        vertical_segment = not horizontal_segment and segment[0][1] == segment[1][1]
+        if horizontal_segment:
+            start_col = min(segment[0][1], segment[1][1])
+            end_col = max(segment[0][1], segment[1][1])
+            x = segment[0][0]
+            for col in range(start_col, 1 + end_col):
+                coordinates[(x, col)] += 1
+        elif vertical_segment:
+            start_row = min(segment[0][0], segment[1][0])
+            end_row = max(segment[0][0], segment[1][0])
+            y = segment[0][1]
+            for row in range(start_row, 1 + end_row):
+                coordinates[(row, y)] += 1
+    #draw_diagram(coordinates=coordinates)
+    overlaps = Counter(coordinates)
+    answer = sum(1 for i in list(overlaps.values()) if i >= 2)
+    return answer
+```
+
+Checking the byte-code we clearly see that performing the `x = segment[0][0]` and `y = segment[0][1]` yields differences in the byte-code. For the latter operation:
+
+```diff
+ 23         264 LOAD_FAST                1 (coordinates)
+            266 LOAD_FAST               12 (row)
+            268 LOAD_FAST                2 (segment)
+ -           270 LOAD_CONST               1 (0)
+ -           272 BINARY_SUBSCR
+ -           274 LOAD_CONST               2 (1)
+ -           276 BINARY_SUBSCR
+            278 BUILD_TUPLE              2
+            280 DUP_TOP_TWO
+            282 BINARY_SUBSCR
+            284 LOAD_CONST               2 (1)
+            286 INPLACE_ADD
+            288 ROT_THREE
+            290 STORE_SUBSCR
+            292 JUMP_ABSOLUTE          130 (to 260)
+        >>  294 JUMP_ABSOLUTE            6 (to 12)
+```
+
 Contents | Command | Answer | Time
 --- | --- | --- | ---
 [`input.txt`](./input.txt) | `./day_5.py input.txt -p 1` | `6841` | 745.3 ms
+
+# 😰🙅 Part Two
+
+## 🥺👉👈 Annotated Statement
+
+> Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider diagonal lines.
+
+Saw this one coming.
+
+> Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+
+To be honest the 1:1 diagonal ratio simplifies things quite a bit.
+
+> Considering all lines from the above example would now produce the following diagram:
+> 
+> ```
+> 1.1....11.
+> .111...2..
+> ..2.1.111.
+> ...1.2.2..
+> .112313211
+> ...1.2....
+> ..1...1...
+> .1.....1..
+> 1.......1.
+> 222111....
+> ```
+> 
+> You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.
+
+Consider all of the lines. At how many points do at least two lines overlap?
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
