@@ -50,9 +50,9 @@ def draw_diagram(coordinates: dict) -> None:
     end_col = max(col for col, row in points)
     start_row = min(row for col, row in points)
     end_row = max(row for col, row in points)
-    for row in range(start_row, 1 + end_row):
+    for row in range(0, 1 + end_row):
         line = ''
-        for col in range(start_col, 1 + end_col):
+        for col in range(0, 1 + end_col):
             if (col, row) not in points:
                 line += '.'
             else:
@@ -94,7 +94,34 @@ def solve_part_two(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    answer = len(contents)
+    coordinates = defaultdict(int)
+    for segment in contents:
+        horizontal_segment = segment[0][0] == segment[1][0]
+        vertical_segment = not horizontal_segment and segment[0][1] == segment[1][1]
+        if horizontal_segment:
+            start_col = min(segment[0][1], segment[1][1])
+            end_col = max(segment[0][1], segment[1][1])
+            x = segment[0][0]
+            for col in range(start_col, 1 + end_col):
+                coordinates[(x, col)] += 1
+        elif vertical_segment:
+            start_row = min(segment[0][0], segment[1][0])
+            end_row = max(segment[0][0], segment[1][0])
+            y = segment[0][1]
+            for row in range(start_row, 1 + end_row):
+                coordinates[(row, y)] += 1
+        else: # diagonal segment
+            x1 = segment[0][0]
+            y1 = segment[0][1]
+            x2 = segment[1][0]
+            y2 = segment[1][1]
+            inc_col = 1 if x2 > x1 else -1
+            inc_row = 1 if y2 > y1 else -1
+            for i, _ in enumerate(range(abs(x2 - x1) + 1)):
+                coordinates[(x1 + inc_col * i, y1 + inc_row * i)] += 1
+    #draw_diagram(coordinates=coordinates)
+    overlaps = Counter(coordinates)
+    answer = sum(1 for i in list(overlaps.values()) if i >= 2)
     return answer
 
 
@@ -142,18 +169,18 @@ def main() -> int:
     log.debug(f'called with {args=}')
     start_time = time.perf_counter()
     contents = list(load_contents(filename=args.filename))
-    assert len(contents) > 5, 'content is too short'
+    #assert len(contents) > 5, 'content is too short'
     compute_part_one = not args.part or args.part == 1
     answer_part_one = 0
     if compute_part_one:
         answer_part_one = solve_part_one(contents=contents)
-    # compute_part_two = not args.part or 2 == args.part
-    # answer_part_two = 0
-    # if compute_part_two:
-    #     answer_part_two = solve_part_two(contents=contents)
+    compute_part_two = not args.part or 2 == args.part
+    answer_part_two = 0
+    if compute_part_two:
+        answer_part_two = solve_part_two(contents=contents)
     elapsed_time = time.perf_counter() - start_time
     print(f'{answer_part_one=}')
-    # print(f'{answer_part_two=}')
+    print(f'{answer_part_two=}')
     print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
 

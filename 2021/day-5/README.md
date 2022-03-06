@@ -302,6 +302,54 @@ To be honest the 1:1 diagonal ratio simplifies things quite a bit.
 
 Consider all of the lines. At how many points do at least two lines overlap?
 
+## 🤔🤯 Puzzle Solver
+
+The second part consisted in adding handling for segments which are neither horizontal nor vertical.
+
+Diagonal segments may come in two slopes and two directions, requiring handling all these four cases. 
+
+```python
+def solve_part_two(contents: any) -> int:
+    """Solve the second part of the challenge
+
+    :param contents: input puzzle contents
+    :return: expected challenge answer
+    """
+    coordinates = defaultdict(int)
+    for segment in contents:
+        horizontal_segment = segment[0][0] == segment[1][0]
+        vertical_segment = not horizontal_segment and segment[0][1] == segment[1][1]
+        if horizontal_segment:
+            start_col = min(segment[0][1], segment[1][1])
+            end_col = max(segment[0][1], segment[1][1])
+            x = segment[0][0]
+            for col in range(start_col, 1 + end_col):
+                coordinates[(x, col)] += 1
+        elif vertical_segment:
+            start_row = min(segment[0][0], segment[1][0])
+            end_row = max(segment[0][0], segment[1][0])
+            y = segment[0][1]
+            for row in range(start_row, 1 + end_row):
+                coordinates[(row, y)] += 1
+        else: # diagonal segment
+            x1 = segment[0][0]
+            y1 = segment[0][1]
+            x2 = segment[1][0]
+            y2 = segment[1][1]
+            inc_col = 1 if x2 > x1 else -1
+            inc_row = 1 if y2 > y1 else -1
+            for i, _ in enumerate(range(abs(x2 - x1) + 1)):
+                coordinates[(x1 + inc_col * i, y1 + inc_row * i)] += 1
+    #draw_diagram(coordinates=coordinates)
+    overlaps = Counter(coordinates)
+    answer = sum(1 for i in list(overlaps.values()) if i >= 2)
+    return answer
+```
+
+Contents | Command | Answer | Time
+--- | --- | --- | ---
+[`input.txt`](./input.txt) | `./day_5.py input.txt -p 2` | `19258` | 1178.9 ms
+
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
 [aoc-2021-5]: https://adventofcode.com/2021/day/5
