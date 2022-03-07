@@ -13,6 +13,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| List iteration | ⭐ | ⭐ | 46.4 ms
 [4](/2021/day-4) | Giant Squid | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]| Data structure iteration | ⭐ | ⭐⭐ | 137.7 ms
 [5](/2021/day-5) | Hydrothermal Venture | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]| Arrays | ⭐ | ⭐ | 1714.2 ms
+[6](/2021/day-6) | Lanternfish | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-5]| Optimization | ⭐ | - | -
 
 # Resources
 
@@ -55,6 +56,12 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [reddit-aoc-2021-3]: https://www.reddit.com/r7r0ff
 [reddit-aoc-2021-4]: https://www.reddit.com/r8i1lq
 [reddit-aoc-2021-5]: https://www.reddit.com/r9824c
+[reddit-aoc-2021-6]: https://www.reddit.com/r9z49j
+[reddit-aoc-2021-7]: https://www.reddit.com/rar7ty
+[reddit-aoc-2021-7]: https://www.reddit.com/rbj87a
+[reddit-aoc-2021-8]: https://www.reddit.com/rca6vp
+[reddit-aoc-2021-9]: https://www.reddit.com/rd0s54
+[reddit-aoc-2021-10]: https://www.reddit.com/rds32p
 
 [w-ari-geom]: https://en.wikipedia.org/wiki/Arithmetic_geometry
 [w-bitmap]: https://en.wikipedia.org/wiki/Bitmap
