@@ -16,7 +16,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 
 # Resources
 
-* [Advent of Code subreddit][reddit]
+* [Advent of Code subreddit][reddit-aoc]
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/

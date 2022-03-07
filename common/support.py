@@ -2,8 +2,7 @@
 
 """Advent of Code Programming Puzzles
 
-2021 Edition - Day 5
-Puzzle Solution in Python
+Common methods
 """
 
 import argparse
