@@ -6,12 +6,13 @@
 Puzzle Solution in Python
 """
 
-import argparse
 from collections import defaultdict, Counter
 import logging
 import sys
 import time
 from pathlib import Path
+
+from common.support import configure_logger, parse_arguments
 
 log = logging.getLogger(__name__)
 
@@ -46,9 +47,7 @@ def draw_diagram(coordinates: dict) -> None:
     :return: nothing
     """
     points = coordinates.keys()
-    start_col = min(col for col, row in points)
     end_col = max(col for col, row in points)
-    start_row = min(row for col, row in points)
     end_row = max(row for col, row in points)
     for row in range(0, 1 + end_row):
         line = ''
@@ -73,15 +72,15 @@ def solve_part_one(contents: any) -> int:
         if horizontal_segment:
             start_col = min(segment[0][1], segment[1][1])
             end_col = max(segment[0][1], segment[1][1])
-            x = segment[0][0]
+            x_1 = segment[0][0]
             for col in range(start_col, 1 + end_col):
-                coordinates[(x, col)] += 1
+                coordinates[(x_1, col)] += 1
         elif vertical_segment:
             start_row = min(segment[0][0], segment[1][0])
             end_row = max(segment[0][0], segment[1][0])
-            y = segment[0][1]
+            y_1 = segment[0][1]
             for row in range(start_row, 1 + end_row):
-                coordinates[(row, y)] += 1
+                coordinates[(row, y_1)] += 1
     #draw_diagram(coordinates=coordinates)
     overlaps = Counter(coordinates)
     answer = sum(1 for i in list(overlaps.values()) if i >= 2)
@@ -96,67 +95,24 @@ def solve_part_two(contents: any) -> int:
     """
     coordinates = defaultdict(int)
     for segment in contents:
-        horizontal_segment = segment[0][0] == segment[1][0]
-        vertical_segment = not horizontal_segment and segment[0][1] == segment[1][1]
-        if horizontal_segment:
-            start_col = min(segment[0][1], segment[1][1])
-            end_col = max(segment[0][1], segment[1][1])
-            x = segment[0][0]
-            for col in range(start_col, 1 + end_col):
-                coordinates[(x, col)] += 1
-        elif vertical_segment:
-            start_row = min(segment[0][0], segment[1][0])
-            end_row = max(segment[0][0], segment[1][0])
-            y = segment[0][1]
-            for row in range(start_row, 1 + end_row):
-                coordinates[(row, y)] += 1
+        (x_1, y_1), (x_2, y_2) = segment
+        if x_1 == x_2:
+            for col in range(min(y_1, y_2), 1 + max(y_1, y_2)):
+                coordinates[(x_1, col)] += 1
+        elif y_1 == y_2:
+            for row in range(min(x_1, x_2), 1 + max(x_1, x_2)):
+                coordinates[(row, y_1)] += 1
         else: # diagonal segment
-            x1 = segment[0][0]
-            y1 = segment[0][1]
-            x2 = segment[1][0]
-            y2 = segment[1][1]
-            inc_col = 1 if x2 > x1 else -1
-            inc_row = 1 if y2 > y1 else -1
-            for i, _ in enumerate(range(abs(x2 - x1) + 1)):
-                coordinates[(x1 + inc_col * i, y1 + inc_row * i)] += 1
+            inc_col = 1 if x_2 > x_1 else -1
+            inc_row = 1 if y_2 > y_1 else -1
+            for i in range(abs(x_2 - x_1) + 1):
+                coordinates[(x_1 + inc_col * i, y_1 + inc_row * i)] += 1
     #draw_diagram(coordinates=coordinates)
-    overlaps = Counter(coordinates)
-    answer = sum(1 for i in list(overlaps.values()) if i >= 2)
+    answer = sum(1 for i in list(Counter(coordinates).values()) if i >= 2)
     return answer
 
 
 # Support Methods --------------------------------------------------------------
-
-
-def configure_logger(verbose: bool):
-    """Configure logging
-
-    :param verbose: display debug and info messages
-    :return: nothing
-    """
-    logger = logging.getLogger()
-    logger.handlers = []
-    stdout = logging.StreamHandler(sys.stdout)
-    stdout.setLevel(level=logging.WARNING)
-    stdout.setFormatter(logging.Formatter(LOG_FORMAT))
-    logger.addHandler(stdout)
-    if verbose:
-        stdout.setLevel(level=logging.DEBUG)
-        logger.setLevel(level=logging.DEBUG)
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse arguments provided by the command-line
-
-    :return: list of decoded arguments
-    """
-    parser = argparse.ArgumentParser(description=__doc__)
-    add = parser.add_argument
-    add('filename', type=str, help='input contents filename')
-    add('-p', '--part', type=int, help='solve only the given part')
-    add('-v', '--verbose', action='store_true', help='print extra messages')
-    arguments = parser.parse_args()
-    return arguments
 
 
 def main() -> int:
@@ -169,7 +125,6 @@ def main() -> int:
     log.debug(f'called with {args=}')
     start_time = time.perf_counter()
     contents = list(load_contents(filename=args.filename))
-    #assert len(contents) > 5, 'content is too short'
     compute_part_one = not args.part or args.part == 1
     answer_part_one = 0
     if compute_part_one:
