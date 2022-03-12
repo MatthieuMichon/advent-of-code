@@ -124,7 +124,68 @@ Contents | Command | Answer | Time
 
 ## 🥺👉👈 Annotated Statement
 
-TBD
+> How many lanternfish would there be after `256` days?
+
+The above solver implementation recomputes the data each day. Because the number of lanterfishs double every seven days we can deduce that the result will be roughly equal to `362639 * 2 ^ ((256-80) / 7) = 1.3×10^13` which obviously cannot be computed using the same method as above.
+
+An interesting fact is that the number doubles every seven days. Applying some inverse logic means that we only need to compute the quantity corresponding to a modulo of to 256 by seven and multiplying the value at this age by two to the power of 256 divided by seven.
+
+This leaves us with `f(256) = f(256 % 7) * 2 ^ (256 // 7) = f(4) * 2**36`. Right? Wrong! Problem is that newly spawned lanterfishs start with a timer set to eight, meaning that this formula doesn't stand. So back to the beginning.
+
+> 📝 **Note:** When in doubt, stare at the data
+> 
+> It always pays to take a step back when facing a dead end. In practice this means taking a deeper look into the input contents of puzzle and extract some features. These are likely to open a path for solving with success the puzzle.
+
+Doing a routing check on the highest lanternfish timer returns `5` on our dataset.
+
+```python
+>>> max(lanterfishs)
+5
+```
+
+This is quite a eye-opener because this means that there are likely to be just a few different values for the initial timers. This is a textbook case for using the [`Counter`][py-counter] class.
+
+```python
+from collections import Counter
+c = Counter(lanternfishs)
+c
+Counter({1: 124, 4: 55, 5: 45, 2: 43, 3: 33})
+```
+
+Just like that the number of input data went from `300` down to `5`, nearly two orders of magnitude less! Doing so we can compute up to approx `190` days in a several dozen of seconds. This is however not enough for reaching `256`, meaning a further improvement is warranted.
+
+For instance, there must be a way to mathematically compute the number of lanterfishs spawned from a single one depending on its initial timer value.
+
+As a first step let us compute the number of lanternfishs **directly** spawned by a single one. The puzzle statement indicates it will spawn each time its timer hits zero.
+
+```python
+def count_directly_spawned_lanternfishs(days: int, initial_timer: int) -> int:
+    ...
+```
+
+The first one is spawned as soon as its timer hits zero, meaning that if the number of days is lower than the initial timer it will obviously have spawned none.
+
+```python
+if (days < initial_timer):
+    return 0
+```
+
+We also know that it spawns every seven days once the timer reaches zero.
+
+```python
+total_days = days + (7 - initial_timer)
+directly_spawned_lanterfishs = total_days // 7
+```
+
+Arranging variables we obtain the final form:
+
+```python
+def count_directly_spawned_lanternfishs(days: int, initial_timer: int) -> int:
+    total_days = days + (7 - initial_timer)
+    return total_days // 7
+```
+
+We can now compute number of **directly** spawned lanterfishes from a single one with an intial_timer of `1` after `256` days: `37`. 
 
 ## 🤔🤯 Puzzle Solver
 
