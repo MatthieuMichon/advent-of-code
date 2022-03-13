@@ -128,6 +128,8 @@ Contents | Command | Answer | Time
 
 The above solver implementation recomputes the data each day. Because the number of lanterfishs double every seven days we can deduce that the result will be roughly equal to `362639 * 2 ^ ((256-80) / 7) = 1.3×10^13` which obviously cannot be computed using the same method as above.
 
+## 🤔🤯 Puzzle Solver
+
 An interesting fact is that the number doubles every seven days. Applying some inverse logic means that we only need to compute the quantity corresponding to a modulo of to 256 by seven and multiplying the value at this age by two to the power of 256 divided by seven.
 
 This leaves us with `f(256) = f(256 % 7) * 2 ^ (256 // 7) = f(4) * 2**36`. Right? Wrong! Problem is that newly spawned lanterfishs start with a timer set to eight, meaning that this formula doesn't stand. So back to the beginning.
@@ -185,11 +187,31 @@ def count_directly_spawned_lanternfishs(days: int, initial_timer: int) -> int:
     return total_days // 7
 ```
 
-We can now compute number of **directly** spawned lanterfishes from a single one with an intial_timer of `1` after `256` days: `37`. 
+We can now compute number of **directly** spawned lanterfishes from a single one with an intial timer of `1` after `256` days: `37`. Next step is where we thrown in some recursion. 🤯
 
-## 🤔🤯 Puzzle Solver
+```python
+DEFAULT_TIMER = 8
 
-TBD
+def count_lanternfishs(days: int, start_day: int = 0,
+                       initial_timer: int = DEFAULT_TIMER) -> int:
+    lanternfishs: int = 1
+    first_spawn_day = start_day + initial_timer + 1
+    for current_day in range(first_spawn_day, days, SPAWN_TIME):
+        lanternfishs += count_lanternfishs(days=days, start_day=current_day)
+    return lanternfishs
+```
+
+Running on a single lanternfish we have the following runtimes:
+
+Days | Duration (ms) | Answer
+--- | --- | ---
+150 | 1449.9 | 460699
+160 | 3396.1 | 1098932
+170 | 7913.8 | 2690561
+180 | 18087.8 | 6249351
+190 | 43798.7 | 15164971
+
+Sadly this new implementation is barely better than the original.
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---

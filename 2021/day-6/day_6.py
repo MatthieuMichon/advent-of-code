@@ -37,7 +37,7 @@ def load_contents(filename: Path) -> [int]:
 # Solver Methods ---------------------------------------------------------------
 
 SPAWN_TIME = 7
-DURATION = 256
+DURATION = 80
 
 
 def print_list(list_): # real signature unknown
@@ -71,28 +71,31 @@ def count_directly_spawned_lanternfishs(days: int, initial_timer: int) -> int:
     return total_days // 7
 
 
+DEFAULT_TIMER = 8
+
+
+def count_lanternfishs(start_day: int, days: int,
+                       initial_timer: int = DEFAULT_TIMER) -> int:
+    lanternfishs = 1
+    for current_day in range(start_day + initial_timer + 1, days, SPAWN_TIME):
+        lanternfishs += count_lanternfishs(
+            start_day=current_day, days=days)
+    return lanternfishs
+
+
 def solve_part_two(contents: any) -> int:
     """Solve the second part of the challenge
 
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    def update_timer(timer: int) -> int:
-        if timer == 0:
-            timer = SPAWN_TIME
-        return timer - 1
+    for days in range(150, 200, 10):
+        start_time = time.perf_counter()
+        answer = count_lanternfishs(
+            start_day=0, days=days, initial_timer=3)
+        elapsed_time = time.perf_counter() - start_time
+        print(f'{days=} in {10000 * elapsed_time:0.1f} ms, {answer=}')
 
-    def list_children(timer: int, duration: int) -> any:
-        for cycle in range(duration % SPAWN_TIME):
-            yield (SPAWN_TIME - timer) + cycle * SPAWN_TIME
-
-    # lanternfishs = [(0, v) for contents.copy()]
-    for _ in range(1, 256 + 1):
-        print(_)
-        respawned = sum(1 for timer in lanternfishs if timer == 0)
-        lanternfishs = [update_timer(timer) for timer in lanternfishs]
-        lanternfishs.extend([8] * respawned)
-    answer = len(lanternfishs)
     return answer
 
 

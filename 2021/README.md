@@ -13,7 +13,7 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [3](/2021/day-3) | Binary Diagnostic | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]| List iteration | ⭐ | ⭐ | 46.4 ms
 [4](/2021/day-4) | Giant Squid | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]| Data structure iteration | ⭐ | ⭐⭐ | 137.7 ms
 [5](/2021/day-5) | Hydrothermal Venture | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]| Arrays | ⭐ | ⭐ | 1714.2 ms
-[6](/2021/day-6) | Lanternfish | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-5]| Optimization | ⭐ | - | -
+[6](/2021/day-6) | Lanternfish | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-6]| Optimization | ⭐ | - | -
 
 # Resources
 
