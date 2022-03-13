@@ -126,13 +126,13 @@ Contents | Command | Answer | Time
 
 > How many lanternfish would there be after `256` days?
 
-The above solver implementation recomputes the data each day. Because the number of lanterfishs double every seven days we can deduce that the result will be roughly equal to `362639 * 2 ^ ((256-80) / 7) = 1.3×10^13` which obviously cannot be computed using the same method as above.
+The above solver implementation recomputes the data each day. Because the number of lanterfishes double every seven days we can deduce that the result will be roughly equal to `362639 * 2 ^ ((256-80) / 7) = 1.3×10^13` which obviously cannot be computed using the same method as above.
 
 ## 🤔🤯 Puzzle Solver
 
 An interesting fact is that the number doubles every seven days. Applying some inverse logic means that we only need to compute the quantity corresponding to a modulo of to 256 by seven and multiplying the value at this age by two to the power of 256 divided by seven.
 
-This leaves us with `f(256) = f(256 % 7) * 2 ^ (256 // 7) = f(4) * 2**36`. Right? Wrong! Problem is that newly spawned lanterfishs start with a timer set to eight, meaning that this formula doesn't stand. So back to the beginning.
+This leaves us with `f(256) = f(256 % 7) * 2 ^ (256 // 7) = f(4) * 2**36`. Right? Wrong! Problem is that newly spawned lanterfishes start with a timer set to eight, meaning that this formula doesn't stand. So back to the beginning.
 
 > 📝 **Note:** When in doubt, stare at the data
 > 
@@ -141,7 +141,7 @@ This leaves us with `f(256) = f(256 % 7) * 2 ^ (256 // 7) = f(4) * 2**36`. Right
 Doing a routing check on the highest lanternfish timer returns `5` on our dataset.
 
 ```python
->>> max(lanterfishs)
+>>> max(lanterfishes)
 5
 ```
 
@@ -156,7 +156,7 @@ Counter({1: 124, 4: 55, 5: 45, 2: 43, 3: 33})
 
 Just like that the number of input data went from `300` down to `5`, nearly two orders of magnitude less! Doing so we can compute up to approx `190` days in a several dozen of seconds. This is however not enough for reaching `256`, meaning a further improvement is warranted.
 
-For instance, there must be a way to mathematically compute the number of lanterfishs spawned from a single one depending on its initial timer value.
+For instance, there must be a way to mathematically compute the number of lanterfishes spawned from a single one depending on its initial timer value.
 
 As a first step let us compute the number of lanternfishs **directly** spawned by a single one. The puzzle statement indicates it will spawn each time its timer hits zero.
 
@@ -176,7 +176,7 @@ We also know that it spawns every seven days once the timer reaches zero.
 
 ```python
 total_days = days + (7 - initial_timer)
-directly_spawned_lanterfishs = total_days // 7
+directly_spawned_lanterfishes = total_days // 7
 ```
 
 Arranging variables we obtain the final form:
@@ -211,11 +211,53 @@ Days | Duration (ms) | Answer
 180 | 18087.8 | 6249351
 190 | 43798.7 | 15164971
 
-Sadly this new implementation is barely better than the original.
+Sadly this new implementation is barely better than the original. Back to the drawing board.
+
+> Find a way to simulate lanternfish.
+
+Reflecting on this line, we must change the way this problem was diced, meaning doing away with the recursion since it is a dead end. As it is often the case, the clue is in front of us.
+
+> ```
+> Initial state: 3,4,3,1,2
+> After  1 day:  2,3,2,0,1
+> After  2 days: 1,2,1,6,0,8
+> After  3 days: 0,1,0,5,6,7,8
+> After  4 days: 6,0,6,4,5,6,7,8,8
+> After  5 days: 5,6,5,3,4,5,6,7,7,8
+> After  6 days: 4,5,4,2,3,4,5,6,6,7
+> After  7 days: 3,4,3,1,2,3,4,5,5,6
+> After  8 days: 2,3,2,0,1,2,3,4,4,5
+> After  9 days: 1,2,1,6,0,1,2,3,3,4,8
+> After 10 days: 0,1,0,5,6,0,1,2,2,3,7,8
+> ```
+
+The different timer values appear to be in a small range, with the highest timer in the input data set being `5`. This means that rather treating each lanterfish as an individual, we could bundle all the lanterfishes with the same timer in an entry. The key to this entry obviously being its time value.
+
+```python
+from collections import Counter, defaultdict
+
+lanternfishes = defaultdict(int)
+lanternfishes.update(dict(Counter(contents)))
+```
+
+The next thing is to implement to daily update logic:
+
+* All the timer values are decremented by one, meaning all the lanterfishes of a timer value `N` are shifted to the timer value `N-1`
+* All the lanternfishes with a timer value of `-1` are immediately recycled (i.e added to the lanternfishes of timer `6`) and spawn the same amount of lanternfishes with a timer of `8`.
+
+```python
+for day in range(1, 1+duration):
+    for timer in range(-1, 8):
+        lanternfishes[timer] = lanternfishes[timer+1]
+    lanternfishes[6] += lanternfishes[-1]
+    lanternfishes[8] = lanternfishes[-1]
+```
+
+This puzzle was great: it showcased the importance of understanding state changes rather then just modeling the behavior of individual elements. Factorizing was a good first step but once again states and their transition is the key.
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_6.py input.txt -p 2` | `-` | - ms
+[`input.txt`](./input.txt) | `./day_6.py input.txt -p 2` | `1639854996917` | 4.4 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/

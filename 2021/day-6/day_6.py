@@ -9,6 +9,7 @@ Puzzle Solution in Python
 import logging
 import sys
 import time
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from common.support import configure_logger, parse_arguments
@@ -36,8 +37,8 @@ def load_contents(filename: Path) -> [int]:
 
 # Solver Methods ---------------------------------------------------------------
 
+DEFAULT_TIMER = 8
 SPAWN_TIME = 7
-DURATION = 80
 
 
 def print_list(list_): # real signature unknown
@@ -56,31 +57,15 @@ def solve_part_one(contents: any) -> int:
             timer = SPAWN_TIME
         return timer - 1
 
-    lanternfishs = contents.copy()
-    for _ in range(1, DURATION + 1):
-        print(_)
-        respawned = sum(1 for timer in lanternfishs if timer == 0)
-        lanternfishs = [update_timer(timer) for timer in lanternfishs]
-        lanternfishs.extend([8] * respawned)
-        answer = len(lanternfishs)
+    duration = 80
+    lanternfishes = contents.copy()
+    for day in range(1, duration + 1):
+        respawned = sum(1 for timer in lanternfishes if timer == 0)
+        lanternfishes = [update_timer(timer) for timer in lanternfishes]
+        lanternfishes.extend([DEFAULT_TIMER] * respawned)
+        log.debug(f'After {day: 2} days: {len(lanternfishes)} lanternfishes')
+    answer = len(lanternfishes)
     return answer
-
-
-def count_directly_spawned_lanternfishs(days: int, initial_timer: int) -> int:
-    total_days = days + (7 - initial_timer)
-    return total_days // 7
-
-
-DEFAULT_TIMER = 8
-
-
-def count_lanternfishs(start_day: int, days: int,
-                       initial_timer: int = DEFAULT_TIMER) -> int:
-    lanternfishs = 1
-    for current_day in range(start_day + initial_timer + 1, days, SPAWN_TIME):
-        lanternfishs += count_lanternfishs(
-            start_day=current_day, days=days)
-    return lanternfishs
 
 
 def solve_part_two(contents: any) -> int:
@@ -89,13 +74,16 @@ def solve_part_two(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    for days in range(150, 200, 10):
-        start_time = time.perf_counter()
-        answer = count_lanternfishs(
-            start_day=0, days=days, initial_timer=3)
-        elapsed_time = time.perf_counter() - start_time
-        print(f'{days=} in {10000 * elapsed_time:0.1f} ms, {answer=}')
-
+    duration = 80
+    lanternfishes = defaultdict(int)
+    lanternfishes.update(dict(Counter(contents)))
+    for day in range(1, 1+duration):
+        for timer in range(-1, 8):
+            lanternfishes[timer] = lanternfishes[timer+1]
+        lanternfishes[6] += lanternfishes[-1]
+        lanternfishes[8] = lanternfishes[-1]
+    lanternfishes[-1] = 0
+    answer = sum(lanternfishes.values())
     return answer
 
 
