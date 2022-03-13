@@ -4,9 +4,44 @@ Solution in [Python][py] for the [day 7 puzzle][aoc-2021-7] of the [2021 edition
 
 ## 🔍📖 Annotated Puzzle Statement
 
+> The crab submarines all need to be aligned before they'll have enough power to blast a large enough hole for your submarine to get through. However, it doesn't look like they'll be aligned before the whale catches you! Maybe you can help?
+> 
+> There's one major catch - crab submarines can only move horizontally.
+
+*Horizontally* they say? Should we be expecting part two to be on in two dimensions?
+
+> You quickly make a list of the horizontal position of each crab (your puzzle input). Crab submarines have limited fuel, so you need to find a way to make all of their horizontal positions match while requiring them to spend as little fuel as possible.
+
+Surely it must be harder than just computing the average?!
+
 ## 💾🔍 Content Decoding
 
+> For example, consider the following horizontal positions:
+> 
+> ```
+> 16,1,2,0,4,2,7,1,2,14
+> ```
+
+The content encoding is the [same as in day 6](../day-6/README.md#-content-decoding).
+
+```python
+def load_contents(filename: Path) -> [int]:
+    """Load and convert contents from file
+
+    :param filename: input filename
+    :return: list of integers
+    """
+    with open(filename, encoding='utf-8') as buffer:
+        line = next(iter(buffer.readlines()))
+        tokens = [int(t) for t in line.strip().split(',')]
+        return tokens
+```
+
+Hoping that `pylint` won't complain of code duplication.
+
 ## 💡🙋 Implementation
+
+
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
