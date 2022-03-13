@@ -74,7 +74,7 @@ def solve_part_two(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    duration = 256
+    duration = 80
     lanternfishes = defaultdict(int)
     lanternfishes.update(dict(Counter(contents)))
     for day in range(1, 1+duration):
