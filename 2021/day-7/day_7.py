@@ -2,7 +2,7 @@
 
 """Advent of Code Programming Puzzles
 
-2021 Edition - Day 6
+2021 Edition - Day 7
 Puzzle Solution in Python
 """
 
@@ -37,13 +37,16 @@ def load_contents(filename: Path) -> [int]:
 
 # Solver Methods ---------------------------------------------------------------
 
-DEFAULT_TIMER = 8
-SPAWN_TIME = 7
 
+def compute_fuel_cost(h_positions: [int], h_position: int) -> int:
+    """Compute fuel cost for a given configuration
 
-def print_list(list_): # real signature unknown
-    """ Return str(self). """
-    return ','.join([str(i) for i in list_])
+    :param h_positions: list of initial horizontal positions
+    :param h_position: final horizontal position
+    :return: total fuel required for reaching final position
+    """
+    fuel = sum(abs(h_position - pos) for pos in h_positions)
+    return fuel
 
 
 def solve_part_one(contents: any) -> int:
@@ -52,19 +55,10 @@ def solve_part_one(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    def update_timer(timer: int) -> int:
-        if timer == 0:
-            timer = SPAWN_TIME
-        return timer - 1
-
-    duration = 80
-    lanternfishes = contents.copy()
-    for day in range(1, duration + 1):
-        respawned = sum(1 for timer in lanternfishes if timer == 0)
-        lanternfishes = [update_timer(timer) for timer in lanternfishes]
-        lanternfishes.extend([DEFAULT_TIMER] * respawned)
-        log.debug(f'After {day: 2} days: {len(lanternfishes)} lanternfishes')
-    answer = len(lanternfishes)
+    positions = sorted(set(contents))
+    min_map = {compute_fuel_cost(contents, pos): pos for pos in positions}
+    answer = min(min_map.keys())
+    log.debug(f'Found min in listed positions: {answer}')
     return answer
 
 
@@ -74,16 +68,8 @@ def solve_part_two(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    duration = 80
-    lanternfishes = defaultdict(int)
-    lanternfishes.update(dict(Counter(contents)))
-    for day in range(1, 1+duration):
-        for timer in range(-1, 8):
-            lanternfishes[timer] = lanternfishes[timer+1]
-        lanternfishes[6] += lanternfishes[-1]
-        lanternfishes[8] = lanternfishes[-1]
-    lanternfishes[-1] = 0
-    answer = sum(lanternfishes.values())
+    ...
+    answer = 0
     return answer
 
 

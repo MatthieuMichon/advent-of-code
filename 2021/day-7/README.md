@@ -41,11 +41,63 @@ Hoping that `pylint` won't complain of code duplication.
 
 ## 💡🙋 Implementation
 
+First thought was to compute an average. With the example input contents the average is `4.9` which is quite different from the correct answer `2`, meaning this first impression is invalid.
 
+We could use successive guesses with a dichotomy, or some sort of converging offset. The starting point could be the most frequent number, and the initial direction the second most frequent.
+
+The scanning algorithm which strongly looks like a [golden-section search][w-golden-section-search] will depend on the curve, more precisely if it is an [unimodal function][w-unimodal-function]. This function which computes the total fuel is easy:
+
+```python
+def compute_fuel_cost(h_positions: [int], h_position: int) -> int:
+    """Compute fuel cost for a given configuration
+    
+    :param h_positions: list of initial horizontal positions
+    :param h_position: final horizontal position
+    :return: total fuel required for reaching final position
+    """
+    fuel = sum(abs(h_position - pos) for pos in h_positions)
+    return fuel
+```
+
+On the example contents we obtain:
+
+Position | Fuel
+--- | ---
+0 | 49
+1 | 41
+2 | 37
+4 | 41
+7 | 53
+14 | 95
+16 | 111
+
+On the full input contents, we can simply sweep through all the positions and index the position by fuel cost:
+
+```python
+>>> map_ = {compute_fuel_cost(contents, pos): pos for pos in contents}
+>>> map_[min(map_.keys())]
+372
+```
+
+The complete method is straightforward:
+
+```python
+def solve_part_one(contents: any) -> int:
+    """Solve the first part of the challenge
+
+    :param contents: input puzzle contents
+    :return: expected challenge answer
+    """
+    positions = sorted(set(contents))
+    min_map = {compute_fuel_cost(contents, pos): pos for pos in positions}
+    answer = min(min_map.keys())
+    log.debug(f'Found min in listed positions: {answer}')
+    return answer
+```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_7.py input.txt -p 1` | - | -
+[`input.txt`](./input.txt) | `./day_7.py input.txt -p 1` | `337488` | 612.9 ms
 
 # 😰🙅 Part Two
 
@@ -95,3 +147,6 @@ Contents | Command | Answer | Time
 [py-sum]: https://docs.python.org/3/library/functions.html#sum
 [py-tuple]: https://docs.python.org/3/library/stdtypes.html#tuple
 [py-zip]: https://docs.python.org/3/library/functions.html#zip
+
+[w-golden-section-search]: https://en.wikipedia.org/wiki/Golden-section_search
+[w-unimodal-function]: https://en.wikipedia.org/wiki/Unimodality#Unimodal_function
