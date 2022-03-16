@@ -9,7 +9,6 @@ Puzzle Solution in Python
 import logging
 import sys
 import time
-from collections import Counter, defaultdict
 from pathlib import Path
 
 from common.support import configure_logger, parse_arguments
@@ -62,14 +61,27 @@ def solve_part_one(contents: any) -> int:
     return answer
 
 
+def compute_fuel_cost_part_two(h_positions: [int], h_position: int) -> int:
+    """Compute fuel cost for a given configuration
+
+    :param h_positions: list of initial horizontal positions
+    :param h_position: final horizontal position
+    :return: total fuel required for reaching final position
+    """
+    fuel = sum(abs(h_position - pos) * (1 + abs(h_position - pos)) // 2 for pos in h_positions)
+    return fuel
+
+
 def solve_part_two(contents: any) -> int:
     """Solve the second part of the challenge
 
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    ...
-    answer = 0
+    positions = sorted(set(contents))
+    min_map = {compute_fuel_cost_part_two(contents, pos): pos for pos in positions}
+    answer = min(min_map.keys())
+    log.debug(f'Found min in listed positions: {answer}')
     return answer
 
 

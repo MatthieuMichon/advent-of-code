@@ -103,11 +103,31 @@ Contents | Command | Answer | Time
 
 ## 🥺👉👈 Annotated Statement
 
+> As it turns out, crab submarine engines don't burn fuel at a constant rate. Instead, each change of 1 step in horizontal position costs 1 more unit of fuel than the last: the first step costs 1, the second step costs 2, the third step costs 3, and so on.
+
+Meaning that instead of a linear function between the offset and the fuel cost, we now have a polynomial one.
+
 ## 🤔🤯 Puzzle Solver
+
+Let's try the minimal effort first. The idea is to change as little as possible the `compute_fuel_cost()` method used in part one. The sum of integers from 0 to N is the same as the sum of integers from N to 0. Both have(N+1) members and because the sum N times (N+1) obviously being N*(N+1) we can affirm that the sum of 0 to N is N*(N+1)/2.
+
+```python
+def compute_fuel_cost_part_two(h_positions: [int], h_position: int) -> int:
+    """Compute fuel cost for a given configuration
+    
+    :param h_positions: list of initial horizontal positions
+    :param h_position: final horizontal position
+    :return: total fuel required for reaching final position
+    """
+    fuel = sum(abs(h_position - pos)*(1+abs(h_position - pos))/2 for pos in h_positions)
+    return fuel
+```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_7.py input.txt -p 2` | - | -
+[`input.txt`](./input.txt) | `./day_7.py input.txt -p 2` | `89647695` | 1356.6 ms
+
+We can feel there is quite some room for improvement, since the scanning method is very crude.
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
