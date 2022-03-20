@@ -6,13 +6,14 @@
 Puzzle Solution in Python
 """
 
-import argparse
 import logging
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Iterator
+
+from common.support import configure_logger, parse_arguments
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +30,9 @@ def load_contents(filename: Path) -> Iterator[int]:
     :param filename: input filename
     :return: iterator yielding integers
     """
-    lines = iter(open(filename).read().strip().split(os.linesep))
-    for line in lines:
-        yield int(line)
+    with open(filename, encoding='utf-8') as buffer:
+        for line in iter(buffer.read().strip().split(os.linesep)):
+            yield int(line)
     log.debug(f'Reached end of {filename=}')
 
 
@@ -65,37 +66,6 @@ def solve_part_two(depths: [int]) -> int:
 
 
 # Support Methods --------------------------------------------------------------
-
-
-def configure_logger(verbose: bool):
-    """Configure logging
-
-    :param verbose: display debug and info messages
-    :return: nothing
-    """
-    logger = logging.getLogger()
-    logger.handlers = []
-    stdout = logging.StreamHandler(sys.stdout)
-    stdout.setLevel(level=logging.WARNING)
-    stdout.setFormatter(logging.Formatter(LOG_FORMAT))
-    logger.addHandler(stdout)
-    if verbose:
-        stdout.setLevel(level=logging.DEBUG)
-        logger.setLevel(level=logging.DEBUG)
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse arguments provided by the command-line
-
-    :return: list of decoded arguments
-    """
-    parser = argparse.ArgumentParser(description=__doc__)
-    pa = parser.add_argument
-    pa('filename', type=str, help='input contents filename')
-    pa('-p', '--part', type=int, help='solve only the given part')
-    pa('-v', '--verbose', action='store_true', help='print extra messages')
-    arguments = parser.parse_args()
-    return arguments
 
 
 def main() -> int:

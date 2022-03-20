@@ -157,7 +157,7 @@ answer = sum(required_fuel_values)
 Computed answers:
 
 ```shell
-$ ./day-1.py input.txt --part 1
+$ ./day_1.py input.txt --part 1
 3152919
 ```
 
@@ -234,7 +234,7 @@ def compute_recursive_required_fuel(mass: int) -> int:
 Computed answers:
 
 ```shell
-$ ./day-1.py input.txt --part 2
+$ ./day_1.py input.txt --part 2
 4726527
 ```
 

@@ -97,7 +97,7 @@ def solve_part_one(depths: [int]) -> int:
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-1.py input.txt -p 1` | `1292`
+[`input.txt`](./input.txt) | `./day_1.py input.txt -p 1` | `1292`
 
 # 😰🙅 Part Two
 
@@ -166,7 +166,7 @@ def solve_part_two(depths: [int]) -> int:
 
 Contents | Command | Answer
 --- | --- | ---
-[`input.txt`](./input.txt) | `./day-1.py input.txt -p 2` | `1262`
+[`input.txt`](./input.txt) | `./day_1.py input.txt -p 2` | `1262`
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
