@@ -72,7 +72,7 @@ def solve_part_one(commands: Iterator[tuple]) -> int:
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-2.py input.txt -p 1` | `1480518` | 11.2 ms
+[`input.txt`](./input.txt) | `./day_2.py input.txt -p 1` | `1480518` | 11.2 ms
 
 # 😰🙅 Part Two
 
@@ -122,7 +122,7 @@ def solve_part_two(commands: Iterator[tuple]) -> int:
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-2.py input.txt -p 2` | `1282809906` | 22.5 ms
+[`input.txt`](./input.txt) | `./day_2.py input.txt -p 2` | `1282809906` | 22.5 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
