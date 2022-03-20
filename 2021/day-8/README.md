@@ -141,6 +141,96 @@ Contents | Command | Answer | Time
 
 ## 🤔🤯 Puzzle Solver
 
+Before diving any deeper, we can already create some helpful methods for printing our results.
+
+Assuming the following configuration:
+
+```text
+ aaaa
+f    b
+f    b
+ gggg
+e    c
+e    c
+ dddd
+```
+
+The [wikipedia article][w-seven-segment] on seven-segment displays features the following encoding table.
+
+Digit | a  | b  | c  | d  | e  | f | g
+------|----|----|----|----|----|----|----
+0     | on | on | on | on |	on | on |
+1     |    | on | on |    |    |    |					
+2     | on | on | 	 | on | on |    | on 	
+3     | on | on | on | on |    | 	| on 	
+4     |    | on | on | 	  |	   | on | on 	
+5     | on | 	| on | on |    | on | on 	
+6     | on | 	| on | on | on | on | on 	
+7     | on | on | on | 	  |	   | 	|       
+8     | on | on | on | on | on | on | on 	
+9     | on | on | on | on |    | on | on 	
+
+```python
+def print_segments(segments: str) -> None:
+    """Print segments according to a convention
+
+    :param segments: string of individual segments
+    :return: nothing
+    """
+    if 'a' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+    for _ in range(2):
+        print(f'{"#" if "f" in segments else "-"}    '
+              f'{"#" if "b" in segments else "-"}')
+    if 'g' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+    for _ in range(2):
+        print(f'{"#" if "e" in segments else "-"}    '
+              f'{"#" if "c" in segments else "-"}')
+    if 'd' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+```
+
+Following on the work laid out in part one, we start by listing all the digits possible given a number of active segments.
+
+Segments | Digits
+--- | ---
+2 | `1`
+3 | `7`
+4 | `4`
+5 | `2`, `3`, `5`
+6 | `6`, `9`, `0`
+7 | `8`
+
+```python
+digit_map = {
+    2: {1},
+    3: {7},
+    4: {4},
+    5: {2, 3, 5},
+    6: {6, 9, 0},
+    7: {8},    
+}
+```
+
+Aiming for fun points, we are going to use something different from the analytical method (i.e searching for the different segment between `1` and `7` and so on).
+
+We start by defining a list of segments. To avoid any ambiguity, lets use names like `upper-left` and `bottom`. We build a map of assignations such as the following.
+
+```python
+known_segment_map = {
+    2: {'upper-right', 'lower-right'},
+    3: {'top', 'upper-right', 'lower-right'},
+    4: {'upper-left', 'middle', 'upper-right', 'lower-right'},
+}
+```
+
 Contents | Command | Answer | Time
 --- | --- | --- | ---
 [`input.txt`](./input.txt) | `./day_8.py input.txt -p 2` | TBD | TBD
@@ -185,4 +275,5 @@ Contents | Command | Answer | Time
 [py-zip]: https://docs.python.org/3/library/functions.html#zip
 
 [w-golden-section-search]: https://en.wikipedia.org/wiki/Golden-section_search
+[w-seven-segment]: https://en.wikipedia.org/wiki/Seven-segment_display
 [w-unimodal-function]: https://en.wikipedia.org/wiki/Unimodality#Unimodal_function

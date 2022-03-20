@@ -61,12 +61,43 @@ def solve_part_one(contents: any) -> int:
     return answer
 
 
+def print_segments(segments: str) -> None:
+    """Print segments according to a convention
+
+    :param segments: string of individual segments
+    :return: nothing
+    """
+    if 'a' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+    for _ in range(2):
+        print(f'{"#" if "f" in segments else "-"}    '
+              f'{"#" if "b" in segments else "-"}')
+    if 'g' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+    for _ in range(2):
+        print(f'{"#" if "e" in segments else "-"}    '
+              f'{"#" if "c" in segments else "-"}')
+    if 'd' in segments:
+        print(' #### ')
+    else:
+        print(' ---- ')
+
+
 def solve_part_two(contents: any) -> int:
     """Solve the second part of the challenge
 
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
+    known_segment_map = {
+        2: {'upper-right', 'lower-right'},
+        3: {'top', 'upper-right', 'lower-right'},
+        4: {'upper-left', 'middle', 'upper-right', 'lower-right'},
+    }
     answer = len(contents)
     return answer
 
