@@ -1,6 +1,6 @@
-Solution in [Python][py] for the [day 7 puzzle][aoc-2021-7] of the [2021 edition][aoc-2021] of the [Advent of Code][aoc] annual programming challenge.
+Solution in [Python][py] for the [day 8 puzzle][aoc-2021-8] of the [2021 edition][aoc-2021] of the [Advent of Code][aoc] annual programming challenge.
 
-# 🎄🌟🌟 The Treachery of Whales 🎄🌟🌟
+# 🎄🌟🌟 Seven Segment Search 🎄🌟🌟
 
 ## 🔍📖 Annotated Puzzle Statement
 
@@ -94,7 +94,7 @@ We can feel there is quite some room for improvement, since the scanning method 
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
-[aoc-2021-7]: https://adventofcode.com/2021/day/7
+[aoc-2021-8]: https://adventofcode.com/2021/day/8
 [py]: https://docs.python.org/3/
 
 [py-argparse]: https://docs.python.org/3/library/argparse.html

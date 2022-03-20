@@ -15,6 +15,9 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [5](/2021/day-5) | Hydrothermal Venture | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]| Arrays | ⭐ | ⭐ | 1714.2 ms
 [6](/2021/day-6) | Lanternfish | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-6]| Optimization | ⭐ | ⭐⭐ | 7.7 ms
 [7](/2021/day-7) | The Treachery of Whales | [AoC][aoc-2021-7] - [Reddit][reddit-aoc-2021-7]| List iteration | ⭐ | ⭐ | 1955.9 ms
+[8](/2021/day-8) | Seven Segment Search | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]| - | - | - | -
+[x](/2021/day-x) | tbd | [AoC][aoc-2021-x] - [Reddit][reddit-aoc-2021-x]| tbd | tbd | tbd | tbd
+
 
 # Resources
 
@@ -22,7 +25,6 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
-[aoc-2021-1]: https://adventofcode.com/2021/day/1
 [aoc-2021-1]: https://adventofcode.com/2021/day/1
 [aoc-2021-2]: https://adventofcode.com/2021/day/2
 [aoc-2021-3]: https://adventofcode.com/2021/day/3
