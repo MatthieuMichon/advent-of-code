@@ -6,14 +6,12 @@
 Puzzle Solution in Python
 """
 
-import argparse
 import logging
 import sys
 import time
-from collections import Counter
 from pathlib import Path
-from typing import Iterator
-import copy
+
+from common.support import configure_logger, parse_arguments
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +30,8 @@ def load_contents(filename: Path) -> tuple[list, list]:
     :param filename: input filename
     :return: called numbers and bingo grids
     """
-    lines = iter(open(filename).readlines())
+    with open(filename, encoding='utf-8') as buffer:
+        lines = iter(buffer.readlines())
     called_numbers:[int] = [int(token) for token in next(lines).split(',')]
     bingo_grids = []
     bingo_grid = []
@@ -66,6 +65,7 @@ def solve_part_one(contents: tuple[list, list]) -> int:
         rows.extend((set(row) for row in list(zip(*grid))))
         processed_grids.append(rows)
     unmarked_numbers:set[int] = {0}
+    called_number = 0
     for called_number in called_numbers:
         for i, grid in enumerate(processed_grids):
             bingo = False
@@ -100,60 +100,27 @@ def solve_part_two(contents: tuple[list, list]) -> int:
         rows.extend((set(row) for row in list(zip(*grid))))
         processed_grids[i] = rows
     unmarked_numbers:set[int] = {0}
+    last_called_number = -1
     for called_number in called_numbers:
-        for i, egrid in enumerate(grids):
+        for i, _ in enumerate(grids):
             if i not in processed_grids:
                 continue
-            bingo = False
             for j, row in enumerate(processed_grids[i]):
                 if called_number not in row:
                     continue
                 processed_grids[i][j] = row - {called_number}
-                if not len(processed_grids[i][j]):
+                if not processed_grids[i][j]:
                     processed_grids[i].pop(j)
-                    bingo = True
+                    unmarked_numbers = {n for row in processed_grids[i] for n in row}
+                    processed_grids.pop(i)
+                    last_called_number = called_number
                     break
-            if bingo:
-                unmarked_numbers = {n for row in processed_grids[i] for n in row}
-                processed_grids.pop(i)
-                last_called_number = called_number
     sum_unmarked_numbers = sum(unmarked_numbers)
     answer = last_called_number * sum_unmarked_numbers
     return answer
 
 
 # Support Methods --------------------------------------------------------------
-
-
-def configure_logger(verbose: bool):
-    """Configure logging
-
-    :param verbose: display debug and info messages
-    :return: nothing
-    """
-    logger = logging.getLogger()
-    logger.handlers = []
-    stdout = logging.StreamHandler(sys.stdout)
-    stdout.setLevel(level=logging.WARNING)
-    stdout.setFormatter(logging.Formatter(LOG_FORMAT))
-    logger.addHandler(stdout)
-    if verbose:
-        stdout.setLevel(level=logging.DEBUG)
-        logger.setLevel(level=logging.DEBUG)
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse arguments provided by the command-line
-
-    :return: list of decoded arguments
-    """
-    parser = argparse.ArgumentParser(description=__doc__)
-    pa = parser.add_argument
-    pa('filename', type=str, help='input contents filename')
-    pa('-p', '--part', type=int, help='solve only the given part')
-    pa('-v', '--verbose', action='store_true', help='print extra messages')
-    arguments = parser.parse_args()
-    return arguments
 
 
 def main() -> int:

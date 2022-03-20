@@ -38,7 +38,7 @@ Iterating it is!
 The input is only 13 characters long, meaning that input contents can be passed directly through the command line instead of relying on a file.
 
 ```shell
-$ ./day-4.py 168630-718098
+$ ./day_4.py 168630-718098
 ```
 
 # ⚙🚀 Implementation

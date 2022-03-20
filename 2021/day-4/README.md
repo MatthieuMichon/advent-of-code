@@ -137,7 +137,7 @@ The inner loop must iterate over all grids. These grids must contain columns and
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-4.py input.txt -p 1` | `35711` | 62.5 ms
+[`input.txt`](./input.txt) | `./day_4.py input.txt -p 1` | `35711` | 62.5 ms
 
 # 😰🙅 Part Two
 
@@ -235,7 +235,7 @@ def solve_part_two(contents: tuple[list, list]) -> int:
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-4.py input.txt -p 2` | `5586` | 101.0 ms
+[`input.txt`](./input.txt) | `./day_4.py input.txt -p 2` | `5586` | 101.0 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
