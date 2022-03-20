@@ -87,7 +87,7 @@ def main() -> int:
         answer = solve_part_two(depths=contents)
         print(f'part two: {answer=}')
     elapsed_time = time.perf_counter() - start_time
-    print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
+    print(f'done in {1000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
 
 
