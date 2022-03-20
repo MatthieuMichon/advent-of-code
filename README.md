@@ -1,4 +1,4 @@
-[![Python 3.9](https://img.shields.io/badge/python-3.9-brightgreen)](https://www.python.org/downloads/release/python-391/)
+[![Pylint](https://github.com/MatthieuMichon/advent-of-code/actions/workflows/pylint.yml/badge.svg?event=push)](https://github.com/MatthieuMichon/advent-of-code/actions/workflows/pylint.yml)
 
 Solutions in [Python][py] for the [Advent of Code][aoc] annual programming challenge.
 
