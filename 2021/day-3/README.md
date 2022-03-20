@@ -121,7 +121,7 @@ def solve_part_one(diagnostic_report: Iterator[tuple]) -> int:
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-3.py input.txt -p 1` | `852500` | 24.4 ms
+[`input.txt`](./input.txt) | `./day_3.py input.txt -p 1` | `852500` | 24.4 ms
 
 # 😰🙅 Part Two
 
@@ -185,7 +185,7 @@ There is room for improvement has this method could be nearly completely factori
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day-3.py input.txt -p 2` | `1007985` | 36.9 ms
+[`input.txt`](./input.txt) | `./day_3.py input.txt -p 2` | `1007985` | 36.9 ms
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/
