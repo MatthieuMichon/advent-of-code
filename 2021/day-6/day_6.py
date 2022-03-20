@@ -37,11 +37,12 @@ def load_contents(filename: Path) -> [int]:
 
 # Solver Methods ---------------------------------------------------------------
 
+
 DEFAULT_TIMER = 8
 SPAWN_TIME = 7
 
 
-def print_list(list_): # real signature unknown
+def print_list(list_):
     """ Return str(self). """
     return ','.join([str(i) for i in list_])
 
@@ -77,9 +78,9 @@ def solve_part_two(contents: any) -> int:
     duration = 256
     lanternfishes = defaultdict(int)
     lanternfishes.update(dict(Counter(contents)))
-    for day in range(1, 1+duration):
+    for _ in range(1, 1 + duration):
         for timer in range(-1, 8):
-            lanternfishes[timer] = lanternfishes[timer+1]
+            lanternfishes[timer] = lanternfishes[timer + 1]
         lanternfishes[6] += lanternfishes[-1]
         lanternfishes[8] = lanternfishes[-1]
     lanternfishes[-1] = 0
