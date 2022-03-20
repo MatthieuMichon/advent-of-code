@@ -55,42 +55,95 @@ patterns, outputs = [part.strip().split(' ') for part in line.split('|')]
 
 Finishing things up, we will use an iterator meaning instead of returning the entire lists we yield each line at the time.
 
+```python
+def load_contents(filename: Path) -> Generator:
+    """Load and convert contents from file
 
+    :param filename: input filename
+    :return: list of integers
+    """
+    with open(filename, encoding='utf-8') as buffer:
+        for line in buffer.readlines():
+            patterns, outputs = [part.strip().split(' ')
+                                 for part in line.split('|')]
+            yield patterns, outputs
+```
 
+## 💡🙋 Implementation
+
+> In the output values, how many times do digits 1, 4, 7, or 8 appear?
+
+The challenge consists in counting the total number of times the four above digits are found. First thing is to setup appropriate data structures:
+
+```python
+easy_digits = {
+    1: 2,
+    4: 4,
+    7: 3,
+    8: 7,
+}
+```
+
+The expected answer if the count of total number of times these easy digits appear. The heart of the algorithm consists in checking if the number of segments (i.e the length of the output).
+
+```python
+easy_digit_present = len(output) in easy_digits.values()
+```
+
+Next thing is to iterate over all the outputs in a single entry.
+
+```python
+easy_digit_count = sum(len(output) in easy_digits.values() 
+                       for output in outputs)
+```
+
+Following is iterating over all entries.
+
+```python
+easy_digit_count = 0
+for entry in entries:
+    easy_digit_count += sum(len(output) in easy_digits.values() 
+                            for output in outputs)
+```
+
+Adding some boiler-plate code and we get the complete method.
+
+```python
+def solve_part_one(contents: any) -> int:
+    """Solve the first part of the challenge
+
+    :param contents: input puzzle contents
+    :return: expected challenge answer
+    """
+    easy_digits = {
+        1: 2,
+        4: 4,
+        7: 3,
+        8: 7,
+    }
+
+    entries = list(zip(*contents))[1]
+    easy_digit_count = 0
+    for outputs in entries:
+        easy_digit_count += sum(len(output) in easy_digits.values()
+                                for output in outputs)
+    answer = easy_digit_count
+    return answer
+```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_7.py input.txt -p 1` | `337488` | 612.9 ms
+[`input.txt`](./input.txt) | `./day_8.py input.txt -p 1` | `310` | 0.9 ms
 
 # 😰🙅 Part Two
 
 ## 🥺👉👈 Annotated Statement
 
-> As it turns out, crab submarine engines don't burn fuel at a constant rate. Instead, each change of 1 step in horizontal position costs 1 more unit of fuel than the last: the first step costs 1, the second step costs 2, the third step costs 3, and so on.
-
-Meaning that instead of a linear function between the offset and the fuel cost, we now have a polynomial one.
-
 ## 🤔🤯 Puzzle Solver
-
-Let's try the minimal effort first. The idea is to change as little as possible the `compute_fuel_cost()` method used in part one. The sum of integers from 0 to N is the same as the sum of integers from N to 0. Both have(N+1) members and because the sum N times (N+1) obviously being N*(N+1) we can affirm that the sum of 0 to N is N*(N+1)/2.
-
-```python
-def compute_fuel_cost_part_two(h_positions: [int], h_position: int) -> int:
-    """Compute fuel cost for a given configuration
-    
-    :param h_positions: list of initial horizontal positions
-    :param h_position: final horizontal position
-    :return: total fuel required for reaching final position
-    """
-    fuel = sum(abs(h_position - pos)*(1+abs(h_position - pos))/2 for pos in h_positions)
-    return fuel
-```
 
 Contents | Command | Answer | Time
 --- | --- | --- | ---
-[`input.txt`](./input.txt) | `./day_7.py input.txt -p 2` | `89647695` | 1356.6 ms
-
-We can feel there is quite some room for improvement, since the scanning method is very crude.
+[`input.txt`](./input.txt) | `./day_8.py input.txt -p 2` | TBD | TBD
 
 [aoc]: https://adventofcode.com/
 [aoc-2021]: https://adventofcode.com/2021/

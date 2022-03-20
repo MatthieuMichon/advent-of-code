@@ -45,7 +45,19 @@ def solve_part_one(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    answer = len(contents)
+    easy_digits = {
+        1: 2,
+        4: 4,
+        7: 3,
+        8: 7,
+    }
+
+    entries = list(zip(*contents))[1]
+    easy_digit_count = 0
+    for outputs in entries:
+        easy_digit_count += sum(len(output) in easy_digits.values()
+                                for output in outputs)
+    answer = easy_digit_count
     return answer
 
 
@@ -80,7 +92,7 @@ def main() -> int:
     elapsed_time = time.perf_counter() - start_time
     print(f'{answer_part_one=}')
     print(f'{answer_part_two=}')
-    print(f'done in {10000 * elapsed_time:0.1f} milliseconds')
+    print(f'done in {1000 * elapsed_time:0.1f} milliseconds')
     return EXIT_SUCCESS
 
 
