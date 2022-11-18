@@ -9,6 +9,11 @@ Puzzle Solution in Python
 import logging
 import sys
 import time
+from collections import Counter
+from enum import Flag, auto
+from functools import reduce
+from itertools import chain, groupby
+from operator import itemgetter
 from pathlib import Path
 from typing import Generator
 
@@ -61,30 +66,89 @@ def solve_part_one(contents: any) -> int:
     return answer
 
 
-def print_segments(segments: str) -> None:
-    """Print segments according to a convention
+class Segment(Flag):
+    TOP = auto()
+    UPPER_LEFT = auto()
+    UPPER_RIGHT = auto()
+    MIDDLE = auto()
+    LOWER_LEFT = auto()
+    LOWER_RIGHT = auto()
+    BOTTOM = auto()
 
-    :param segments: string of individual segments
-    :return: nothing
-    """
-    if 'a' in segments:
-        print(' #### ')
-    else:
-        print(' ---- ')
-    for _ in range(2):
-        print(f'{"#" if "f" in segments else "-"}    '
-              f'{"#" if "b" in segments else "-"}')
-    if 'g' in segments:
-        print(' #### ')
-    else:
-        print(' ---- ')
-    for _ in range(2):
-        print(f'{"#" if "e" in segments else "-"}    '
-              f'{"#" if "c" in segments else "-"}')
-    if 'd' in segments:
-        print(' #### ')
-    else:
-        print(' ---- ')
+
+SEGMENTS_BY_DIGIT = {
+    0: Segment.TOP | Segment.UPPER_LEFT | Segment.BOTTOM |
+        Segment.LOWER_RIGHT | Segment.UPPER_RIGHT | Segment.LOWER_LEFT,
+    1: Segment.UPPER_RIGHT | Segment.LOWER_RIGHT,
+    2: Segment.TOP | Segment.MIDDLE | Segment.BOTTOM | Segment.UPPER_RIGHT |
+       Segment.LOWER_LEFT,
+    3: Segment.TOP | Segment.MIDDLE | Segment.BOTTOM |
+        Segment.LOWER_RIGHT | Segment.UPPER_RIGHT,
+    4: Segment.UPPER_LEFT | Segment.MIDDLE | Segment.UPPER_RIGHT |
+        Segment.LOWER_RIGHT,
+    5: Segment.TOP | Segment.UPPER_LEFT | Segment.MIDDLE | Segment.BOTTOM |
+        Segment.LOWER_RIGHT,
+    6: Segment.TOP | Segment.UPPER_LEFT | Segment.MIDDLE | Segment.BOTTOM |
+        Segment.LOWER_RIGHT | Segment.LOWER_LEFT,
+    7: Segment.TOP | Segment.UPPER_RIGHT | Segment.LOWER_RIGHT,
+    8: Segment.TOP | Segment.UPPER_LEFT | Segment.MIDDLE | Segment.BOTTOM |
+        Segment.LOWER_RIGHT | Segment.UPPER_RIGHT | Segment.LOWER_LEFT,
+    9: Segment.TOP | Segment.UPPER_LEFT | Segment.MIDDLE | Segment.BOTTOM |
+        Segment.LOWER_RIGHT | Segment.UPPER_RIGHT,
+}
+
+DIGIT_BY_SEGMENT = {v: k for k, v in SEGMENTS_BY_DIGIT.items()}
+NB_SEGMENTS_BY_DIGIT = {k: len(v) for k, v in SEGMENTS_BY_DIGIT.items()}
+DIGITS_BY_NB_SEGMENTS = {k: [ch for ch, _ in v] for k, v in
+                        groupby(sorted(NB_SEGMENTS_BY_DIGIT.items(),
+                                       key=itemgetter(1)), itemgetter(1))}
+DIGITS_BY_SEGMENT = {k: [d for d, v in SEGMENTS_BY_DIGIT.items() if k in v]
+                     for k in Segment}
+OCCURRENCES_BY_SEGMENT = {k: len(v) for k, v in DIGITS_BY_SEGMENT.items()}
+SEGMENTS_BY_OCCURRENCE = {k: [ch for ch, _ in v] for k, v in
+                          groupby(sorted(OCCURRENCES_BY_SEGMENT.items(),
+                                         key=itemgetter(1)), itemgetter(1))}
+
+EXPECTED_NB_SEGMENTS = 10
+
+
+def map_digits(digits):
+
+    # map segment by char for segments with unique occurrence
+
+    char_occurrences = Counter(chain.from_iterable(digits))
+    segment_by_char = {}
+    for char, occurrence in char_occurrences.items():
+        ambiguous_char = (1 != len(SEGMENTS_BY_OCCURRENCE[occurrence]))
+        if ambiguous_char:
+            continue
+        segment_by_char[char] = SEGMENTS_BY_OCCURRENCE[occurrence][0]
+
+    # find digits with unique segment number
+
+    for enabled_chars in sorted(digits, key=len):
+        nb_segments = len(enabled_chars)
+        ambiguous_digit = (1 != len(DIGITS_BY_NB_SEGMENTS[nb_segments]))
+        if ambiguous_digit:
+            continue
+        digit = DIGITS_BY_NB_SEGMENTS[nb_segments][0]
+        unresolved_chars = set(enabled_chars) - set(segment_by_char.keys())
+        for char in enabled_chars:
+            already_resolved = (char not in unresolved_chars)
+            if already_resolved:
+                continue
+            if 1 == len(unresolved_chars):
+                segment = SEGMENTS_BY_DIGIT[digit] & ~ reduce(Flag.__or__, segment_by_char.values())
+                segment_by_char[char] = segment
+    return segment_by_char
+
+
+def map_number(number, char_map):
+    mapped_number_str = ''
+    for digit in number:
+        segments = reduce(Flag.__or__, [char_map[s] for s in digit])
+        mapped_number_str += str(DIGIT_BY_SEGMENT[segments])
+    return int(mapped_number_str)
 
 
 def solve_part_two(contents: any) -> int:
@@ -93,12 +157,11 @@ def solve_part_two(contents: any) -> int:
     :param contents: input puzzle contents
     :return: expected challenge answer
     """
-    known_segment_map = {
-        2: {'upper-right', 'lower-right'},
-        3: {'top', 'upper-right', 'lower-right'},
-        4: {'upper-left', 'middle', 'upper-right', 'lower-right'},
-    }
-    answer = len(contents)
+    answer = 0
+    for digits, output_value in contents:
+        char_map = map_digits(digits=digits)
+        number = map_number(number=output_value, char_map=char_map)
+        answer += number
     return answer
 
 
@@ -111,7 +174,7 @@ def main() -> int:
     configure_logger(verbose=args.verbose)
     log.debug(f'called with {args=}')
     start_time = time.perf_counter()
-    contents = load_contents(filename=args.filename)
+    contents = list(load_contents(filename=args.filename))
     compute_part_one = not args.part or args.part == 1
     answer_part_one = 0
     if compute_part_one:
