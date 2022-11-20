@@ -15,7 +15,8 @@ Day | Puzzle Title | Links | Topics | Part One | Part Two | Runtime
 [5](/2021/day-5) | Hydrothermal Venture | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]| Arrays | ⭐ | ⭐ | 1714.2 ms
 [6](/2021/day-6) | Lanternfish | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-6]| Optimization | ⭐ | ⭐⭐ | 7.7 ms
 [7](/2021/day-7) | The Treachery of Whales | [AoC][aoc-2021-7] - [Reddit][reddit-aoc-2021-7]| List iteration | ⭐ | ⭐ | 1955.9 ms
-[8](/2021/day-8) | Seven Segment Search | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]| List iteration | ⭐ | - | -
+[8](/2021/day-8) | Seven Segment Search | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]| Data structures | ⭐ | ⭐⭐ | 17 ms
+[9](/2021/day-x) | Smoke Basin | [AoC][aoc-2021-9] - [Reddit][reddit-aoc-2021-9]| tbd | tbd | tbd | tbd
 [x](/2021/day-x) | tbd | [AoC][aoc-2021-x] - [Reddit][reddit-aoc-2021-x]| tbd | tbd | tbd | tbd
 
 # Resources
