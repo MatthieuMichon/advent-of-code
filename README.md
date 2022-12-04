@@ -16,10 +16,10 @@ Annual editions: [2021](#-2021), [2020](#-2020-tropical-island-), [2019](#-2019-
 
 > You're minding your own business on a ship at sea when the overboard alarm goes off! You rush to see if you can help. Apparently, one of the Elves tripped and accidentally sent the sleigh keys flying into the ocean!
 
-| 日 | 月 | 火 | 水 | 木 | 金 | 土
-|---|---|---|---|---|---|---
+| 日 | 月 | 火 | 水 | 木                 | 金 | 土
+|---|---|---|---|-------------------|---|---
 | - | - | - | [1](./2021/day-1) | [2](./2021/day-2) | [3](./2021/day-3) | [4](./2021/day-4) |
-| [5](./2021/day-5) | [6](./2021/day-6) | [7](./2021/day-7) | [8](./2021/day-8) | - | - | - |
+| [5](./2021/day-5) | [6](./2021/day-6) | [7](./2021/day-7) | [8](./2021/day-8) | [9](./2021/day-9) | - | - |
 
 # 🎄🌟 [2020: Tropical Island](./2020/) 🎄🌟
 
