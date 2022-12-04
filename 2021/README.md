@@ -17,7 +17,7 @@ Annual editions in Python: **2021**, [2020](/2020), [2019](/2019).
 | [7](/2021/day-7)   | The Treachery of Whales | [AoC][aoc-2021-7] - [Reddit][reddit-aoc-2021-7]   | List iteration           | ⭐        | ⭐        | 1955.9 ms
 | [8](/2021/day-8)   | Seven Segment Search    | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]   | Data structures          | ⭐        | ⭐⭐       | 17 ms
 | [9](/2021/day-9)   | Smoke Basin             | [AoC][aoc-2021-9] - [Reddit][reddit-aoc-2021-9]   | Fill algorithm           | ⭐        | ⭐        | 160 ms
-| [10](/2021/day-10) | Syntax Scoring          | [AoC][aoc-2021-10] - [Reddit][reddit-aoc-2021-10] | Tokenization             | ⭐        | tbd      | tbd
+| [10](/2021/day-10) | Syntax Scoring          | [AoC][aoc-2021-10] - [Reddit][reddit-aoc-2021-10] | Tokenization             | ⭐        | ⭐        | 1.4 ms
 | [xx](/2021/day-xx) | tbd                     | [AoC][aoc-2021-x] - [Reddit][reddit-aoc-2021-x]   | tbd                      | tbd      | tbd      | tbd
 
 # Resources
