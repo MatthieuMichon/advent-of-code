@@ -1,9 +1,17 @@
+#!/usr/bin/env python
+
+"""Advent of Code Programming Puzzles
+
+2021 Edition - Day 10
+Puzzle Solution in Python
+"""
+
 import logging
 import sys
 import time
-from math import prod
 from pathlib import Path
 from typing import Iterator
+
 from common.support import configure_logger, parse_arguments
 
 log = logging.getLogger(__name__)
@@ -60,7 +68,7 @@ def scan_syntax(line: str) -> Iterator[str]:
     :param line: line with zero or more syntax errors
     :return: iterator over syntax errors
     """
-    chunks = list()
+    chunks = []
     for chunk in line:
         opening_token = chunk in OPENING_MAP
         if opening_token:
@@ -79,8 +87,8 @@ def solve_first_part(contents: Iterator[str]) -> int:
     """
     answer = 0
     for line in contents:
-        for se in scan_syntax(line=line):
-            answer += ERROR_SCORE[se]
+        for syntax_error in scan_syntax(line=line):
+            answer += ERROR_SCORE[syntax_error]
             break
     return answer
 
@@ -91,7 +99,7 @@ def autocomplete(line: str) -> str:
     :param line: incomplete line
     :return: iterator over syntax errors
     """
-    chunks = list()
+    chunks = []
     for chunk in line:
         opening_token = chunk in OPENING_MAP
         if opening_token:
@@ -107,7 +115,7 @@ def solve_second_part(contents: Iterator[str]) -> int:
     :param contents:
     :return:
     """
-    scores = list()
+    scores = []
     for line in contents:
         corrupted_line = any(True for _ in scan_syntax(line=line))
         if corrupted_line:
@@ -154,7 +162,8 @@ def main() -> int:
 
 
 if __name__ == '__main__':
-    if 1 == len(sys.argv):
-        script_dir = Path(__file__).parent
-        sys.argv.append(str(script_dir / 'example-input.txt'))
+    NO_INPUT_FILE = 1 == len(sys.argv)
+    if NO_INPUT_FILE:
+        default_input = Path(__file__).parent / 'example-input.txt'
+        sys.argv.append(str(default_input))
     sys.exit(main())
