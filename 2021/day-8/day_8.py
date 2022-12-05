@@ -67,6 +67,7 @@ def solve_part_one(contents: any) -> int:
 
 
 class Segment(Flag):
+    """Display segment enumeration class"""
     TOP = auto()
     UPPER_LEFT = auto()
     UPPER_RIGHT = auto()
@@ -112,7 +113,12 @@ SEGMENTS_BY_OCCURRENCE = {k: [ch for ch, _ in v] for k, v in
 EXPECTED_NB_SEGMENTS = 10
 
 
-def map_digits(digits):
+def map_digits(digits: list) -> dict:
+    """Map digits to segments
+
+    :param digits: list of digits combinations
+    :return: per-character segment map
+    """
 
     # map segment by char for segments with unique occurrence
 
@@ -143,9 +149,15 @@ def map_digits(digits):
     return segment_by_char
 
 
-def map_number(number, char_map):
+def map_number(numbers: list, char_map: dict) -> int:
+    """Map list of numbers into an integer
+
+    :param numbers:
+    :param char_map:
+    :return:
+    """
     mapped_number_str = ''
-    for digit in number:
+    for digit in numbers:
         segments = reduce(Flag.__or__, [char_map[s] for s in digit])
         mapped_number_str += str(DIGIT_BY_SEGMENT[segments])
     return int(mapped_number_str)
@@ -160,7 +172,7 @@ def solve_part_two(contents: any) -> int:
     answer = 0
     for digits, output_value in contents:
         char_map = map_digits(digits=digits)
-        number = map_number(number=output_value, char_map=char_map)
+        number = map_number(numbers=output_value, char_map=char_map)
         answer += number
     return answer
 
