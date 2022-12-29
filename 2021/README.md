@@ -6,19 +6,20 @@ Annual editions in Python: **2021**, [2020](/2020), [2019](/2019).
 
 > Santa has become stranded at the edge of the Solar System while delivering presents to other planets! To accurately calculate his position in space, safely align his warp drive, and return to Earth in time to save Christmas, he needs you to bring him *measurements* from fifty stars.
 
- Day                 | Puzzle Title            | Links                                             | Topics                   | Part One | Part Two | Runtime
-|--------------------|-------------------------|---------------------------------------------------|--------------------------|----------|----------| ---
-| [1](/2021/day-1)   | Sonar Sweep             | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]   | List manipulation        | ⭐        | ⭐        | 20.8 ms
-| [2](/2021/day-2)   | Dive!                   | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]   | List iteration           | ⭐        | ⭐        | 23.2 ms
-| [3](/2021/day-3)   | Binary Diagnostic       | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]   | List iteration           | ⭐        | ⭐        | 46.4 ms
-| [4](/2021/day-4)   | Giant Squid             | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]   | Data structure iteration | ⭐        | ⭐⭐       | 137.7 ms
-| [5](/2021/day-5)   | Hydrothermal Venture    | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]   | Arrays                   | ⭐        | ⭐        | 1714.2 ms
-| [6](/2021/day-6)   | Lanternfish             | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-6]   | Optimization             | ⭐        | ⭐⭐       | 7.7 ms
-| [7](/2021/day-7)   | The Treachery of Whales | [AoC][aoc-2021-7] - [Reddit][reddit-aoc-2021-7]   | List iteration           | ⭐        | ⭐        | 1955.9 ms
-| [8](/2021/day-8)   | Seven Segment Search    | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]   | Data structures          | ⭐        | ⭐⭐       | 17 ms
-| [9](/2021/day-9)   | Smoke Basin             | [AoC][aoc-2021-9] - [Reddit][reddit-aoc-2021-9]   | Fill algorithm           | ⭐        | ⭐        | 160 ms
-| [10](/2021/day-10) | Syntax Scoring          | [AoC][aoc-2021-10] - [Reddit][reddit-aoc-2021-10] | Tokenization             | ⭐        | ⭐        | 1.4 ms
-| [xx](/2021/day-xx) | tbd                     | [AoC][aoc-2021-x] - [Reddit][reddit-aoc-2021-x]   | tbd                      | tbd      | tbd      | tbd
+| Day                | Puzzle Title            | Links                                             | Topics                   | Part One | Part Two | Runtime   |
+|--------------------|-------------------------|---------------------------------------------------|--------------------------|----------|----------|-----------|
+| [1](/2021/day-1)   | Sonar Sweep             | [AoC][aoc-2021-1] - [Reddit][reddit-aoc-2021-1]   | List manipulation        | ⭐        | ⭐        | 20.8 ms   |  
+| [2](/2021/day-2)   | Dive!                   | [AoC][aoc-2021-2] - [Reddit][reddit-aoc-2021-2]   | List iteration           | ⭐        | ⭐        | 23.2 ms   |  
+| [3](/2021/day-3)   | Binary Diagnostic       | [AoC][aoc-2021-3] - [Reddit][reddit-aoc-2021-3]   | List iteration           | ⭐        | ⭐        | 46.4 ms   |  
+| [4](/2021/day-4)   | Giant Squid             | [AoC][aoc-2021-4] - [Reddit][reddit-aoc-2021-4]   | Data structure iteration | ⭐        | ⭐⭐       | 137.7 ms  | 
+| [5](/2021/day-5)   | Hydrothermal Venture    | [AoC][aoc-2021-5] - [Reddit][reddit-aoc-2021-5]   | Arrays                   | ⭐        | ⭐        | 1714.2 ms |
+| [6](/2021/day-6)   | Lanternfish             | [AoC][aoc-2021-6] - [Reddit][reddit-aoc-2021-6]   | Optimization             | ⭐        | ⭐⭐       | 7.7 ms    |   
+| [7](/2021/day-7)   | The Treachery of Whales | [AoC][aoc-2021-7] - [Reddit][reddit-aoc-2021-7]   | List iteration           | ⭐        | ⭐        | 1955.9 ms |
+| [8](/2021/day-8)   | Seven Segment Search    | [AoC][aoc-2021-8] - [Reddit][reddit-aoc-2021-8]   | Data structures          | ⭐        | ⭐⭐       | 17 ms     |    
+| [9](/2021/day-9)   | Smoke Basin             | [AoC][aoc-2021-9] - [Reddit][reddit-aoc-2021-9]   | Fill algorithm           | ⭐        | ⭐        | 160 ms    |   
+| [10](/2021/day-10) | Syntax Scoring          | [AoC][aoc-2021-10] - [Reddit][reddit-aoc-2021-10] | Tokenization             | ⭐        | ⭐        | 1.4 ms    |   
+| [11](/2021/day-11) | Dumbo Octopus           | [AoC][aoc-2021-11] - [Reddit][reddit-aoc-2021-11] | tbd                      | ⭐        | tbd      | 10.7 ms   |
+| [xx](/2021/day-xx) | tbd                     | [AoC][aoc-2021-x] - [Reddit][reddit-aoc-2021-x]   | tbd                      | tbd      | tbd      | tbd       |
 
 # Resources
 
